@@ -1,8 +1,25 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fafaf9;
+  --foreground: #18181b;
+  --surface: #ffffff;
+  --surface-muted: #f4f4f5;
+  --border: rgba(24, 24, 27, 0.09);
+  --ring-focus: rgba(245, 158, 11, 0.35);
+  color-scheme: light;
+}
+
+.dark {
+  --background: #0c0c0e;
+  --foreground: #ececee;
+  --surface: #141418;
+  --surface-muted: #1a1a20;
+  --border: rgba(255, 255, 255, 0.08);
+  --ring-focus: rgba(251, 191, 36, 0.28);
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -12,29 +29,62 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes app-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes nav-item-in {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes sidebar-glow {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+.app-page-enter {
+  animation: app-page-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.nav-item-enter {
+  animation: nav-item-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.sidebar-ambient {
+  animation: sidebar-glow 8s ease-in-out infinite;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-  /* Performance optimizations */
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  /* Prevent layout shift */
   scroll-behavior: smooth;
-  /* Mobile optimizations */
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
 }
 
-/* Optimize animations */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -45,21 +95,18 @@ body {
   }
 }
 
-/* Image and media performance */
 img {
   max-width: 100%;
   height: auto;
   display: block;
 }
 
-/* Button performance and accessibility */
 button {
   cursor: pointer;
   -webkit-user-select: none;
   user-select: none;
 }
 
-/* Touch optimization utility */
 @supports (touch-action: manipulation) {
   button,
   a,
@@ -69,10 +116,9 @@ button {
   }
 }
 
-/* Input optimization */
 input,
 textarea {
-  font-size: 16px; /* Prevent auto-zoom on iOS */
+  font-size: 16px;
   -webkit-appearance: none;
   appearance: none;
 }
@@ -87,30 +133,26 @@ input[type="number"]::-webkit-inner-spin-button {
   margin: 0;
 }
 
-/* Mobile viewport optimization */
 @media (max-width: 640px) {
   body {
-    font-size: 16px; /* Prevent iOS auto-zoom */
+    font-size: 16px;
   }
-  
+
   button,
   a[role="button"],
   input[type="button"],
   input[type="submit"] {
-    min-height: 44px; /* Mobile touch target */
+    min-height: 44px;
     min-width: 44px;
-    /** Prevent double tap zoom **/
     -webkit-user-select: none;
     user-select: none;
   }
-  
-  /* Prevent zoom on input focus for iOS */
+
   input:focus {
     font-size: 16px;
   }
 }
 
-/* Safe area utilities */
 .safe-area-inset {
   padding-top: max(0px, env(safe-area-inset-top));
   padding-left: max(0px, env(safe-area-inset-left));

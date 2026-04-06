@@ -1,85 +1,89 @@
-const CACHE_NAME = "vibecode-v1";
-const urlsToCache = [
-  "/",
-  "/login",
-  "/register",
-  "/wizzard-punkterechner",
+const CACHE_NAME = "vibecode-v2";
+const PRECACHE_URLS = [
   "/manifest.json",
   "/icon-192x192.png",
   "/icon-512x512.png",
 ];
 
-// Install event - cache assets
+// Install — precache only static assets (not HTML: stale HTML breaks Next.js hydration)
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(urlsToCache).catch((err) => {
-        console.warn("Caching failed for some assets:", err);
-      });
-    })
+    caches.open(CACHE_NAME).then((cache) =>
+      cache.addAll(PRECACHE_URLS).catch((err) => {
+        console.warn("Precache failed:", err);
+      }),
+    ),
   );
   self.skipWaiting();
 });
 
-// Activate event - clean up old caches
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    })
+    caches.keys().then((cacheNames) =>
+      Promise.all(
+        cacheNames.map((name) => {
+          if (name !== CACHE_NAME) return caches.delete(name);
+        }),
+      ),
+    ),
   );
   self.clients.claim();
 });
 
-// Fetch event - serve from cache, fallback to network
 self.addEventListener("fetch", (event) => {
-  // Skip non-GET requests
-  if (event.request.method !== "GET") {
+  if (event.request.method !== "GET") return;
+
+  const url = new URL(event.request.url);
+  if (url.origin !== self.location.origin) return;
+
+  const accept = event.request.headers.get("accept") ?? "";
+
+  // Never cache-first HTML: old shells + new chunks = broken interactivity
+  if (
+    event.request.mode === "navigate" ||
+    accept.includes("text/html") ||
+    url.pathname.startsWith("/_next/data/")
+  ) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match("/")),
+    );
     return;
   }
 
-  // Skip cross-origin requests
-  if (!event.request.url.startsWith(self.location.origin)) {
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      if (response) {
-        return response;
-      }
-
-      return fetch(event.request)
+  // Hashed Next chunks: network first (avoids stale bundles), cache for offline retry
+  if (url.pathname.startsWith("/_next/static/")) {
+    event.respondWith(
+      fetch(event.request)
         .then((response) => {
-          // Don't cache non-successful responses
-          if (
-            !response ||
-            response.status !== 200 ||
-            response.type !== "basic"
-          ) {
-            return response;
+          if (response.ok && response.type === "basic") {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, copy);
+            });
           }
-
-          // Clone the response
-          const responseToCache = response.clone();
-
-          // Cache successful responses
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
-
           return response;
         })
-        .catch(() => {
-          // Return a fallback page if offline
-          return caches.match("/");
-        });
-    })
+        .catch(() => caches.match(event.request)),
+    );
+    return;
+  }
+
+  // Other same-origin GET: network first, offline fallback
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        if (
+          response.ok &&
+          response.type === "basic" &&
+          !accept.includes("text/html")
+        ) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, copy);
+          });
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request)),
   );
 });

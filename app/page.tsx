@@ -3,11 +3,7 @@ import { redirect } from "next/navigation";
 import { logoutAction } from "@/app/actions/auth";
 import { getCurrentUser } from "@/lib/auth";
 
-export default function Home() {
-  return <HomeInner />;
-}
-
-async function HomeInner() {
+export default async function Home() {
   const user = await getCurrentUser();
 
   if (!user) {
@@ -15,8 +11,8 @@ async function HomeInner() {
   }
 
   return (
-    <div className="flex flex-col gap-6 h-screen overflow-hidden">
-      <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-950 sm:p-8">
+    <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-hidden">
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-sm sm:p-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="flex-1">
             <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -76,7 +72,8 @@ function Tile({
   disabled?: boolean;
 }) {
   const className =
-    "group flex flex-col gap-2 rounded-2xl border border-zinc-200 bg-white p-5 text-left transition hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700 dark:hover:bg-zinc-900";
+    "group flex flex-col gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 text-left shadow-sm transition-all duration-200 " +
+    "hover:border-amber-300/40 hover:shadow-md dark:hover:border-zinc-600 dark:hover:bg-[var(--surface-muted)]";
 
   if (disabled || !href) {
     return (
@@ -104,17 +101,37 @@ function Tile({
 
 function WizardTile() {
   return (
-    <Link href="/wizzard-punkterechner" className="group flex flex-col gap-3 rounded-2xl border-2 border-amber-900/20 bg-gradient-to-br from-[#020617] to-slate-900/20 p-6 text-left transition hover:border-amber-500/40 hover:shadow-[0_0_20px_rgba(245,158,11,0.2)] overflow-hidden relative">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,#1e1b4b,transparent)] pointer-events-none" />
-      <div className="relative flex flex-col gap-4 flex-1 items-center justify-center">
-        <h2 className="text-3xl md:text-4xl font-serif font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-amber-200 to-amber-500 drop-shadow-[0_2px_10px_rgba(245,158,11,0.3)] text-center">
+    <Link
+      href="/wizzard-punkterechner"
+      className={
+        "group relative flex flex-col gap-3 overflow-hidden rounded-2xl border-2 border-amber-400/35 bg-gradient-to-br " +
+        "from-amber-50 via-white to-amber-100/90 p-6 text-left shadow-sm transition-all duration-300 " +
+        "hover:border-amber-500/55 hover:shadow-[0_12px_40px_-12px_rgba(245,158,11,0.35)] " +
+        "dark:border-amber-500/25 dark:from-[#0a1020] dark:via-[#0f172a] dark:to-[#020617] " +
+        "dark:hover:border-amber-400/40 dark:hover:shadow-[0_12px_40px_-8px_rgba(245,158,11,0.15)]"
+      }
+    >
+      <div
+        className={
+          "pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-10%,#fde68a,transparent)] opacity-90 " +
+          "dark:bg-[radial-gradient(circle_at_50%_-20%,#1e1b4b,transparent)] dark:opacity-100"
+        }
+      />
+      <div className="relative flex flex-1 flex-col items-center justify-center gap-4">
+        <h2
+          className={
+            "text-center font-serif text-3xl font-black tracking-tighter text-transparent md:text-4xl " +
+            "bg-gradient-to-b from-amber-800 to-amber-500 bg-clip-text " +
+            "dark:from-amber-200 dark:to-amber-500 dark:drop-shadow-[0_2px_12px_rgba(245,158,11,0.25)]"
+          }
+        >
           WIZARD
         </h2>
-        <p className="text-[9px] uppercase tracking-[0.3em] text-amber-500/60 font-bold">
+        <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-amber-700/70 dark:text-amber-500/70">
           Score Master
         </p>
       </div>
-      <div className="relative mt-2 text-xs font-medium text-amber-400 group-hover:text-amber-300 transition text-center">
+      <div className="relative mt-2 text-center text-xs font-medium text-amber-700 transition group-hover:text-amber-900 dark:text-amber-400 dark:group-hover:text-amber-300">
         Zum Spiel
       </div>
     </Link>
