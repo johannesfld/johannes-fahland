@@ -11,8 +11,7 @@ type NavItem = {
 
 const NAV: NavItem[] = [
   { href: "/", label: "Home" },
-  { href: "/login", label: "Login" },
-  { href: "/register", label: "Register" },
+  { href: "/wizzard-punkterechner", label: "Wizzard Punkterechner" },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
