@@ -15,8 +15,7 @@ function newSessionToken() {
 
 export type CurrentUser = {
   id: string;
-  email: string;
-  name: string | null;
+  username: string;
 };
 
 export async function createSession(userId: string) {
@@ -45,13 +44,12 @@ export async function createSession(userId: string) {
 export async function deleteCurrentSession() {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
-  if (!token) {
-    cookieStore.delete(SESSION_COOKIE_NAME);
-    return;
+  
+  if (token) {
+    const tokenHash = hashToken(token);
+    await prisma.session.deleteMany({ where: { tokenHash } });
   }
-
-  const tokenHash = hashToken(token);
-  await prisma.session.deleteMany({ where: { tokenHash } });
+  
   cookieStore.delete(SESSION_COOKIE_NAME);
 }
 
@@ -67,19 +65,16 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   });
 
   if (!session) {
-    cookieStore.delete(SESSION_COOKIE_NAME);
     return null;
   }
 
   if (session.expiresAt.getTime() <= Date.now()) {
     await prisma.session.deleteMany({ where: { tokenHash } });
-    cookieStore.delete(SESSION_COOKIE_NAME);
     return null;
   }
 
   return {
     id: session.user.id,
-    email: session.user.email,
-    name: session.user.name,
+    username: session.user.username,
   };
 }
