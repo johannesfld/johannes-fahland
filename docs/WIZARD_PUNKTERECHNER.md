@@ -8,8 +8,8 @@ Diese Seite (`/wizzard-punkterechner`) ist ein **Client-only** Spiel-UI (`Wizard
 2. **`components/AppShell.tsx`** — Shell mit **`flex-row`**: links Sidebar (`md+`), rechts Spalte mit Header (`h-14`) und **`main`**.
 3. **`main`** — `flex flex-1 flex-col min-h-0 overflow-y-auto`; innerer Container `max-w-7xl` + Padding.
 4. **`app/template.tsx`** — umschließt jede Route mit **`flex flex-1 flex-col min-h-0 w-full`**, damit Kinder eine **messbare Höhe** erben können.
-5. **`app/wizzard-punkterechner/layout.tsx`** — volle Breite der Content-Spalte, **negativer Rand** (`-mx-4 -my-4`) gleicht das AppShell-Padding aus (optisch randlos im Hauptbereich).
-6. **`components/wizard/WizardScoreMaster.tsx`** — Spiel-UI.
+5. **`app/wizzard-punkterechner/layout.tsx`** — gleicht das AppShell-Padding aus (`-mx-4 -my-4`, `px-0`) und setzt **`min-h-[calc(100svh-3.5rem)]`** auf kleinen Viewports, damit der Wizard-Bereich unter dem App-Header die volle sichtbare Höhe nutzt (mobil „fullscreen“ im Content-Bereich).
+6. **`components/wizard/WizardScoreMaster.tsx`** — Spiel-UI; **Setup:** Spielernamen als **freie Texteingabe** (max. 32 Zeichen), Validierung auf nicht-leer und eindeutige Namen; Spieleranzahl als **Grid** (`grid-cols-4`), damit Kacheln nicht überlappen.
 
 ## Kritische Regeln
 
@@ -19,7 +19,7 @@ Ein **absolut** positioniertes Root (`absolute inset-0`) **trägt keine Höhe** 
 
 **Lösung:** Die Wizard-Wurzel ist ein **`flex flex-col flex-1 min-h-0`**-Container im normalen Flow. Zusätzlich:
 
-- **`min-h-[calc(100svh-3.5rem-2rem)]`** auf kleinen Viewports (`md:min-h-0`), damit die Höhe auch dann stimmt, wenn die Flex-Kette auf iOS/Android zickt (`svh` berücksichtigt mobile Browser-UI besser als `100vh`).
+- **`min-h-[calc(100svh-3.5rem)]`** auf kleinen Viewports (`md:min-h-0`), abgestimmt auf den Bereich unter dem App-Header (`3.5rem`); `svh` statt `vh` wo sinnvoll für Mobile-Browser.
 
 ### Flex-Kette und `min-h-0`
 

@@ -1,14 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  IconAlert,
-  IconChevronLeft,
-  IconChevronRight,
-  IconClose,
-  IconMinus,
-  IconPlus,
-} from "@/components/ui/icons";
+import { IconAlert, IconClose, IconMinus, IconPlus } from "@/components/ui/icons";
 
 type Player = {
   name: string;
@@ -41,12 +34,11 @@ type GameState = {
 
 const STORAGE_KEY = "wizard-pro-score-v3";
 
-const NAME_POOL = [
-  "Aldar", "Brin", "Cora", "Darian", "Elena", "Finn", "Greta", "Hugo", "Ida",
-  "Jonas", "Klara", "Liam", "Mira", "Nora", "Oskar", "Paula", "Quinn", "Rosa",
-  "Simon", "Thea", "Ulrik", "Vera", "Willi", "Yara", "Zoe",
-  "Spieler 1", "Spieler 2", "Spieler 3", "Spieler 4", "Spieler 5", "Spieler 6",
-];
+const MAX_NAME_LEN = 32;
+
+function defaultPlayerNames(count: number): string[] {
+  return Array.from({ length: count }, (_, i) => `Spieler ${i + 1}`);
+}
 
 const getRoundCount = (players: number) => Math.floor(60 / players);
 
@@ -85,7 +77,7 @@ const INITIAL_STATE: GameState = {
  */
 const shell =
   "relative z-0 flex w-full min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-hidden font-sans selection:bg-amber-500/25 " +
-  "min-h-[calc(100svh-3.5rem-2rem)] md:min-h-0 " +
+  "min-h-[calc(100svh-3.5rem)] md:min-h-0 " +
   "bg-gradient-to-b from-amber-50 via-stone-100 to-amber-100/95 text-amber-950 " +
   "dark:from-[#080d18] dark:via-[#0f172a] dark:to-[#020617] dark:text-amber-50";
 
@@ -160,8 +152,8 @@ function CloseGameButton({ onClick }: { onClick: () => void }) {
 export default function WizardScoreMaster() {
   const [state, setState] = useState<GameState>(INITIAL_STATE);
   const [setupPlayerCount, setSetupPlayerCount] = useState(4);
-  const [nameIndices, setNameIndices] = useState<number[]>(() =>
-    Array.from({ length: 4 }, (_, i) => i % NAME_POOL.length),
+  const [playerNames, setPlayerNames] = useState<string[]>(() =>
+    defaultPlayerNames(4),
   );
   const [error, setError] = useState<string | null>(null);
   const isHydrated = useRef(false);
@@ -244,23 +236,19 @@ export default function WizardScoreMaster() {
   const currentActualBidderIndex = actualOrder[state.currentActualIndex];
   const currentActualBidder = state.players[currentActualBidderIndex];
 
-  const cycleName = useCallback((i: number, delta: number) => {
-    setNameIndices((prev) => {
-      const next = [...prev];
-      const n = NAME_POOL.length;
-      const cur = next[i] ?? 0;
-      next[i] = (((cur + delta) % n) + n) % n;
-      return next;
-    });
-  }, []);
-
   const handleStartGame = useCallback(() => {
     setError(null);
     const playerCount = setupPlayerCount;
-    const names = Array.from({ length: playerCount }, (_, i) => {
-      const idx = nameIndices[i] ?? 0;
-      return NAME_POOL[idx];
-    });
+    const names = playerNames.slice(0, playerCount).map((s) => s.trim());
+    if (names.some((n) => n.length === 0)) {
+      setError("Bitte für jeden Spieler einen Namen eintragen.");
+      return;
+    }
+    const lower = names.map((n) => n.toLowerCase());
+    if (new Set(lower).size !== names.length) {
+      setError("Die Namen müssen sich unterscheiden.");
+      return;
+    }
 
     const randomMixer = Math.floor(Math.random() * playerCount);
     const roundCount = getRoundCount(playerCount);
@@ -277,7 +265,7 @@ export default function WizardScoreMaster() {
       pendingBids: new Array(playerCount).fill(0),
       pendingActuals: new Array(playerCount).fill(0),
     });
-  }, [setupPlayerCount, nameIndices]);
+  }, [setupPlayerCount, playerNames]);
 
   const handleBidSubmit = useCallback(() => {
     setError(null);
@@ -401,9 +389,7 @@ export default function WizardScoreMaster() {
     if (confirm("Möchtest du das aktuelle Spiel wirklich beenden?")) {
       localStorage.removeItem(STORAGE_KEY);
       setState(INITIAL_STATE);
-      setNameIndices(
-        Array.from({ length: setupPlayerCount }, (_, i) => i % NAME_POOL.length),
-      );
+      setPlayerNames(defaultPlayerNames(setupPlayerCount));
     }
   }, [setupPlayerCount]);
 
@@ -421,9 +407,9 @@ export default function WizardScoreMaster() {
 
       <div className="relative flex min-h-0 flex-1 flex-col">
         {state.mainStage === "setup" && (
-          <div className="flex min-h-0 w-full flex-1 items-center justify-center p-2 sm:p-4">
+          <div className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto overscroll-y-contain px-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pt-2 sm:p-4">
             <div
-              className={`${card} w-full max-w-md space-y-4 p-4 sm:space-y-6 sm:p-6 max-h-[90vh] overflow-y-auto`}
+              className={`${card} mx-auto w-full max-w-md space-y-4 p-4 sm:space-y-6 sm:p-6`}
             >
               <div className="space-y-1 text-center sm:space-y-2">
                 <h1 className={titleClass}>WIZARD</h1>
@@ -434,26 +420,24 @@ export default function WizardScoreMaster() {
                 <div className="space-y-3 sm:space-y-4">
                   <div className="block text-center">
                     <span className={labelMuted}>Anzahl der Spieler</span>
-                    <div className="mt-2 flex justify-center gap-2 sm:mt-3">
+                    <div className="mx-auto mt-2 grid w-full max-w-[18rem] grid-cols-4 gap-2 sm:mt-3 sm:max-w-xs sm:gap-3">
                       {[3, 4, 5, 6].map((n) => (
                         <button
                           key={n}
                           type="button"
                           onClick={() => {
                             setSetupPlayerCount(n);
-                            setNameIndices((prev) =>
-                              Array.from({ length: n }, (_, i) => {
-                                const v = prev[i];
-                                return v !== undefined
-                                  ? v
-                                  : i % NAME_POOL.length;
-                              }),
+                            setPlayerNames((prev) =>
+                              Array.from({ length: n }, (_, i) =>
+                                prev[i] !== undefined ? prev[i] : `Spieler ${i + 1}`,
+                              ),
                             );
+                            setError(null);
                           }}
                           className={
-                            `h-12 w-12 rounded-full border-2 font-serif text-base transition-all sm:h-14 sm:w-14 sm:text-lg touch-manipulation ` +
+                            `flex aspect-square w-full max-h-14 shrink-0 items-center justify-center rounded-full border-2 font-serif text-base transition-colors sm:max-h-16 sm:text-lg touch-manipulation ` +
                             (setupPlayerCount === n
-                              ? "scale-100 border-amber-400 bg-amber-500 text-slate-950 shadow-[0_0_20px_rgba(245,158,11,0.35)] dark:border-amber-300 dark:bg-amber-400"
+                              ? "border-amber-400 bg-amber-500 text-slate-950 shadow-[0_0_16px_rgba(245,158,11,0.35)] dark:border-amber-300 dark:bg-amber-400"
                               : "border-amber-300/60 bg-white/60 text-amber-800 hover:bg-amber-100/80 dark:border-slate-600 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:bg-slate-800")
                           }
                         >
@@ -463,49 +447,46 @@ export default function WizardScoreMaster() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <span className={`${labelMuted} mb-2 block text-center`}>
+                  <div className="space-y-3">
+                    <span className={`${labelMuted} block text-center`}>
                       Namen der Spieler
                     </span>
                     {Array.from({ length: setupPlayerCount }).map((_, i) => (
-                      <div
-                        key={i}
-                        className={
-                          "flex items-center gap-2 rounded-2xl border border-amber-200/70 bg-white/60 px-2 py-2 " +
-                          "dark:border-slate-700/80 dark:bg-slate-900/50"
-                        }
-                      >
-                        <button
-                          type="button"
-                          onClick={() => cycleName(i, -1)}
-                          className={
-                            "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border " +
-                            "border-amber-200 bg-white text-amber-800 transition-colors hover:bg-amber-50 " +
-                            "dark:border-slate-600 dark:bg-slate-800 dark:text-amber-200 dark:hover:bg-slate-700"
-                          }
-                          aria-label={`Vorheriger Name Spieler ${i + 1}`}
+                      <label key={i} className="block">
+                        <span
+                          className={`${labelMuted} mb-1.5 block text-left text-[10px] sm:text-xs`}
                         >
-                          <IconChevronLeft className="h-5 w-5" />
-                        </button>
-                        <div className="min-w-0 flex-1 truncate text-center text-sm font-semibold text-amber-950 dark:text-amber-100">
-                          {NAME_POOL[nameIndices[i] ?? 0]}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => cycleName(i, 1)}
+                          Spieler {i + 1}
+                        </span>
+                        <input
+                          type="text"
+                          value={playerNames[i] ?? ""}
+                          onChange={(e) => {
+                            const v = e.target.value.slice(0, MAX_NAME_LEN);
+                            setPlayerNames((prev) => {
+                              const next = [...prev];
+                              next[i] = v;
+                              return next;
+                            });
+                            setError(null);
+                          }}
                           className={
-                            "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border " +
-                            "border-amber-200 bg-white text-amber-800 transition-colors hover:bg-amber-50 " +
-                            "dark:border-slate-600 dark:bg-slate-800 dark:text-amber-200 dark:hover:bg-slate-700"
+                            "w-full rounded-2xl border border-amber-200/80 bg-white/90 px-4 py-3 text-base text-amber-950 shadow-inner outline-none " +
+                            "ring-0 placeholder:text-amber-900/35 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/35 " +
+                            "dark:border-slate-600 dark:bg-slate-900/85 dark:text-amber-50 dark:placeholder:text-slate-500 dark:focus:border-amber-500 dark:focus:ring-amber-500/25"
                           }
-                          aria-label={`Nächster Name Spieler ${i + 1}`}
-                        >
-                          <IconChevronRight className="h-5 w-5" />
-                        </button>
-                      </div>
+                          placeholder={`Name eingeben …`}
+                          autoComplete="off"
+                          autoCapitalize="words"
+                          enterKeyHint="done"
+                          inputMode="text"
+                        />
+                      </label>
                     ))}
                   </div>
                 </div>
+
+                {error ? <ErrorBanner message={error} /> : null}
 
                 <button
                   type="button"
@@ -551,12 +532,12 @@ export default function WizardScoreMaster() {
                     <p className="text-sm font-bold text-amber-950 sm:text-lg dark:text-amber-50">
                       Bitte teile {state.roundNumber} Karten an jeden aus.
                     </p>
-                    <div className="flex flex-wrap justify-center gap-1 sm:gap-2">
+                    <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
                       {state.players.map((p, i) => (
                         <div
                           key={i}
                           className={
-                            `rounded-lg px-2 py-1 text-xs font-bold transition-all sm:px-3 sm:text-sm ` +
+                            `min-h-[2.5rem] min-w-0 break-words rounded-lg px-2 py-2 text-center text-xs font-bold leading-snug sm:text-sm ` +
                             (i === state.mixerIndex
                               ? "bg-amber-500 text-slate-950 dark:bg-amber-400 dark:text-slate-950"
                               : "bg-white/80 text-amber-900 dark:bg-slate-800 dark:text-slate-200")
