@@ -11,91 +11,31 @@ export default async function Home() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-hidden">
-      <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-sm sm:p-8">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto p-4 sm:p-0">
+      {/* User Header */}
+      <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="flex-1">
-            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              Home
-            </h1>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-              Eingeloggt als <span className="font-medium">{user.username}</span>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl text-zinc-900 dark:text-zinc-50">Dashboard</h1>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+              Willkommen zurück, <span className="font-semibold text-amber-500">{user.username}</span>
             </p>
           </div>
-          <form action={logoutAction}>
-            <button
-              type="submit"
-              className="inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-4 text-sm font-semibold text-white hover:bg-zinc-800 active:bg-zinc-700 transition-all duration-200 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 dark:active:bg-zinc-300"
-            >
+          <form action={logoutAction} className="w-full sm:w-auto">
+            <button type="submit" className="w-full sm:w-auto inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-6 text-sm font-bold text-white transition-all hover:bg-zinc-800 active:scale-95 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200">
               Logout
             </button>
           </form>
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 flex-1 overflow-hidden">
+      {/* Grid */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <WizardTile />
-        <Tile
-          title="Platzhalter 1"
-          description="Kommt später."
-          disabled
-        />
-        <Tile
-          title="Platzhalter 2"
-          description="Kommt später."
-          disabled
-        />
-        <Tile
-          title="Platzhalter 3"
-          description="Kommt später."
-          disabled
-        />
-        <Tile
-          title="Platzhalter 4"
-          description="Kommt später."
-          disabled
-        />
+        <KniffelTile />
+        <Tile title="Platzhalter" description="Weitere Spiele folgen." disabled />
       </div>
     </div>
-  );
-}
-
-function Tile({
-  title,
-  description,
-  href,
-  disabled,
-}: {
-  title: string;
-  description: string;
-  href?: string;
-  disabled?: boolean;
-}) {
-  const className =
-    "group flex flex-col gap-2 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 text-left shadow-sm transition-all duration-200 " +
-    "hover:border-amber-300/40 hover:shadow-md dark:hover:border-zinc-600 dark:hover:bg-[var(--surface-muted)]";
-
-  if (disabled || !href) {
-    return (
-      <div className={`${className} opacity-60`}>
-        <div className="text-sm font-semibold tracking-tight">{title}</div>
-        <div className="text-sm text-zinc-600 dark:text-zinc-300">
-          {description}
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <Link href={href} className={className}>
-      <div className="text-sm font-semibold tracking-tight">{title}</div>
-      <div className="text-sm text-zinc-600 dark:text-zinc-300">
-        {description}
-      </div>
-      <div className="mt-2 text-sm font-medium text-zinc-900 group-hover:underline dark:text-zinc-50">
-        Öffnen
-      </div>
-    </Link>
   );
 }
 
@@ -103,37 +43,61 @@ function WizardTile() {
   return (
     <Link
       href="/wizzard-punkterechner"
-      className={
-        "group relative flex flex-col gap-3 overflow-hidden rounded-2xl border-2 border-amber-400/35 bg-gradient-to-br " +
-        "from-amber-50 via-white to-amber-100/90 p-6 text-left shadow-sm transition-all duration-300 " +
-        "hover:border-amber-500/55 hover:shadow-[0_12px_40px_-12px_rgba(245,158,11,0.35)] " +
-        "dark:border-amber-500/25 dark:from-[#0a1020] dark:via-[#0f172a] dark:to-[#020617] " +
-        "dark:hover:border-amber-400/40 dark:hover:shadow-[0_12px_40px_-8px_rgba(245,158,11,0.15)]"
-      }
+      className="group relative flex flex-col gap-3 overflow-hidden rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-50 to-white p-6 text-left shadow-md transition-all duration-300 hover:border-amber-500 hover:shadow-xl dark:border-amber-900/50 dark:from-[#0f172a] dark:to-[#020617] active:scale-[0.98]"
     >
-      <div
-        className={
-          "pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-10%,#fde68a,transparent)] opacity-90 " +
-          "dark:bg-[radial-gradient(circle_at_50%_-20%,#1e1b4b,transparent)] dark:opacity-100"
-        }
-      />
-      <div className="relative flex flex-1 flex-col items-center justify-center gap-4">
-        <h2
-          className={
-            "text-center font-serif text-3xl font-black tracking-tighter text-transparent md:text-4xl " +
-            "bg-gradient-to-b from-amber-800 to-amber-500 bg-clip-text " +
-            "dark:from-amber-200 dark:to-amber-500 dark:drop-shadow-[0_2px_12px_rgba(245,158,11,0.25)]"
-          }
-        >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,#f59e0b20,transparent)] opacity-100" />
+      
+      <div className="relative flex flex-1 flex-col items-center justify-center py-8">
+        <h2 className="text-center font-serif text-[clamp(2.5rem,8vw,4.25rem)] font-black tracking-tighter text-transparent bg-gradient-to-b from-amber-800 to-amber-500 bg-clip-text dark:from-amber-200 dark:to-amber-500 transition-transform duration-500 group-hover:scale-110">
           WIZARD
         </h2>
-        <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-amber-700/70 dark:text-amber-500/70">
-          Score Master
-        </p>
+        <div className="mt-3 h-1.5 w-12 rounded-full bg-amber-200 dark:bg-amber-900/40 transition-all duration-500 group-hover:w-24 group-hover:bg-amber-500" />
       </div>
-      <div className="relative mt-2 text-center text-xs font-medium text-amber-700 transition group-hover:text-amber-900 dark:text-amber-400 dark:group-hover:text-amber-300">
-        Zum Spiel
+
+      <div className="relative flex justify-between items-center mt-2 pt-4 border-t border-amber-100 dark:border-zinc-800/50">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-700/60 dark:text-amber-500/50">
+          Game Assistant
+        </p>
+        <span className="text-xs font-bold text-amber-600 transition-all group-hover:translate-x-1">
+          Öffnen →
+        </span>
       </div>
     </Link>
+  );
+}
+
+function KniffelTile() {
+  return (
+    <Link
+      href="/kniffel-rechner"
+      className="group relative flex flex-col gap-3 overflow-hidden rounded-3xl border border-zinc-200 bg-white p-6 text-left shadow-md transition-all duration-300 hover:border-amber-500 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 active:scale-[0.98]"
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,#f59e0b15,transparent)] opacity-100" />
+      
+      <div className="relative flex flex-1 flex-col items-center justify-center py-8">
+        <h2 className="text-center font-sans text-[clamp(2.4rem,7.6vw,4.1rem)] font-black italic tracking-tighter text-amber-500 transition-transform duration-500 group-hover:scale-110">
+          KNIFFEL
+        </h2>
+        <div className="mt-3 h-1.5 w-12 rounded-full bg-zinc-100 dark:bg-zinc-800 transition-all duration-500 group-hover:w-24 group-hover:bg-amber-500" />
+      </div>
+
+      <div className="relative flex justify-between items-center mt-2 pt-4 border-t border-zinc-100 dark:border-zinc-800/50">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
+          Tabelle
+        </p>
+        <span className="text-xs font-bold text-amber-600 transition-all group-hover:translate-x-1">
+          Öffnen →
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+function Tile({ title, description, disabled }: { title: string; description: string; disabled?: boolean }) {
+  return (
+    <div className={`flex flex-col gap-2 rounded-3xl border border-zinc-200 bg-zinc-50/50 p-6 dark:border-zinc-800 dark:bg-zinc-900/50 opacity-60 ${disabled ? 'cursor-not-allowed' : ''}`}>
+      <div className="text-sm font-bold tracking-tight text-zinc-400 uppercase">{title}</div>
+      <div className="text-sm text-zinc-400 dark:text-zinc-500">{description}</div>
+    </div>
   );
 }

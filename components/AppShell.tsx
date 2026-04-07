@@ -2,26 +2,21 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState, type ComponentType } from "react";
+import { useMemo, useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import {
-  IconClose,
-  IconHome,
-  IconMenu,
-  IconSparkles,
-} from "@/components/ui/icons";
+import { IconClose, IconMenu } from "@/components/ui/icons";
 
 type NavItem = {
   href: string;
   label: string;
-  Icon: ComponentType<{ className?: string }>;
 };
 
 const WIZARD_HREF = "/wizzard-punkterechner";
 
 const NAV: NavItem[] = [
-  { href: "/", label: "Home", Icon: IconHome },
-  { href: WIZARD_HREF, label: "Wizzard Punkterechner", Icon: IconSparkles },
+  { href: "/", label: "Home" },
+  { href: WIZARD_HREF, label: "Wizzard Punkterechner" },
+  { href: "/kniffel-rechner", label: "Kniffel Rechner" },
 ];
 
 function navIsActive(pathname: string | null, href: string) {
@@ -30,9 +25,21 @@ function navIsActive(pathname: string | null, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+function navTypographyByHref(href: string) {
+  if (href === WIZARD_HREF) {
+    return "font-serif font-black tracking-tight text-amber-700 dark:text-amber-300";
+  }
+  if (href === "/kniffel-rechner") {
+    return "font-sans italic font-black tracking-tight text-amber-500 dark:text-amber-400";
+  }
+  return "font-medium tracking-tight text-zinc-700 dark:text-zinc-200";
+}
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
+  const isWizardPage = pathname?.startsWith(WIZARD_HREF) ?? false;
 
   const shouldShowChrome = useMemo(() => {
     if (!pathname) return true;
@@ -54,8 +61,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-dvh min-h-0 w-full min-w-0 flex-row overflow-hidden bg-[var(--background)] text-[var(--foreground)]">
-      {/* Desktop Sidebar */}
-      <aside className="relative hidden w-[17.5rem] shrink-0 flex-col border-r border-[var(--border)] bg-[var(--surface)] md:flex md:shadow-[4px_0_24px_-12px_rgba(0,0,0,0.08)] dark:shadow-[4px_0_28px_-8px_rgba(0,0,0,0.45)]">
+      <aside
+        className={[
+          "relative hidden w-[17.5rem] shrink-0 flex-col border-r border-[var(--border)] bg-[var(--surface)] md:shadow-[4px_0_24px_-12px_rgba(0,0,0,0.08)] dark:shadow-[4px_0_28px_-8px_rgba(0,0,0,0.45)]",
+          desktopSidebarOpen ? "md:flex" : "md:hidden",
+        ].join(" ")}
+      >
         <div
           className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-amber-400/12 to-transparent dark:from-amber-500/10 sidebar-ambient opacity-60"
           aria-hidden
@@ -80,7 +91,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <nav className="flex flex-col gap-1" aria-label="Hauptnavigation">
             {NAV.map((item, index) => {
               const active = navIsActive(pathname, item.href);
-              const { Icon } = item;
               return (
                 <Link
                   key={item.href}
@@ -88,23 +98,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   aria-current={active ? "page" : undefined}
                   style={{ animationDelay: `${index * 45}ms` }}
                   className={[
-                    "nav-item-enter group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                    "nav-item-enter group flex items-center rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
                     "motion-safe:hover:translate-x-0.5",
+                    navTypographyByHref(item.href),
                     active
-                      ? "bg-gradient-to-r from-amber-500/18 to-amber-600/8 text-amber-950 shadow-sm ring-1 ring-amber-500/30 dark:from-amber-400/14 dark:to-amber-600/8 dark:text-amber-50 dark:ring-amber-400/25"
+                      ? "bg-amber-500/16 ring-1 ring-amber-500/30 dark:bg-amber-400/12 dark:ring-amber-400/24"
                       : "text-zinc-600 hover:bg-zinc-100/95 hover:text-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-800/70 dark:hover:text-white",
                   ].join(" ")}
                 >
-                  <span
-                    className={[
-                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors duration-200",
-                      active
-                        ? "bg-amber-500/25 text-amber-900 dark:bg-amber-400/20 dark:text-amber-100"
-                        : "bg-zinc-200/70 text-zinc-600 group-hover:bg-zinc-300/80 dark:bg-zinc-800/90 dark:text-zinc-400 dark:group-hover:bg-zinc-700",
-                    ].join(" ")}
-                  >
-                    <Icon className="h-[18px] w-[18px]" />
-                  </span>
                   <span className="min-w-0 leading-snug">{item.label}</span>
                 </Link>
               );
@@ -152,7 +153,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <nav className="flex flex-col gap-1" aria-label="Hauptnavigation">
               {NAV.map((item) => {
                 const active = navIsActive(pathname, item.href);
-                const { Icon } = item;
                 return (
                   <Link
                     key={item.href}
@@ -160,22 +160,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     onClick={() => setMobileOpen(false)}
                     aria-current={active ? "page" : undefined}
                     className={[
-                      "flex items-center gap-3 rounded-xl px-3 py-3 text-base font-medium transition-colors duration-200",
+                      "flex items-center rounded-xl px-3 py-3 text-base transition-colors duration-200",
+                      navTypographyByHref(item.href),
                       active
-                        ? "bg-amber-500/18 text-amber-950 ring-1 ring-amber-500/30 dark:bg-amber-400/12 dark:text-amber-50 dark:ring-amber-400/22"
+                        ? "bg-amber-500/16 ring-1 ring-amber-500/30 dark:bg-amber-400/12 dark:ring-amber-400/24"
                         : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800/80",
                     ].join(" ")}
                   >
-                    <span
-                      className={[
-                        "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
-                        active
-                          ? "bg-amber-500/25 text-amber-900 dark:bg-amber-400/18 dark:text-amber-100"
-                          : "bg-zinc-200/80 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400",
-                      ].join(" ")}
-                    >
-                      <Icon className="h-5 w-5" />
-                    </span>
                     {item.label}
                   </Link>
                 );
@@ -200,6 +191,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               <IconMenu className="h-5 w-5" />
             </button>
+            <button
+              type="button"
+              onClick={() => setDesktopSidebarOpen((prev) => !prev)}
+              className="hidden h-11 w-11 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] text-[var(--foreground)] transition-colors hover:bg-zinc-100 md:inline-flex dark:hover:bg-zinc-800"
+              aria-label={
+                desktopSidebarOpen ? "Sidebar einklappen" : "Sidebar ausklappen"
+              }
+            >
+              {desktopSidebarOpen ? (
+                <IconClose className="h-5 w-5" />
+              ) : (
+                <IconMenu className="h-5 w-5" />
+              )}
+            </button>
             <Link
               href="/"
               className="text-sm font-semibold tracking-tight text-zinc-800 transition-colors hover:text-amber-600 dark:text-zinc-100 dark:hover:text-amber-400"
@@ -216,10 +221,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     href={item.href}
                     aria-current={active ? "page" : undefined}
                     className={[
-                      "rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200",
+                      "rounded-lg px-3 py-2 text-sm transition-colors duration-200",
+                      navTypographyByHref(item.href),
                       active
-                        ? "bg-amber-500/18 text-amber-900 dark:bg-amber-400/12 dark:text-amber-100"
-                        : "text-zinc-600 hover:text-amber-600 dark:text-zinc-300 dark:hover:text-amber-400",
+                        ? "bg-amber-500/16 ring-1 ring-amber-500/25 dark:bg-amber-400/12 dark:ring-amber-400/20"
+                        : "hover:text-amber-600 dark:hover:text-amber-300",
                     ].join(" ")}
                   >
                     {item.label}
@@ -233,7 +239,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </header>
 
         <main className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-y-contain">
-          <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col px-4 py-4 sm:py-6">
+          <div
+            className={[
+              "flex min-h-0 w-full flex-1 flex-col",
+              isWizardPage ? "px-0 py-0" : "mx-auto max-w-7xl px-4 py-4 sm:py-6",
+            ].join(" ")}
+          >
             {children}
           </div>
         </main>
