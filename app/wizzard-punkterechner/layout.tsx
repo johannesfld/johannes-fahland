@@ -10,9 +10,9 @@ export default function WizzardPunkterechnerLayout({
   return (
     <div
       className={
-        "relative flex w-full max-w-none min-h-0 flex-1 flex-col overflow-hidden " +
-        "-mx-4 -my-4 px-0 sm:-my-6 " +
-        "min-h-[calc(100svh-3.5rem)] md:min-h-0"
+        "relative flex h-full w-full max-w-none min-h-0 flex-1 flex-col overflow-hidden " +
+        "my-0 px-0 " +
+        "min-h-[calc(100dvh-3.5rem)] min-h-[calc(100svh-3.5rem)]"
       }
     >
       {children}

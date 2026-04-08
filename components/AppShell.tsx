@@ -181,7 +181,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       )}
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <header className="safe-area-inset sticky top-0 z-40 flex h-14 shrink-0 items-center border-b border-[var(--border)] bg-[var(--surface)]/85 backdrop-blur-md dark:bg-[var(--surface)]/75">
+        <header className="safe-area-inset sticky top-0 z-40 flex min-h-14 shrink-0 items-center border-b border-[var(--border)] bg-[var(--surface)]/85 pt-[max(env(safe-area-inset-top),0.4rem)] backdrop-blur-md md:h-14 md:min-h-0 md:pt-0 dark:bg-[var(--surface)]/75">
           <div className="mx-auto flex h-full w-full max-w-7xl items-center gap-3 px-4">
             <button
               type="button"
@@ -238,11 +238,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-y-contain">
+        <main className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-y-contain">
           <div
             className={[
               "flex min-h-0 w-full flex-1 flex-col",
-              isWizardPage ? "px-0 py-0" : "mx-auto max-w-7xl px-4 py-4 sm:py-6",
+              isWizardPage
+                ? "h-full min-h-0 px-0 py-0"
+                : "mx-auto max-w-7xl px-4 py-4 sm:py-6",
             ].join(" ")}
           >
             {children}

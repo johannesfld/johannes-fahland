@@ -76,8 +76,7 @@ const INITIAL_STATE: GameState = {
  * collapsed to 0px and showed only the dark gradient. `min-h` backs up the flex chain (svh/mobile).
  */
 const shell =
-  "relative z-0 flex w-full min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-hidden font-sans selection:bg-amber-500/25 " +
-  "min-h-[calc(100svh-3.5rem)] md:min-h-0 " +
+  "relative z-0 flex h-full w-full min-h-0 flex-1 flex-col overflow-hidden font-sans selection:bg-amber-500/25 " +
   "bg-gradient-to-b from-amber-50 via-stone-100 to-amber-100/95 text-amber-950 " +
   "dark:from-[#080d18] dark:via-[#0f172a] dark:to-[#020617] dark:text-amber-50";
 
@@ -100,6 +99,10 @@ const stepperBtn =
   "flex h-16 flex-1 items-center justify-center rounded-xl border-2 border-amber-500 bg-white/90 text-amber-700 " +
   "transition-colors hover:bg-amber-50 active:bg-amber-100 dark:border-amber-400 dark:bg-slate-900/80 dark:text-amber-300 " +
   "dark:hover:bg-slate-800 md:h-16 md:w-16 md:flex-none touch-manipulation";
+
+const stageCenterWrap =
+  "relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto overscroll-y-contain px-3 py-3 " +
+  "pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pt-[max(0.75rem,env(safe-area-inset-top,0px))] sm:px-4 sm:py-4";
 
 function BigNumber({ value }: { value: number }) {
   return (
@@ -407,7 +410,7 @@ export default function WizardScoreMaster() {
 
       <div className="relative flex min-h-0 flex-1 flex-col">
         {state.mainStage === "setup" && (
-          <div className="flex min-h-0 w-full flex-1 flex-col overflow-y-auto overscroll-y-contain px-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pt-2 sm:p-4">
+          <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center overflow-y-auto overscroll-y-contain px-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pt-[max(0.75rem,env(safe-area-inset-top,0px))] sm:px-4 sm:py-4">
             <div
               className={`${card} mx-auto w-full max-w-md space-y-4 p-4 sm:space-y-6 sm:p-6`}
             >
@@ -503,7 +506,7 @@ export default function WizardScoreMaster() {
         {state.mainStage === "game" && (
           <div className="flex min-h-0 w-full flex-1 flex-col">
             {state.gamePhase === "mixer-announcement" && (
-              <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center p-3 sm:p-4">
+              <div className={stageCenterWrap}>
                 <CloseGameButton onClick={resetGame} />
                 <div className="w-full max-w-md space-y-3 text-center sm:space-y-6 app-page-enter">
                   <div className="space-y-2 sm:space-y-3">
@@ -567,7 +570,7 @@ export default function WizardScoreMaster() {
             )}
 
             {state.gamePhase === "bids" && (
-              <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center p-2 sm:p-4">
+              <div className={stageCenterWrap}>
                 <CloseGameButton onClick={resetGame} />
                 <div className="w-full max-w-md space-y-3 text-center sm:space-y-6 app-page-enter">
                   <div className="space-y-1">
@@ -647,7 +650,7 @@ export default function WizardScoreMaster() {
             )}
 
             {state.gamePhase === "actuals" && (
-              <div className="relative flex min-h-0 flex-1 flex-col items-center justify-center p-2 sm:p-4">
+              <div className={stageCenterWrap}>
                 <CloseGameButton onClick={resetGame} />
                 <div className="w-full max-w-md space-y-3 text-center sm:space-y-6 app-page-enter">
                   <div className="space-y-1">
@@ -734,7 +737,7 @@ export default function WizardScoreMaster() {
             )}
 
             {state.gamePhase === "scoreboard" && (
-              <div className="relative flex min-h-0 w-full flex-1 flex-col overflow-y-auto overscroll-y-contain p-2 pb-16 sm:p-4">
+              <div className="relative flex min-h-0 w-full flex-1 flex-col items-center justify-center overflow-y-auto overscroll-y-contain px-3 py-3 pb-16 sm:px-4 sm:py-4">
                 <CloseGameButton onClick={resetGame} />
                 <div className="mx-auto w-full max-w-md space-y-3 sm:space-y-4">
                   <div className="py-2 text-center sm:py-3 app-page-enter">
@@ -857,8 +860,8 @@ export default function WizardScoreMaster() {
         )}
 
         {state.mainStage === "finished" && (
-          <div className="flex min-h-0 w-full flex-1 items-center justify-center p-2 sm:p-4">
-            <div className="max-h-screen w-full max-w-md space-y-3 overflow-y-auto text-center sm:space-y-6 app-page-enter">
+          <div className="flex min-h-0 w-full flex-1 items-center justify-center px-3 py-3 sm:px-4 sm:py-4">
+            <div className="max-h-full w-full max-w-md space-y-3 overflow-y-auto text-center sm:space-y-6 app-page-enter">
               <div className="space-y-1 sm:space-y-2">
                 <h2 className="font-serif text-xl font-bold text-amber-800 sm:text-2xl md:text-3xl dark:text-amber-200">
                   Das Schicksal ist besiegelt!

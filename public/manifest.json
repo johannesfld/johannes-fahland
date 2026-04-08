@@ -5,9 +5,9 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "theme_color": "#000000",
-  "background_color": "#ffffff",
+  "orientation": "any",
+  "theme_color": "#fafaf9",
+  "background_color": "#fafaf9",
   "categories": ["productivity", "games"],
   "screenshots": [
     {

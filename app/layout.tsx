@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
+  maximumScale: 5,
+  userScalable: true,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#fafaf9" },
     { media: "(prefers-color-scheme: dark)", color: "#0c0c0e" },
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: "vibecode projekte",
   },
   formatDetection: {
@@ -79,15 +79,10 @@ export default function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-        <meta name="theme-color" content="#fafaf9" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
-        />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta
           name="apple-mobile-web-app-status-bar-style"
-          content="black-translucent"
+          content="default"
         />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
