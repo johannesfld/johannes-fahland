@@ -16,6 +16,9 @@ const CAT_LABELS: Record<string, string> = {
   kniffel: "Kniffel", chance: "Chance"
 };
 
+const TOP_CATEGORIES: Category[] = ["ones", "twos", "threes", "fours", "fives", "sixes"];
+const BOTTOM_CATEGORIES: Category[] = ["onePair", "twoPairs", "threeKind", "fourKind", "fullHouse", "smallStraight", "largeStraight", "kniffel", "chance"];
+
 // --- Main Component ---
 export default function KniffelApp() {
   const [playerNames, setPlayerNames] = useState(["Spieler 1", "Spieler 2"]);
@@ -105,31 +108,31 @@ export default function KniffelApp() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-sm">
-                    {Object.entries(CAT_LABELS).map(([key, label]) => (
+                    {TOP_CATEGORIES.map((key) => (
                       <tr key={key} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30">
-                        <td className="sticky left-0 z-10 bg-white dark:bg-zinc-900 p-4 font-bold border-r dark:border-zinc-700 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">{label}</td>
+                        <td className="sticky left-0 z-10 bg-white dark:bg-zinc-900 p-4 font-bold border-r dark:border-zinc-700 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">{CAT_LABELS[key]}</td>
                         {scores.map((pScore, pIdx) => (
                           <td key={pIdx} className="p-2">
                             <div className="flex justify-center items-center gap-1">
-                              {FIXED_PTS[key as Category] ? (
+                              {FIXED_PTS[key] ? (
                                 <button 
-                                  onClick={() => updateCell(pIdx, key as Category, pScore[key as Category].score ? null : FIXED_PTS[key as Category]!, false)}
-                                  className={`flex-1 h-10 rounded-lg border-2 font-black transition-all ${pScore[key as Category].score ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-zinc-100 dark:border-zinc-800 text-zinc-300'}`}
+                                  onClick={() => updateCell(pIdx, key, pScore[key].score ? null : FIXED_PTS[key]!, false)}
+                                  className={`flex-1 h-10 rounded-lg border-2 font-black transition-all ${pScore[key].score ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-zinc-100 dark:border-zinc-800 text-zinc-300'}`}
                                 >
-                                  {pScore[key as Category].score || FIXED_PTS[key as Category]}
+                                  {pScore[key].score || FIXED_PTS[key]}
                                 </button>
                               ) : (
                                 <input
                                   type="number" inputMode="numeric"
-                                  value={pScore[key as Category].score ?? ""}
-                                  disabled={pScore[key as Category].crossed}
-                                  onChange={e => updateCell(pIdx, key as Category, e.target.value === "" ? null : parseInt(e.target.value))}
+                                  value={pScore[key].score ?? ""}
+                                  disabled={pScore[key].crossed}
+                                  onChange={e => updateCell(pIdx, key, e.target.value === "" ? null : parseInt(e.target.value))}
                                   className="w-14 h-10 bg-zinc-50 dark:bg-zinc-800 border-2 border-zinc-100 dark:border-zinc-800 rounded-lg text-center font-bold focus:border-amber-500 outline-none disabled:opacity-20 transition-all"
                                 />
                               )}
                               <button 
-                                onClick={() => updateCell(pIdx, key as Category, null, !pScore[key as Category].crossed)}
-                                className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center transition-all ${pScore[key as Category].crossed ? 'bg-red-500 border-red-500 text-white' : 'border-zinc-100 dark:border-zinc-800 text-zinc-200 dark:text-zinc-700'}`}
+                                onClick={() => updateCell(pIdx, key, null, !pScore[key].crossed)}
+                                className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center transition-all ${pScore[key].crossed ? 'bg-red-500 border-red-500 text-white' : 'border-zinc-100 dark:border-zinc-800 text-zinc-200 dark:text-zinc-700'}`}
                               >✕</button>
                             </div>
                           </td>
@@ -139,6 +142,37 @@ export default function KniffelApp() {
                     {/* Summenzeilen */}
                     <SumRow label="Oben (Summe)" players={scores} calc={s => sum(s, ["ones","twos","threes","fours","fives","sixes"])} />
                     <SumRow label="Bonus (+25)" players={scores} calc={s => sum(s, ["ones","twos","threes","fours","fives","sixes"]) >= 63 ? 25 : 0} highlight />
+                    {BOTTOM_CATEGORIES.map((key) => (
+                      <tr key={key} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30">
+                        <td className="sticky left-0 z-10 bg-white dark:bg-zinc-900 p-4 font-bold border-r dark:border-zinc-700 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">{CAT_LABELS[key]}</td>
+                        {scores.map((pScore, pIdx) => (
+                          <td key={pIdx} className="p-2">
+                            <div className="flex justify-center items-center gap-1">
+                              {FIXED_PTS[key] ? (
+                                <button
+                                  onClick={() => updateCell(pIdx, key, pScore[key].score ? null : FIXED_PTS[key]!, false)}
+                                  className={`flex-1 h-10 rounded-lg border-2 font-black transition-all ${pScore[key].score ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-zinc-100 dark:border-zinc-800 text-zinc-300'}`}
+                                >
+                                  {pScore[key].score || FIXED_PTS[key]}
+                                </button>
+                              ) : (
+                                <input
+                                  type="number" inputMode="numeric"
+                                  value={pScore[key].score ?? ""}
+                                  disabled={pScore[key].crossed}
+                                  onChange={e => updateCell(pIdx, key, e.target.value === "" ? null : parseInt(e.target.value))}
+                                  className="w-14 h-10 bg-zinc-50 dark:bg-zinc-800 border-2 border-zinc-100 dark:border-zinc-800 rounded-lg text-center font-bold focus:border-amber-500 outline-none disabled:opacity-20 transition-all"
+                                />
+                              )}
+                              <button
+                                onClick={() => updateCell(pIdx, key, null, !pScore[key].crossed)}
+                                className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center transition-all ${pScore[key].crossed ? 'bg-red-500 border-red-500 text-white' : 'border-zinc-100 dark:border-zinc-800 text-zinc-200 dark:text-zinc-700'}`}
+                              >✕</button>
+                            </div>
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
                     <SumRow label="Gesamt" players={scores} calc={calculateTotal} highlight large />
                   </tbody>
                 </table>
