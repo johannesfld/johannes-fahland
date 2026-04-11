@@ -1,0 +1,17 @@
+name: Auto Deploy
+on:
+  push:
+    branches: [ main ] # Falls dein Haupt-Branch "master" heißt, ändere das hier
+
+jobs:
+  deploy:
+    runs-on: self-hosted # Das sagt GitHub: "Mach das auf meinem Pi!"
+    steps:
+      - name: Code vom Repo holen
+        uses: actions/checkout@v4
+
+      - name: Update App
+        run: |
+          npm install
+          npm run build
+          pm2 restart next-website
