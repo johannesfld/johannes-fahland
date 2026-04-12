@@ -1,7 +1,7 @@
 name: Auto Deploy
 on:
   push:
-    branches: [ main ] # Falls dein Haupt-Branch "master" heißt, ändere das hier
+    branches: [ master ] # Falls dein Haupt-Branch "master" heißt, ändere das hier
 
 jobs:
   deploy:
