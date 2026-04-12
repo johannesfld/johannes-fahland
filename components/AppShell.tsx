@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
+import { BrandingLogo } from "@/components/BrandingLogo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { IconClose, IconMenu } from "@/components/ui/icons";
 
@@ -12,11 +13,13 @@ type NavItem = {
 };
 
 const WIZARD_HREF = "/wizzard-punkterechner";
+const SCHIFFE_HREF = "/schiffe-versenken";
 
 const NAV: NavItem[] = [
   { href: "/", label: "Home" },
   { href: WIZARD_HREF, label: "Wizzard Punkterechner" },
   { href: "/kniffel-rechner", label: "Kniffel Rechner" },
+  { href: SCHIFFE_HREF, label: "Schiffe versenken" },
 ];
 
 function navIsActive(pathname: string | null, href: string) {
@@ -32,6 +35,9 @@ function navTypographyByHref(href: string) {
   if (href === "/kniffel-rechner") {
     return "font-sans italic font-black tracking-tight text-amber-500 dark:text-amber-400";
   }
+  if (href === SCHIFFE_HREF) {
+    return "font-sans font-black tracking-tight text-sky-700 dark:text-sky-300";
+  }
   return "font-medium tracking-tight text-zinc-700 dark:text-zinc-200";
 }
 
@@ -39,7 +45,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
-  const isWizardPage = pathname?.startsWith(WIZARD_HREF) ?? false;
+  const isFullBleedPage =
+    (pathname?.startsWith(WIZARD_HREF) ?? false) ||
+    (pathname?.startsWith(SCHIFFE_HREF) ?? false);
 
   const shouldShowChrome = useMemo(() => {
     if (!pathname) return true;
@@ -63,19 +71,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex h-dvh min-h-0 w-full min-w-0 flex-row overflow-hidden bg-[var(--background)] text-[var(--foreground)]">
       <aside
         className={[
-          "relative hidden w-[17.5rem] shrink-0 flex-col border-r border-[var(--border)] bg-[var(--surface)] md:shadow-[4px_0_24px_-12px_rgba(0,0,0,0.08)] dark:shadow-[4px_0_28px_-8px_rgba(0,0,0,0.45)]",
+          "relative hidden w-[17.5rem] shrink-0 flex-col border-r border-[var(--border)] bg-gradient-to-b from-zinc-50 to-[var(--surface)] md:shadow-[4px_0_24px_-12px_rgba(0,0,0,0.08)] dark:from-zinc-800 dark:to-[var(--surface)] dark:shadow-[4px_0_28px_-8px_rgba(0,0,0,0.45)]",
           desktopSidebarOpen ? "md:flex" : "md:hidden",
         ].join(" ")}
       >
-        <div
-          className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-amber-400/12 to-transparent dark:from-amber-500/10 sidebar-ambient opacity-60"
-          aria-hidden
-        />
         <div className="relative flex flex-col gap-5 px-4 pb-4 pt-6">
-          <div className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)]/80 p-3 shadow-sm backdrop-blur-md dark:bg-zinc-900/40">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-sm font-bold text-zinc-950 shadow-md ring-2 ring-amber-400/25 dark:from-amber-300 dark:to-amber-600 dark:ring-amber-300/20">
-              V
-            </div>
+          <div className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-zinc-50/95 p-3 shadow-sm backdrop-blur-md dark:border-zinc-700/80 dark:bg-zinc-800/85">
+            <BrandingLogo />
             <div className="min-w-0">
               <h1 className="truncate text-sm font-bold tracking-tight">
                 vibecode projekte
@@ -181,7 +183,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       )}
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <header className="safe-area-inset sticky top-0 z-40 flex min-h-14 shrink-0 items-center border-b border-[var(--border)] bg-[var(--surface)]/85 pt-[max(env(safe-area-inset-top),0.4rem)] backdrop-blur-md md:h-14 md:min-h-0 md:pt-0 dark:bg-[var(--surface)]/75">
+        <header className="safe-area-inset sticky top-0 z-40 flex min-h-14 shrink-0 items-center border-b border-[var(--border)] bg-zinc-50/95 pt-[max(env(safe-area-inset-top),0.4rem)] backdrop-blur-md md:h-14 md:min-h-0 md:pt-0 dark:border-zinc-700/80 dark:bg-zinc-800/85">
           <div className="mx-auto flex h-full w-full max-w-7xl items-center gap-3 px-4">
             <button
               type="button"
@@ -207,9 +209,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </button>
             <Link
               href="/"
-              className="text-sm font-semibold tracking-tight text-zinc-800 transition-colors hover:text-amber-600 dark:text-zinc-100 dark:hover:text-amber-400"
+              className="flex min-w-0 items-center gap-2 text-sm font-semibold tracking-tight text-zinc-800 transition-colors hover:text-amber-600 dark:text-zinc-100 dark:hover:text-amber-400"
             >
-              vibecode projekte
+              <BrandingLogo className="!h-9 !w-9" />
+              <span className="truncate">vibecode projekte</span>
             </Link>
             <div className="hidden flex-1 md:block" />
             <nav className="hidden items-center gap-1 md:flex">
@@ -242,7 +245,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div
             className={[
               "flex min-h-0 w-full flex-1 flex-col",
-              isWizardPage
+              isFullBleedPage
                 ? "h-full min-h-0 px-0 py-0"
                 : "mx-auto max-w-7xl px-4 py-4 sm:py-6",
             ].join(" ")}

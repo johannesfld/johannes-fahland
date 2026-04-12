@@ -33,7 +33,7 @@ export default async function Home() {
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <WizardTile />
         <KniffelTile />
-        <Tile title="Platzhalter" description="Weitere Spiele folgen." disabled />
+        <SchiffeTile />
       </div>
     </div>
   );
@@ -93,11 +93,30 @@ function KniffelTile() {
   );
 }
 
-function Tile({ title, description, disabled }: { title: string; description: string; disabled?: boolean }) {
+function SchiffeTile() {
   return (
-    <div className={`flex flex-col gap-2 rounded-3xl border border-zinc-200 bg-zinc-50/50 p-6 dark:border-zinc-800 dark:bg-zinc-900/50 opacity-60 ${disabled ? 'cursor-not-allowed' : ''}`}>
-      <div className="text-sm font-bold tracking-tight text-zinc-400 uppercase">{title}</div>
-      <div className="text-sm text-zinc-400 dark:text-zinc-500">{description}</div>
-    </div>
+    <Link
+      href="/schiffe-versenken"
+      className="group relative flex flex-col gap-3 overflow-hidden rounded-3xl border border-sky-200 bg-gradient-to-br from-sky-50 to-white p-6 text-left shadow-md transition-all duration-300 hover:border-sky-500 hover:shadow-xl dark:border-sky-900/40 dark:from-[#0c1222] dark:to-[#020617] active:scale-[0.98]"
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,#0ea5e920,transparent)] opacity-100" />
+      <div className="relative flex flex-1 flex-col items-center justify-center py-8">
+        <h2 className="text-center font-sans text-[clamp(1.6rem,5.5vw,2.75rem)] font-black tracking-tight text-sky-700 transition-transform duration-500 group-hover:scale-105 dark:text-sky-300">
+          SCHIFFE
+        </h2>
+        <p className="mt-1 text-center text-xs font-bold uppercase tracking-widest text-sky-600/80 dark:text-sky-400/80">
+          versenken · Solo
+        </p>
+        <div className="mt-3 h-1.5 w-12 rounded-full bg-sky-200 transition-all duration-500 group-hover:w-24 group-hover:bg-sky-500 dark:bg-sky-900/50" />
+      </div>
+      <div className="relative flex justify-between items-center mt-2 pt-4 border-t border-sky-100 dark:border-zinc-800/50">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-sky-700/60 dark:text-sky-500/50">
+          Gegen den Computer
+        </p>
+        <span className="text-xs font-bold text-sky-600 transition-all group-hover:translate-x-1 dark:text-sky-400">
+          Öffnen →
+        </span>
+      </div>
+    </Link>
   );
 }

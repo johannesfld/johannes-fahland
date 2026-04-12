@@ -51,26 +51,12 @@
   }
 }
 
-@keyframes sidebar-glow {
-  0%,
-  100% {
-    opacity: 0.45;
-  }
-  50% {
-    opacity: 0.75;
-  }
-}
-
 .app-page-enter {
   animation: app-page-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .nav-item-enter {
   animation: nav-item-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.sidebar-ambient {
-  animation: sidebar-glow 8s ease-in-out infinite;
 }
 
 html,

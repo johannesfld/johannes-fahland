@@ -6,9 +6,15 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted # Das sagt GitHub: "Mach das auf meinem Pi!"
+    defaults:
+      run:
+        working-directory: /home/johannes/apps/my-website
     steps:
       - name: Code vom Repo holen
         uses: actions/checkout@v4
+        with: 
+          path: /home/johannes/apps/my-website
+          clean: false # Verhindert, dass deine .env oder die DB gelöscht wird!
 
       - name: Build and Restart
         run: |

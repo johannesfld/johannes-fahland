@@ -1,8 +1,8 @@
-const CACHE_NAME = "vibecode-v2";
+const CACHE_NAME = "vibecode-v3";
 const PRECACHE_URLS = [
   "/manifest.json",
-  "/icon-192x192.png",
-  "/icon-512x512.png",
+  "/icon-192x192.svg",
+  "/icon-512x512.svg",
 ];
 
 // Install — precache only static assets (not HTML: stale HTML breaks Next.js hydration)
