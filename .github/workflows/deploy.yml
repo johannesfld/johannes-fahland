@@ -1,27 +1,40 @@
-name: Auto Deploy
+name: Deploy Website
 on:
   push:
-    branches: [ master ] # Falls dein Haupt-Branch "master" heißt, ändere das hier
+    branches:
+      - main
+      - master
 
 jobs:
   deploy:
-    runs-on: self-hosted # Das sagt GitHub: "Mach das auf meinem Pi!"
-    defaults:
-      run:
-        working-directory: /home/johannes/apps/my-website
+    runs-on: self-hosted
     steps:
+      # 1. Code in den Standard-Runner-Ordner laden
       - name: Code vom Repo holen
         uses: actions/checkout@v4
-        with: 
-          path: /home/johannes/apps/my-website
-          clean: false # Verhindert, dass deine .env oder die DB gelöscht wird!
 
-      - name: Build and Restart
+      # 2. Code zum Zielordner schieben (ohne die .env zu löschen!)
+      - name: Dateien zum Zielordner kopieren
         run: |
-          cd ~/apps/my-website
-          # Nur neue Pakete installieren, ohne alles jedes Mal zu prüfen
+          mkdir -p /home/johannes/apps/my-website
+          # rsync kopiert nur Änderungen und lässt die .env Datei in Ruhe
+          rsync -av --exclude='.git' --exclude='.env' ./ /home/johannes/apps/my-website/
+
+      # 3. Build & Restart im Zielordner
+      - name: Build and Restart
+        working-directory: /home/johannes/apps/my-website
+        run: |
+          # Platz schaffen vor dem Start
+          npm cache clean --force
+          
+          # Installation & Build
           npm install --no-audit --no-fund
-          # Dem Pi helfen: Node mehr Speicher erlauben (virtuell)
-          export NODE_OPTIONS="--max-old-space-size=1536"
+          npx prisma generate
+          
+          # Dem Pi beim Build helfen (RAM Limit)
+          export NODE_OPTIONS="--max-old-space-size=1024"
           npm run build
-          pm2 restart next-website
+          
+          # Neustart
+          pm2 restart next-website || pm2 start npm --name "next-website" -- start
+          pm2 save
