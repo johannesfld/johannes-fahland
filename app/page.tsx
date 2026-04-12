@@ -16,7 +16,7 @@ export default async function Home() {
       <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="flex-1">
-            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl text-zinc-900 dark:text-zinc-50">Dashboard Hi</h1>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl text-zinc-900 dark:text-zinc-50">Dashboard Hello</h1>
             <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
               Willkommen zurück, <span className="font-semibold text-amber-500">{user.username}</span>
             </p>
