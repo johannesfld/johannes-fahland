@@ -5,6 +5,7 @@ import { IconAlert, IconClose, IconMinus, IconPlus } from "@/components/ui/icons
 
 type Player = {
   name: string;
+  isDummy: boolean;
   totalScore: number;
   history: RoundResult[];
 };
@@ -17,7 +18,12 @@ type RoundResult = {
 };
 
 type MainStage = "setup" | "game" | "finished";
-type GamePhase = "mixer-announcement" | "bids" | "actuals" | "scoreboard";
+type GamePhase =
+  | "rules"
+  | "mixer-announcement"
+  | "bids"
+  | "actuals"
+  | "scoreboard";
 
 type GameState = {
   mainStage: MainStage;
@@ -33,18 +39,43 @@ type GameState = {
 };
 
 const STORAGE_KEY = "wizard-pro-score-v3";
+const DUMMY_PLAYER_NAME = "Bruv";
 
 const MAX_NAME_LEN = 32;
-
-function defaultPlayerNames(count: number): string[] {
-  return Array.from({ length: count }, (_, i) => `Spieler ${i + 1}`);
-}
 
 const getRoundCount = (players: number) => Math.floor(60 / players);
 
 const calculatePoints = (bid: number, actual: number) => {
   if (bid === actual) return 20 + actual * 10;
   return -Math.abs(bid - actual) * 10;
+};
+
+const isDummyPlayer = (player: Player | undefined) =>
+  Boolean(player && (player.isDummy || player.name === DUMMY_PLAYER_NAME));
+
+const getEligibleMixerIndexes = (players: Player[]): number[] => {
+  const humanIndexes = players
+    .map((player, index) => ({ player, index }))
+    .filter(({ player }) => !isDummyPlayer(player))
+    .map(({ index }) => index);
+  if (humanIndexes.length > 0) return humanIndexes;
+  return players.map((_, index) => index);
+};
+
+const getRandomMixerIndex = (players: Player[]) => {
+  const eligibleMixerIndexes = getEligibleMixerIndexes(players);
+  return eligibleMixerIndexes[
+    Math.floor(Math.random() * eligibleMixerIndexes.length)
+  ];
+};
+
+const getNextMixerIndex = (players: Player[], currentMixerIndex: number) => {
+  const eligibleMixerIndexes = getEligibleMixerIndexes(players);
+  const currentPos = eligibleMixerIndexes.indexOf(currentMixerIndex);
+  if (currentPos === -1) return eligibleMixerIndexes[0] ?? 0;
+  return (
+    eligibleMixerIndexes[(currentPos + 1) % eligibleMixerIndexes.length] ?? 0
+  );
 };
 
 const getNextBidderIndex = (mixerIndex: number, playerCount: number) =>
@@ -154,9 +185,9 @@ function CloseGameButton({ onClick }: { onClick: () => void }) {
 
 export default function WizardScoreMaster() {
   const [state, setState] = useState<GameState>(INITIAL_STATE);
-  const [setupPlayerCount, setSetupPlayerCount] = useState(4);
+  const [setupPlayerCount, setSetupPlayerCount] = useState(2);
   const [playerNames, setPlayerNames] = useState<string[]>(() =>
-    defaultPlayerNames(4),
+    Array.from({ length: 2 }, () => ""),
   );
   const [error, setError] = useState<string | null>(null);
   const isHydrated = useRef(false);
@@ -232,8 +263,12 @@ export default function WizardScoreMaster() {
     getNextBidderIndex(state.mixerIndex, state.players.length),
     state.players.length,
   );
-  const currentBidderIndex = bidderOrder[state.currentBidderIndex];
-  const currentBidder = state.players[currentBidderIndex];
+  const biddingPlayerOrder = bidderOrder.filter(
+    (playerIndex) => !isDummyPlayer(state.players[playerIndex]),
+  );
+  const currentBidderPlayerIndex =
+    biddingPlayerOrder[state.currentBidderIndex] ?? biddingPlayerOrder[0] ?? 0;
+  const currentBidder = state.players[currentBidderPlayerIndex];
 
   const actualOrder = getPlayerOrder(0, state.players.length);
   const currentActualBidderIndex = actualOrder[state.currentActualIndex];
@@ -241,25 +276,39 @@ export default function WizardScoreMaster() {
 
   const handleStartGame = useCallback(() => {
     setError(null);
-    const playerCount = setupPlayerCount;
-    const names = playerNames.slice(0, playerCount).map((s) => s.trim());
-    if (names.some((n) => n.length === 0)) {
-      setError("Bitte für jeden Spieler einen Namen eintragen.");
+    const selectedPlayerCount = setupPlayerCount;
+    const names = playerNames
+      .slice(0, selectedPlayerCount)
+      .map((s, i) => s.trim() || `Spieler ${i + 1}`);
+    if (
+      selectedPlayerCount === 2 &&
+      names.some((n) => n.toLowerCase() === DUMMY_PLAYER_NAME.toLowerCase())
+    ) {
+      setError(`"${DUMMY_PLAYER_NAME}" ist für den Dummy-Spieler reserviert.`);
       return;
     }
+    const finalNames =
+      selectedPlayerCount === 2 ? [...names, DUMMY_PLAYER_NAME] : names;
     const lower = names.map((n) => n.toLowerCase());
     if (new Set(lower).size !== names.length) {
       setError("Die Namen müssen sich unterscheiden.");
       return;
     }
 
-    const randomMixer = Math.floor(Math.random() * playerCount);
+    const players = finalNames.map((name) => ({
+      name,
+      isDummy: name === DUMMY_PLAYER_NAME,
+      totalScore: 0,
+      history: [],
+    }));
+    const playerCount = players.length;
+    const randomMixer = getRandomMixerIndex(players);
     const roundCount = getRoundCount(playerCount);
 
     setState({
       mainStage: "game",
-      gamePhase: "mixer-announcement",
-      players: names.map((name) => ({ name, totalScore: 0, history: [] })),
+      gamePhase: selectedPlayerCount === 2 ? "rules" : "mixer-announcement",
+      players,
       totalRounds: roundCount,
       roundNumber: 1,
       mixerIndex: randomMixer,
@@ -274,10 +323,13 @@ export default function WizardScoreMaster() {
     setError(null);
 
     const isLastBidder =
-      state.currentBidderIndex === state.players.length - 1;
+      state.currentBidderIndex === biddingPlayerOrder.length - 1;
 
     if (isLastBidder) {
-      const sumBids = state.pendingBids.reduce((a, b) => a + b, 0);
+      const sumBids = biddingPlayerOrder.reduce(
+        (sum, idx) => sum + state.pendingBids[idx],
+        0,
+      );
       if (sumBids === state.roundNumber) {
         setError(
           `Die Summe der Ansagen darf nicht ${state.roundNumber} sein.`,
@@ -297,7 +349,7 @@ export default function WizardScoreMaster() {
     }
   }, [
     state.currentBidderIndex,
-    state.players.length,
+    biddingPlayerOrder,
     state.pendingBids,
     state.roundNumber,
   ]);
@@ -318,10 +370,9 @@ export default function WizardScoreMaster() {
       }
 
       const updatedPlayers = state.players.map((p, i) => {
-        const points = calculatePoints(
-          state.pendingBids[i],
-          state.pendingActuals[i],
-        );
+        const points = isDummyPlayer(p)
+          ? state.pendingActuals[i] * 10
+          : calculatePoints(state.pendingBids[i], state.pendingActuals[i]);
         return {
           ...p,
           totalScore: p.totalScore + points,
@@ -368,7 +419,7 @@ export default function WizardScoreMaster() {
       }));
     } else {
       const nextRound = state.roundNumber + 1;
-      const nextMixerIndex = (state.mixerIndex + 1) % state.players.length;
+      const nextMixerIndex = getNextMixerIndex(state.players, state.mixerIndex);
 
       setState((prev) => ({
         ...prev,
@@ -392,7 +443,7 @@ export default function WizardScoreMaster() {
     if (confirm("Möchtest du das aktuelle Spiel wirklich beenden?")) {
       localStorage.removeItem(STORAGE_KEY);
       setState(INITIAL_STATE);
-      setPlayerNames(defaultPlayerNames(setupPlayerCount));
+      setPlayerNames(Array.from({ length: setupPlayerCount }, () => ""));
     }
   }, [setupPlayerCount]);
 
@@ -423,8 +474,8 @@ export default function WizardScoreMaster() {
                 <div className="space-y-3 sm:space-y-4">
                   <div className="block text-center">
                     <span className={labelMuted}>Anzahl der Spieler</span>
-                    <div className="mx-auto mt-2 grid w-full max-w-[18rem] grid-cols-4 gap-2 sm:mt-3 sm:max-w-xs sm:gap-3">
-                      {[3, 4, 5, 6].map((n) => (
+                    <div className="mx-auto mt-2 grid w-full max-w-[18rem] grid-cols-5 gap-2 sm:mt-3 sm:max-w-xs sm:gap-3">
+                      {[2, 3, 4, 5, 6].map((n) => (
                         <button
                           key={n}
                           type="button"
@@ -432,7 +483,7 @@ export default function WizardScoreMaster() {
                             setSetupPlayerCount(n);
                             setPlayerNames((prev) =>
                               Array.from({ length: n }, (_, i) =>
-                                prev[i] !== undefined ? prev[i] : `Spieler ${i + 1}`,
+                                prev[i] ?? "",
                               ),
                             );
                             setError(null);
@@ -475,10 +526,10 @@ export default function WizardScoreMaster() {
                           }}
                           className={
                             "w-full rounded-2xl border border-amber-200/80 bg-white/90 px-4 py-3 text-base text-amber-950 shadow-inner outline-none " +
-                            "ring-0 placeholder:text-amber-900/35 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/35 " +
-                            "dark:border-slate-600 dark:bg-slate-900/85 dark:text-amber-50 dark:placeholder:text-slate-500 dark:focus:border-amber-500 dark:focus:ring-amber-500/25"
+                            "ring-0 placeholder:text-amber-700/45 focus:border-amber-400 focus:ring-2 focus:ring-amber-400/35 " +
+                            "dark:border-slate-600 dark:bg-slate-900/85 dark:text-amber-50 dark:placeholder:text-amber-400/45 dark:focus:border-amber-500 dark:focus:ring-amber-500/25"
                           }
-                          placeholder={`Name eingeben …`}
+                          placeholder={`Spieler ${i + 1}`}
                           autoComplete="off"
                           autoCapitalize="words"
                           enterKeyHint="done"
@@ -486,6 +537,24 @@ export default function WizardScoreMaster() {
                         />
                       </label>
                     ))}
+                    {setupPlayerCount === 2 && (
+                      <label className="block opacity-60">
+                        <span
+                          className={`${labelMuted} mb-1.5 block text-left text-[10px] sm:text-xs`}
+                        >
+                          Dummy-Spieler
+                        </span>
+                        <input
+                          type="text"
+                          value={DUMMY_PLAYER_NAME}
+                          disabled
+                          className={
+                            "w-full rounded-2xl border border-amber-200/80 bg-white/70 px-4 py-3 text-base text-amber-900/70 shadow-inner outline-none " +
+                            "dark:border-slate-600 dark:bg-slate-900/65 dark:text-amber-100/65"
+                          }
+                        />
+                      </label>
+                    )}
                   </div>
                 </div>
 
@@ -569,6 +638,50 @@ export default function WizardScoreMaster() {
               </div>
             )}
 
+            {state.gamePhase === "rules" && (
+              <div className={stageCenterWrap}>
+                <CloseGameButton onClick={resetGame} />
+                <div className="w-full max-w-md space-y-3 text-center sm:space-y-6 app-page-enter">
+                  <div className="space-y-2 sm:space-y-3">
+                    <p className={labelMuted}>2-Spieler-Regeln mit Bruv</p>
+                    <h2 className="font-serif text-2xl font-bold text-amber-900 sm:text-3xl dark:text-amber-100">
+                      Zusatzregeln
+                    </h2>
+                  </div>
+                  <div className="space-y-4 rounded-2xl border border-amber-200/60 bg-white/50 p-5 text-left text-sm leading-relaxed text-amber-900 dark:border-amber-900/30 dark:bg-slate-900/40 dark:text-amber-100 sm:text-base">
+  <h3 className="font-semibold text-amber-950 dark:text-amber-50">So spielt der Dummy mit:</h3>
+  
+  <ul className="space-y-3 list-none">
+    <li className="flex gap-2">
+      <span className="text-amber-500">•</span>
+      <p><strong>Setup:</strong> Vor jeder Runde wird rechts von der verteilenden Person ein dritter Stapel für <strong>{DUMMY_PLAYER_NAME}</strong> gebildet.</p>
+    </li>
+    <li className="flex gap-2">
+      <span className="text-amber-500">•</span>
+      <p><strong>Spielzug:</strong> Ist der Dummy an der Reihe, wird einfach die oberste Karte seines Stapels aufgedeckt.</p>
+    </li>
+    <li className="flex gap-2">
+      <span className="text-amber-500">•</span>
+      <p><strong>Wertung:</strong> Der Dummy gibt keine Ansage ab. Jeder gewonnene Stich zählt fix <strong>10 Punkte</strong> – ohne Abzüge oder Bonuspunkte.</p>
+    </li>
+  </ul>
+</div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setState((prev) => ({
+                        ...prev,
+                        gamePhase: "mixer-announcement",
+                      }))
+                    }
+                    className={primaryBtn}
+                  >
+                    Regeln verstanden
+                  </button>
+                </div>
+              </div>
+            )}
+
             {state.gamePhase === "bids" && (
               <div className={stageCenterWrap}>
                 <CloseGameButton onClick={resetGame} />
@@ -578,7 +691,7 @@ export default function WizardScoreMaster() {
                       Runde {state.roundNumber} – Ansagen
                     </p>
                     <p className="text-xs text-amber-800 sm:text-sm dark:text-amber-300">
-                      {state.currentBidderIndex + 1} von {state.players.length}
+                      {state.currentBidderIndex + 1} von {biddingPlayerOrder.length}
                     </p>
                   </div>
 
@@ -600,9 +713,9 @@ export default function WizardScoreMaster() {
                         type="button"
                         onClick={() => {
                           const next = [...state.pendingBids];
-                          next[currentBidderIndex] = Math.max(
+                          next[currentBidderPlayerIndex] = Math.max(
                             0,
-                            next[currentBidderIndex] - 1,
+                            next[currentBidderPlayerIndex] - 1,
                           );
                           setState((s) => ({ ...s, pendingBids: next }));
                         }}
@@ -613,16 +726,16 @@ export default function WizardScoreMaster() {
                       </button>
                       <div className="flex flex-1 justify-center">
                         <BigNumber
-                          value={state.pendingBids[currentBidderIndex]}
+                          value={state.pendingBids[currentBidderPlayerIndex]}
                         />
                       </div>
                       <button
                         type="button"
                         onClick={() => {
                           const next = [...state.pendingBids];
-                          next[currentBidderIndex] = Math.min(
+                          next[currentBidderPlayerIndex] = Math.min(
                             state.roundNumber,
-                            next[currentBidderIndex] + 1,
+                            next[currentBidderPlayerIndex] + 1,
                           );
                           setState((s) => ({ ...s, pendingBids: next }));
                         }}
@@ -641,7 +754,7 @@ export default function WizardScoreMaster() {
                     onClick={handleBidSubmit}
                     className={primaryBtn}
                   >
-                    {state.currentBidderIndex === state.players.length - 1
+                    {state.currentBidderIndex === biddingPlayerOrder.length - 1
                       ? "Bestätigen und weiter"
                       : "Bestätigen"}
                   </button>

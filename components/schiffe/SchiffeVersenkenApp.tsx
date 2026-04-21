@@ -34,6 +34,7 @@ import {
 } from "@/lib/schiffe/settings";
 
 type Phase = "place" | "play";
+type PlayBoardTab = "fleet" | "target";
 
 type GameState = {
   phase: Phase;
@@ -204,7 +205,7 @@ function cellsAfterRotateShip(
   return null;
 }
 
-const PLACEMENT_ROTATE_BTN_PX = 36;
+const PLACEMENT_ROTATE_BTN_PX = 44;
 
 function emptyPlacementCellRefGrid(): (HTMLButtonElement | null)[][] {
   return Array.from({ length: GRID_SIZE }, () =>
@@ -229,7 +230,7 @@ function BoardGrid({
     <div
       ref={rootRef}
       className={[
-        "relative w-full max-w-[min(22rem,calc(100vw-1.5rem))] touch-manipulation sm:max-w-[min(24rem,calc(100vw-2rem))] lg:max-w-[min(30rem,min(42vw,36rem)))] xl:max-w-[34rem]",
+        "relative w-full max-w-[min(22rem,100%)] touch-manipulation sm:max-w-[min(24rem,100%)] lg:max-w-[min(30rem,min(42vw,36rem))] xl:max-w-[34rem]",
         dimmed ? "opacity-55" : "opacity-100",
       ].join(" ")}
     >
@@ -288,6 +289,7 @@ export function SchiffeVersenkenApp() {
     loadColorSettings(),
   );
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [mobilePlayBoard, setMobilePlayBoard] = useState<PlayBoardTab>("target");
   const [vertical, setVertical] = useState(false);
   const [pickedId, setPickedId] = useState<FleetShipId | null>(null);
   /** Nur nach Tap auf ein bereits gesetztes Schiff auf dem Raster (Dreh-Button + Hervorhebung). */
@@ -306,6 +308,16 @@ export function SchiffeVersenkenApp() {
     if (!placing) return [];
     return game.myShips;
   }, [placing, game.myShips]);
+  const selectedPlacedShipId = useMemo<FleetShipId | null>(() => {
+    if (!placing) return null;
+    if (boardSelectedId && shipsHere.some((s) => s.id === boardSelectedId)) {
+      return boardSelectedId;
+    }
+    if (pickedId && shipsHere.some((s) => s.id === pickedId)) {
+      return pickedId;
+    }
+    return null;
+  }, [placing, shipsHere, boardSelectedId, pickedId]);
 
   useEffect(() => {
     if (
@@ -570,14 +582,18 @@ export function SchiffeVersenkenApp() {
     setHexDraft({ hit: colors.hit, miss: colors.miss });
   }, [settingsOpen, colors.hit, colors.miss]);
 
+  useEffect(() => {
+    if (game.phase === "play") setMobilePlayBoard("target");
+  }, [game.phase]);
+
   return (
-    <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-1 flex-col gap-3 overflow-hidden px-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pt-[max(0.5rem,env(safe-area-inset-top,0px))] [padding-left:max(0.75rem,env(safe-area-inset-left,0px))] [padding-right:max(0.75rem,env(safe-area-inset-right,0px))] sm:gap-4 sm:px-4 lg:gap-5 lg:px-6">
-      <header className="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+    <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-1 flex-col gap-2 overflow-hidden px-2 pb-[max(0.6rem,env(safe-area-inset-bottom,0px))] pt-[max(0.4rem,env(safe-area-inset-top,0px))] [padding-left:max(0.6rem,env(safe-area-inset-left,0px))] [padding-right:max(0.6rem,env(safe-area-inset-right,0px))] sm:gap-4 sm:px-4 sm:pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] sm:pt-[max(0.5rem,env(safe-area-inset-top,0px))] lg:gap-5 lg:px-6">
+      <header className="flex shrink-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0 flex-1">
-          <h1 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-xl lg:text-2xl">
+          <h1 className="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-xl lg:text-2xl">
             Schiffe versenken
           </h1>
-          <p className="mt-1 max-w-prose text-[11px] leading-snug text-zinc-500 dark:text-zinc-400 sm:text-xs lg:text-sm">
+          <p className="mt-0.5 max-w-prose text-[10px] leading-snug text-zinc-500 dark:text-zinc-400 sm:mt-1 sm:text-xs lg:text-sm">
             Hilfsmittel fürs Brett: Flotte hier ablegen, danach am Tippfeld Treffer und Fehlschüsse vom
             Tischspiel eintragen.
           </p>
@@ -586,7 +602,7 @@ export function SchiffeVersenkenApp() {
           <button
             type="button"
             onClick={() => setSettingsOpen((o) => !o)}
-            className="inline-flex min-h-11 items-center justify-center rounded-xl border border-zinc-200 bg-white px-3 text-xs font-bold text-zinc-800 shadow-sm active:scale-[0.98] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 sm:min-h-10 sm:min-w-[7.5rem]"
+            className="inline-flex min-h-10 items-center justify-center rounded-xl border border-zinc-200 bg-white px-3 text-[11px] font-bold text-zinc-800 shadow-sm active:scale-[0.98] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 sm:min-h-10 sm:min-w-[7.5rem] sm:text-xs"
           >
             Einstellungen
           </button>
@@ -598,7 +614,7 @@ export function SchiffeVersenkenApp() {
                 dispatch({ type: "RESET" });
               }
             }}
-            className="inline-flex min-h-11 items-center justify-center rounded-xl border border-red-200 bg-white px-3 text-xs font-bold text-red-700 shadow-sm active:scale-[0.98] dark:border-red-900/50 dark:bg-zinc-900 dark:text-red-300 sm:min-h-10 sm:min-w-[7.5rem]"
+            className="inline-flex min-h-10 items-center justify-center rounded-xl border border-red-200 bg-white px-3 text-[11px] font-bold text-red-700 shadow-sm active:scale-[0.98] dark:border-red-900/50 dark:bg-zinc-900 dark:text-red-300 sm:min-h-10 sm:min-w-[7.5rem] sm:text-xs"
           >
             Neu
           </button>
@@ -692,19 +708,19 @@ export function SchiffeVersenkenApp() {
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         {game.phase === "place" && (
-          <div className="flex h-full min-h-0 flex-col gap-3 overflow-hidden sm:gap-4">
-            <div className="shrink-0 rounded-2xl border border-amber-200/80 bg-amber-50/90 px-3 py-2.5 text-center text-xs font-semibold text-amber-950 dark:border-amber-900/40 dark:bg-amber-950/25 dark:text-amber-100 sm:px-4 sm:text-sm">
+          <div className="flex h-full min-h-0 flex-col gap-2 overflow-hidden sm:gap-4">
+            <div className="shrink-0 rounded-2xl border border-amber-200/80 bg-amber-50/90 px-3 py-2 text-center text-[11px] font-semibold text-amber-950 dark:border-amber-900/40 dark:bg-amber-950/25 dark:text-amber-100 sm:px-4 sm:py-2.5 sm:text-sm">
               Schiffe legen – danach wechselst du zum Tippfeld für das Spiel am Tisch.
             </div>
-            <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden lg:flex-row lg:items-stretch lg:gap-8">
-              <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto lg:max-w-md lg:shrink-0">
-              <p className="text-pretty text-center text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400 sm:text-left sm:text-xs lg:text-sm">
+            <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden lg:flex-row lg:items-stretch lg:gap-8">
+              <div className="order-2 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto lg:order-1 lg:max-w-md lg:shrink-0 lg:gap-3">
+              <p className="text-pretty text-center text-[10px] leading-relaxed text-zinc-500 dark:text-zinc-400 sm:text-left sm:text-xs lg:text-sm">
                 Schiff in der Leiste oder auf dem Brett antippen,{" "}
                 <strong className="text-zinc-700 dark:text-zinc-300">ziehen zum Platzieren</strong>. Leeres Feld
                 antippen legt das gewählte Schiff. Gesetztes Schiff auf dem Brett antippen: Auswahl und{" "}
                 <strong className="text-zinc-700 dark:text-zinc-300">↻</strong> zum Drehen.
               </p>
-              <div className="flex touch-none flex-wrap justify-center gap-2 sm:justify-start lg:justify-start">
+              <div className="flex flex-wrap justify-center gap-2 sm:justify-start lg:justify-start">
                 {FLEET.map((f) => {
                   const placed = shipsHere.some((s) => s.id === f.id);
                   return (
@@ -739,25 +755,27 @@ export function SchiffeVersenkenApp() {
                   );
                 })}
               </div>
-              <div className="flex flex-wrap justify-center gap-2 pb-1 sm:justify-start">
-                {shipsHere.map((s) => (
+              {selectedPlacedShipId ? (
+                <div className="flex justify-center pb-1 sm:justify-start">
                   <button
-                    key={s.id}
                     type="button"
-                    onClick={() =>
+                    onClick={() => {
                       dispatch({
                         type: "REMOVE_SHIP",
-                        id: s.id,
-                      })
-                    }
-                    className="min-h-10 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-[11px] font-semibold text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+                        id: selectedPlacedShipId,
+                      });
+                      if (boardSelectedId === selectedPlacedShipId) {
+                        setBoardSelectedId(null);
+                      }
+                    }}
+                    className="min-h-10 rounded-lg border border-red-200 bg-white px-3 py-2 text-[11px] font-semibold text-red-700 dark:border-red-900/50 dark:bg-zinc-900 dark:text-red-300"
                   >
-                    {s.id} entfernen
+                    {selectedPlacedShipId} entfernen
                   </button>
-                ))}
+                </div>
+              ) : null}
               </div>
-              </div>
-              <div className="flex shrink-0 flex-col items-center gap-3 lg:min-w-0 lg:flex-1 lg:items-center lg:justify-start">
+              <div className="order-1 flex shrink-0 flex-col items-center gap-2 lg:order-2 lg:min-w-0 lg:flex-1 lg:items-center lg:justify-start lg:gap-3">
               <BoardGrid
                 rootRef={placementBoardRootRef}
                 innerRef={placementInnerRef}
@@ -873,7 +891,7 @@ export function SchiffeVersenkenApp() {
               type="button"
               disabled={!fleetIsCompleteAndValid(game.myShips)}
               onClick={() => dispatch({ type: "ADVANCE_PLACEMENT" })}
-              className="mx-auto w-full max-w-md shrink-0 rounded-2xl bg-amber-500 py-3.5 text-sm font-black text-amber-950 shadow-md disabled:cursor-not-allowed disabled:opacity-40 sm:py-3 lg:max-w-sm dark:bg-amber-400 dark:text-amber-950"
+              className="mx-auto w-full max-w-md shrink-0 rounded-2xl bg-amber-500 py-3 text-sm font-black text-amber-950 shadow-md disabled:cursor-not-allowed disabled:opacity-40 sm:py-3 lg:max-w-sm dark:bg-amber-400 dark:text-amber-950"
             >
               Weiter zum Tippfeld
             </button>
@@ -881,17 +899,48 @@ export function SchiffeVersenkenApp() {
         )}
 
         {game.phase === "play" && (
-          <div className="flex h-full min-h-0 flex-col gap-3 overflow-hidden sm:gap-4">
-            <div className="shrink-0 rounded-xl border border-zinc-200 bg-white px-3 py-2.5 text-center text-[11px] font-semibold leading-snug text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 sm:px-4 sm:text-xs lg:mx-auto lg:max-w-4xl lg:text-sm">
+          <div className="flex h-full min-h-0 flex-col gap-2 overflow-hidden sm:gap-4">
+            <div className="shrink-0 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-center text-[10px] font-semibold leading-snug text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 sm:px-4 sm:py-2.5 sm:text-xs lg:mx-auto lg:max-w-4xl lg:text-sm">
               Am <strong className="text-zinc-900 dark:text-zinc-100">Tippfeld</strong> ein leeres oder rotes Feld
               wählen, dann <strong className="text-zinc-900 dark:text-zinc-100">Treffer</strong> /{" "}
               <strong className="text-zinc-900 dark:text-zinc-100">Kein Treffer</strong>. Fünf Treffer in einer Reihe
               erhalten automatisch den Umriss. Zwei benachbarte Treffer:{" "}
               <strong className="text-zinc-900 dark:text-zinc-100">Versenkt</strong>.
             </div>
+            <div className="grid grid-cols-2 gap-2 lg:hidden">
+              <button
+                type="button"
+                onClick={() => setMobilePlayBoard("target")}
+                className={[
+                  "min-h-10 rounded-xl border px-3 text-[11px] font-bold transition-colors",
+                  mobilePlayBoard === "target"
+                    ? "border-amber-500 bg-amber-100 text-amber-950 dark:border-amber-400 dark:bg-amber-950/40 dark:text-amber-100"
+                    : "border-zinc-200 bg-white text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200",
+                ].join(" ")}
+              >
+                Tippfeld
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobilePlayBoard("fleet")}
+                className={[
+                  "min-h-10 rounded-xl border px-3 text-[11px] font-bold transition-colors",
+                  mobilePlayBoard === "fleet"
+                    ? "border-sky-500 bg-sky-100 text-sky-900 dark:border-sky-400 dark:bg-sky-950/40 dark:text-sky-100"
+                    : "border-zinc-200 bg-white text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200",
+                ].join(" ")}
+              >
+                Eigene Schiffe
+              </button>
+            </div>
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain pb-1 lg:grid lg:grid-cols-2 lg:grid-rows-[minmax(0,1fr)_auto] lg:gap-x-8 lg:gap-y-4 lg:overflow-hidden lg:pb-0">
               <div className="flex min-h-0 flex-col gap-3 lg:col-span-2 lg:grid lg:min-h-0 lg:grid-cols-2 lg:gap-x-8 lg:overflow-hidden">
-                <section className="flex flex-col items-center gap-2 rounded-2xl border border-zinc-200 bg-zinc-50/80 p-2 sm:p-3 dark:border-zinc-800 dark:bg-zinc-900/40 lg:min-h-0 lg:overflow-y-auto lg:p-4">
+                <section
+                  className={[
+                    mobilePlayBoard === "fleet" ? "flex" : "hidden",
+                    "flex-col items-center gap-2 rounded-2xl border border-zinc-200 bg-zinc-50/80 p-2 sm:p-3 dark:border-zinc-800 dark:bg-zinc-900/40 lg:flex lg:min-h-0 lg:overflow-y-auto lg:p-4",
+                  ].join(" ")}
+                >
                   <span className="text-[10px] font-bold uppercase tracking-wide text-zinc-500 dark:text-zinc-400 sm:text-xs">
                     Deine Schiffe
                   </span>
@@ -910,7 +959,12 @@ export function SchiffeVersenkenApp() {
                     }}
                   />
                 </section>
-                <section className="flex flex-col items-center gap-2 rounded-2xl border border-amber-300/80 bg-amber-50/50 p-2 sm:p-3 dark:border-amber-800/50 dark:bg-amber-950/20 lg:min-h-0 lg:overflow-y-auto lg:p-4">
+                <section
+                  className={[
+                    mobilePlayBoard === "target" ? "flex" : "hidden",
+                    "flex-col items-center gap-2 rounded-2xl border border-amber-300/80 bg-amber-50/50 p-2 sm:p-3 dark:border-amber-800/50 dark:bg-amber-950/20 lg:flex lg:min-h-0 lg:overflow-y-auto lg:p-4",
+                  ].join(" ")}
+                >
                   <span className="text-[10px] font-bold uppercase tracking-wide text-zinc-500 dark:text-zinc-400 sm:text-xs">
                     Tippfeld
                   </span>
@@ -958,7 +1012,7 @@ export function SchiffeVersenkenApp() {
                 </section>
               </div>
               <div
-                className="shrink-0 space-y-2 rounded-2xl border border-zinc-200 bg-white p-3 shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/30 sm:p-4 lg:col-span-2 lg:mx-auto lg:w-full lg:max-w-3xl"
+                className="sticky bottom-0 z-10 shrink-0 space-y-2 rounded-2xl border border-zinc-200 bg-white p-3 shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/30 sm:p-4 lg:static lg:col-span-2 lg:mx-auto lg:w-full lg:max-w-3xl"
                 style={{
                   paddingBottom: "max(0.75rem, env(safe-area-inset-bottom, 0px))",
                 }}
@@ -1002,7 +1056,7 @@ export function SchiffeVersenkenApp() {
                 <button
                   type="button"
                   onClick={() => dispatch({ type: "TRACK_CLEAR_SELECT" })}
-                  className="w-full py-1.5 text-center text-[11px] font-semibold text-zinc-600 underline dark:text-zinc-400 sm:text-xs"
+                  className="min-h-11 w-full rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-[11px] font-semibold text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800/70 dark:text-zinc-200 sm:text-xs"
                 >
                   Auswahl aufheben
                 </button>
