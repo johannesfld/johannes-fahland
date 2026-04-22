@@ -178,9 +178,4 @@ input[type="number"]::-webkit-inner-spin-button {
     padding-right: max(0px, env(safe-area-inset-right));
   }
 
-  @media (max-width: 767px) {
-    .standalone-compact-title {
-      display: none;
-    }
-  }
 }

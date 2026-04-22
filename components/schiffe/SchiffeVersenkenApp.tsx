@@ -23,6 +23,7 @@ import {
   loadColorSettings,
   normalizeHexInput,
   saveColorSettings,
+  textColorForBg,
   type SchiffeColorSettings,
 } from "@/lib/schiffe/settings";
 import {
@@ -840,6 +841,8 @@ export function SchiffeVersenkenApp() {
                       const selectedOnBoard = Boolean(
                         sh && boardSelectedId === sh.id,
                       );
+                      const isDraggedShip = Boolean(placementDrag && sh && sh.id === placementDrag.shipId);
+                      const isHoverAnchor = prev && placementHover?.cells[0]?.r === r && placementHover?.cells[0]?.c === c;
                       return (
                         <button
                           type="button"
@@ -885,7 +888,7 @@ export function SchiffeVersenkenApp() {
                             setBoardSelectedId(null);
                           }}
                         >
-                          {sh && sh.cells[0].r === r && sh.cells[0].c === c && (
+                          {sh && sh.cells[0].r === r && sh.cells[0].c === c && !isDraggedShip && (
                             <div
                               className="pointer-events-none absolute left-0 top-0 z-20"
                               style={{
@@ -904,9 +907,32 @@ export function SchiffeVersenkenApp() {
                               />
                             </div>
                           )}
-                          {prev && (
+                          {prev && isHoverAnchor && placementDrag && (
                             <div
-                              className={`absolute inset-0.5 z-10 rounded-sm opacity-40 ${
+                              className="pointer-events-none absolute left-0 top-0 z-20"
+                              style={{
+                                width: vertical
+                                  ? "100%"
+                                  : `calc(${placementHover!.cells.length * 100}% + ${(placementHover!.cells.length - 1) * boardCellGapPx}px)`,
+                                height: vertical
+                                  ? `calc(${placementHover!.cells.length * 100}% + ${(placementHover!.cells.length - 1) * boardCellGapPx}px)`
+                                  : "100%",
+                                opacity: prevOk ? 0.7 : 0.35,
+                              }}
+                            >
+                              <ShipVisual
+                                len={placementHover!.cells.length}
+                                vertical={vertical}
+                                isSelected
+                              />
+                            </div>
+                          )}
+                          {prev && !isHoverAnchor && placementDrag && !prevOk && (
+                            <div className="absolute inset-0 z-10 rounded-sm bg-red-500 opacity-40" />
+                          )}
+                          {prev && !placementDrag && (
+                            <div
+                              className={`absolute inset-0 z-10 rounded-sm opacity-40 ${
                                 prevOk ? "bg-amber-400" : "bg-red-500"
                               }`}
                             />
@@ -1028,7 +1054,7 @@ export function SchiffeVersenkenApp() {
                       const disabledCell =
                         game.mode === "single"
                           ? game.single?.turn !== "player" || shot !== "empty"
-                          : shot === "miss";
+                          : false;
                       return (
                         <button
                           type="button"
@@ -1051,17 +1077,13 @@ export function SchiffeVersenkenApp() {
                               <div
                                 className="h-3 w-3 animate-pulse rounded-full shadow-[0_0_8px_currentColor]"
                                 style={{
-                                  backgroundColor:
-                                    game.mode === "single" ? "#ef4444" : colors.hit,
-                                  color: game.mode === "single" ? "#ef4444" : colors.hit,
+                                  backgroundColor: colors.hit,
+                                  color: colors.hit,
                                 }}
                               />
                               <div
                                 className="absolute inset-0 opacity-20"
-                                style={{
-                                  backgroundColor:
-                                    game.mode === "single" ? "#ef4444" : colors.hit,
-                                }}
+                                style={{ backgroundColor: colors.hit }}
                               />
                             </div>
                           )}
@@ -1069,10 +1091,7 @@ export function SchiffeVersenkenApp() {
                             <div className="flex h-full w-full items-center justify-center">
                               <div
                                 className="h-1.5 w-1.5 rounded-full opacity-40"
-                                style={{
-                                  backgroundColor:
-                                    game.mode === "single" ? "#94a3b8" : colors.miss,
-                                }}
+                                style={{ backgroundColor: colors.miss }}
                               />
                             </div>
                           )}
@@ -1122,42 +1141,64 @@ export function SchiffeVersenkenApp() {
                   </div>
                 ) : (
                   <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      disabled={markHitMissDisabled}
-                      onClick={() => dispatch({ type: "TRACKER_MARK", mark: "hit" })}
-                      className="min-h-10 flex-1 rounded-xl px-4 py-2 text-xs font-black text-white transition duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-sm dark:focus-visible:ring-offset-zinc-950"
-                      style={{ backgroundColor: colors.hit }}
-                    >
-                      Treffer
-                    </button>
-                    <button
-                      type="button"
-                      disabled={markHitMissDisabled}
-                      onClick={() => dispatch({ type: "TRACKER_MARK", mark: "miss" })}
-                      className="min-h-10 flex-1 rounded-xl border-2 border-zinc-400 px-4 py-2 text-xs font-black text-zinc-900 transition duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-sm dark:border-zinc-500 dark:text-zinc-100 dark:focus-visible:ring-offset-zinc-950"
-                      style={{ backgroundColor: colors.miss }}
-                    >
-                      Kein Treffer
-                    </button>
-                    {showVersenktButton && (
-                      <button
-                        type="button"
-                        title="Versenkt"
-                        aria-label="Versenkt"
-                        onClick={() => dispatch({ type: "TRACKER_SUNK" })}
-                        className="min-h-10 rounded-xl border-2 border-amber-700 bg-amber-100 px-4 py-2 text-xs font-black text-amber-950 transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-sm dark:border-amber-500 dark:bg-amber-950/50 dark:text-amber-100 dark:focus-visible:ring-offset-zinc-950"
-                      >
-                        Versenkt
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => dispatch({ type: "TRACKER_CLEAR_SELECT" })}
-                      className="shrink-0 rounded-lg border border-zinc-200 bg-zinc-50 px-2 py-1.5 text-[11px] font-semibold text-zinc-600 transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-xs dark:border-zinc-700 dark:bg-zinc-800/70 dark:text-zinc-300 dark:focus-visible:ring-offset-zinc-950"
-                    >
-                      Aufheben
-                    </button>
+                    {(() => {
+                      const pendingShot = game.trackerPending
+                        ? game.trackerShotGrid[game.trackerPending.r][game.trackerPending.c]
+                        : null;
+                      const isFilled = pendingShot === "hit" || pendingShot === "miss";
+                      const isEmpty = pendingShot === "empty";
+                      return (
+                        <>
+                          {isEmpty && (
+                            <>
+                              <button
+                                type="button"
+                                disabled={markHitMissDisabled}
+                                onClick={() => dispatch({ type: "TRACKER_MARK", mark: "hit" })}
+                                className="min-h-10 flex-1 rounded-xl px-4 py-2 text-xs font-black transition duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-sm dark:focus-visible:ring-offset-zinc-950"
+                                style={{ backgroundColor: colors.hit, color: textColorForBg(colors.hit) }}
+                              >
+                                Treffer
+                              </button>
+                              <button
+                                type="button"
+                                disabled={markHitMissDisabled}
+                                onClick={() => dispatch({ type: "TRACKER_MARK", mark: "miss" })}
+                                className="min-h-10 flex-1 rounded-xl border-2 px-4 py-2 text-xs font-black transition duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-sm dark:focus-visible:ring-offset-zinc-950"
+                                style={{ backgroundColor: colors.miss, color: textColorForBg(colors.miss), borderColor: colors.miss }}
+                              >
+                                Kein Treffer
+                              </button>
+                              {showVersenktButton && (
+                                <button
+                                  type="button"
+                                  title="Versenkt"
+                                  aria-label="Versenkt"
+                                  onClick={() => dispatch({ type: "TRACKER_SUNK" })}
+                                  className="min-h-10 rounded-xl border-2 border-amber-700 bg-amber-100 px-4 py-2 text-xs font-black text-amber-950 transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-sm dark:border-amber-500 dark:bg-amber-950/50 dark:text-amber-100 dark:focus-visible:ring-offset-zinc-950"
+                                >
+                                  Versenkt
+                                </button>
+                              )}
+                            </>
+                          )}
+                          {isFilled && (
+                            <button
+                              type="button"
+                              onClick={() => dispatch({ type: "TRACKER_UNDO" })}
+                              className="min-h-10 flex-1 rounded-xl border-2 border-red-300 bg-red-50 px-4 py-2 text-xs font-black text-red-700 transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-sm dark:border-red-800 dark:bg-red-950/40 dark:text-red-300 dark:focus-visible:ring-offset-zinc-950"
+                            >
+                              Aufheben
+                            </button>
+                          )}
+                          {!game.trackerPending && (
+                            <span className="flex-1 truncate rounded-lg bg-zinc-50 px-2 py-1.5 text-center text-[11px] font-semibold text-zinc-500 sm:text-xs dark:bg-zinc-800/70 dark:text-zinc-400">
+                              Feld antippen zum Markieren
+                            </span>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 )}
               </div>
@@ -1249,13 +1290,14 @@ const ShipVisual = ({ len, vertical, isSelected }: { len: number; vertical: bool
   return (
     <svg
       viewBox={vertical ? `0 0 40 ${len * 40}` : `0 0 ${len * 40} 40`}
-      className={`absolute inset-0.5 z-10 h-[calc(100%-4px)] w-[calc(100%-4px)] drop-shadow-sm ${baseColor}`}
+      className={`absolute inset-0 z-10 h-full w-full drop-shadow-sm ${baseColor}`}
+      preserveAspectRatio="none"
     >
       <rect
-        x="2" y="2"
-        width={vertical ? "36" : len * 40 - 4}
-        height={vertical ? len * 40 - 4 : "36"}
-        rx="6"
+        x="1" y="1"
+        width={vertical ? "38" : len * 40 - 2}
+        height={vertical ? len * 40 - 2 : "38"}
+        rx="5"
         strokeWidth="2"
         className="transition-all duration-300"
       />

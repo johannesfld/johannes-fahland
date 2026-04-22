@@ -13,6 +13,7 @@ import {
   hasOrthoHitNeighbor,
   orthoHitComponent,
 } from "@/lib/schiffe/tracking";
+import { GRID_SIZE } from "@/lib/schiffe/constants";
 import { randomBotFleet } from "@/components/schiffe/bot";
 import type { GameAction, GameState } from "@/components/schiffe/types";
 
@@ -22,6 +23,7 @@ export const initialGame = (): GameState => ({
   myShips: [],
   trackerShotGrid: emptyShotGrid(),
   trackerPending: null,
+  trackerManualMisses: new Set(),
   single: null,
   winner: null,
 });
@@ -39,6 +41,59 @@ function shotGridAfterHit(grid: Shot[][], r: number, c: number): Shot[][] {
     next = applyVersenktHull(next, seg);
   }
   return next;
+}
+
+const ORTHO: readonly [number, number][] = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+
+/**
+ * Remove a hit or miss from the tracker grid. When removing a hit, also remove
+ * any auto-generated surrounding misses (those NOT in trackerManualMisses).
+ */
+function undoTrackerCell(
+  grid: Shot[][],
+  r: number,
+  c: number,
+  manualMisses: Set<string>,
+): { nextGrid: Shot[][]; nextManual: Set<string> } {
+  const next = cloneShotGrid(grid);
+  const cellShot = next[r][c];
+  const nextManual = new Set(manualMisses);
+  const key = `${r},${c}`;
+
+  if (cellShot === "miss") {
+    next[r][c] = "empty";
+    nextManual.delete(key);
+    return { nextGrid: next, nextManual };
+  }
+
+  if (cellShot === "hit") {
+    const hull = orthoHitComponent(grid, r, c);
+    next[r][c] = "empty";
+
+    for (const hc of hull) {
+      for (const [dr, dc] of ORTHO) {
+        const nr = hc.r + dr;
+        const nc = hc.c + dc;
+        if (nr < 0 || nr >= GRID_SIZE || nc < 0 || nc >= GRID_SIZE) continue;
+        const nk = `${nr},${nc}`;
+        if (next[nr][nc] === "miss" && !nextManual.has(nk)) {
+          const isAdjacentToOtherHit = ORTHO.some(([dr2, dc2]) => {
+            const hr = nr + dr2;
+            const hc2 = nc + dc2;
+            if (hr < 0 || hr >= GRID_SIZE || hc2 < 0 || hc2 >= GRID_SIZE) return false;
+            if (hr === r && hc2 === c) return false;
+            return next[hr][hc2] === "hit";
+          });
+          if (!isAdjacentToOtherHit) {
+            next[nr][nc] = "empty";
+          }
+        }
+      }
+    }
+    return { nextGrid: next, nextManual };
+  }
+
+  return { nextGrid: next, nextManual };
 }
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
@@ -92,6 +147,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           winner: null,
           trackerShotGrid: emptyShotGrid(),
           trackerPending: null,
+          trackerManualMisses: new Set(),
         };
       }
       return {
@@ -99,6 +155,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         phase: "play",
         trackerShotGrid: emptyShotGrid(),
         trackerPending: null,
+        trackerManualMisses: new Set(),
         single: null,
         winner: null,
       };
@@ -106,8 +163,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case "TRACKER_SELECT": {
       if (state.phase !== "play" || state.mode !== "twoPlayerTracker") return state;
       const { r, c } = action.cell;
-      const cell = state.trackerShotGrid[r][c];
-      if (cell === "miss") return state;
+      if (state.trackerPending?.r === r && state.trackerPending?.c === c) {
+        return { ...state, trackerPending: null };
+      }
       return { ...state, trackerPending: { r, c } };
     }
     case "TRACKER_CLEAR_SELECT":
@@ -127,7 +185,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (action.mark === "miss") {
         const shotGrid = cloneShotGrid(state.trackerShotGrid);
         shotGrid[r][c] = "miss";
-        return { ...state, trackerShotGrid: shotGrid, trackerPending: null };
+        const nextManual = new Set(state.trackerManualMisses);
+        nextManual.add(`${r},${c}`);
+        return { ...state, trackerShotGrid: shotGrid, trackerPending: null, trackerManualMisses: nextManual };
       }
       const shotGrid = shotGridAfterHit(state.trackerShotGrid, r, c);
       return { ...state, trackerShotGrid: shotGrid, trackerPending: null };
@@ -146,6 +206,27 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const hull = orthoHitComponent(state.trackerShotGrid, r, c);
       const shotGrid = applyVersenktHull(state.trackerShotGrid, hull);
       return { ...state, trackerShotGrid: shotGrid, trackerPending: null };
+    }
+    case "TRACKER_UNDO": {
+      if (
+        state.phase !== "play" ||
+        state.mode !== "twoPlayerTracker" ||
+        !state.trackerPending
+      ) {
+        return state;
+      }
+      const { r, c } = state.trackerPending;
+      const cellShot = state.trackerShotGrid[r][c];
+      if (cellShot === "empty") return state;
+      const { nextGrid, nextManual } = undoTrackerCell(
+        state.trackerShotGrid, r, c, state.trackerManualMisses,
+      );
+      return {
+        ...state,
+        trackerShotGrid: nextGrid,
+        trackerManualMisses: nextManual,
+        trackerPending: null,
+      };
     }
     case "SINGLE_SELECT_TARGET": {
       if (state.phase !== "play" || state.mode !== "single" || !state.single) return state;

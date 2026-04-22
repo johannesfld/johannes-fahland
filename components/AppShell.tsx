@@ -68,7 +68,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       />
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <header className="safe-area-inset sticky top-0 z-40 flex min-h-14 shrink-0 items-center border-b border-[var(--border)] bg-zinc-50/95 pt-[max(env(safe-area-inset-top),0.4rem)] backdrop-blur-md dark:border-zinc-700/80 dark:bg-zinc-800/85">
+        <header className="sticky top-0 z-40 flex min-h-14 shrink-0 items-center border-b border-[var(--border)] bg-zinc-50/95 pt-[max(env(safe-area-inset-top,0px),0.4rem)] pr-[env(safe-area-inset-right,0px)] pl-[env(safe-area-inset-left,0px)] backdrop-blur-md dark:border-zinc-700/80 dark:bg-zinc-800/85">
           <div className="mx-auto flex h-full w-full max-w-7xl items-center gap-3 px-4">
             <motion.button
               type="button"
@@ -103,7 +103,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               className="flex min-w-0 items-center gap-2 text-sm font-semibold tracking-tight text-zinc-800 transition-colors hover:text-amber-600 dark:text-zinc-100 dark:hover:text-amber-400"
             >
               <BrandingLogo className="!h-9 !w-9" />
-              <span className="truncate max-[360px]:hidden standalone-compact-title">vibecode projekte</span>
+              <span className="truncate max-[360px]:hidden">vibecode projekte</span>
             </Link>
             <div className="hidden flex-1 md:block" />
             <AnimatePresence>

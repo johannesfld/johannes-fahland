@@ -29,6 +29,7 @@ export type GameState = {
   myShips: PlacedShip[];
   trackerShotGrid: Shot[][];
   trackerPending: Cell | null;
+  trackerManualMisses: Set<string>;
   single: SinglePlayerState | null;
   winner: Turn | null;
 };
@@ -44,6 +45,7 @@ export type GameAction =
   | { type: "TRACKER_CLEAR_SELECT" }
   | { type: "TRACKER_MARK"; mark: "hit" | "miss" }
   | { type: "TRACKER_SUNK" }
+  | { type: "TRACKER_UNDO" }
   | { type: "SINGLE_SELECT_TARGET"; cell: Cell }
   | { type: "SINGLE_CLEAR_TARGET" }
   | { type: "SINGLE_FIRE" }

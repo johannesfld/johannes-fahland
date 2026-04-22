@@ -40,8 +40,8 @@ export default function KniffelApp() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans p-4 sm:p-8">
-      <header className="max-w-5xl mx-auto mb-8 flex justify-between items-end">
+    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans p-4 sm:p-8">
+      <header className="max-w-5xl mx-auto mb-4 w-full shrink-0 flex justify-between items-end">
         <div>
           <h1 className="text-5xl font-black italic tracking-tighter text-amber-500 underline decoration-zinc-300 dark:decoration-zinc-700 decoration-4 underline-offset-4">
             KNIFFEL
@@ -59,7 +59,7 @@ export default function KniffelApp() {
         )}
       </header>
 
-      <main className="max-w-5xl mx-auto">
+      <main className="max-w-5xl mx-auto flex min-h-0 w-full flex-1 flex-col overflow-hidden">
         <AnimatePresence mode="wait">
           {!isStarted ? (
             <motion.div
@@ -68,7 +68,7 @@ export default function KniffelApp() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.4, ease }}
-              className="bg-white dark:bg-zinc-900 p-6 rounded-3xl shadow-xl border border-zinc-200 dark:border-zinc-800"
+              className="bg-white dark:bg-zinc-900 p-6 rounded-3xl shadow-xl border border-zinc-200 dark:border-zinc-800 overflow-y-auto"
             >
               <h2 className="text-xl font-bold mb-4 text-center">Wer spielt mit?</h2>
               <div className="grid gap-3 mb-6">
@@ -114,14 +114,14 @@ export default function KniffelApp() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, ease }}
-              className="space-y-4"
+              className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden"
             >
               <motion.div
                 key={activeIdx}
                 initial={{ opacity: 0, x: 12 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, ease }}
-                className="bg-white dark:bg-zinc-900 p-4 rounded-2xl flex items-center justify-between border border-zinc-200 dark:border-zinc-800 shadow-sm"
+                className="shrink-0 bg-white dark:bg-zinc-900 p-4 rounded-2xl flex items-center justify-between border border-zinc-200 dark:border-zinc-800 shadow-sm"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center font-bold text-white text-xl">
@@ -141,8 +141,8 @@ export default function KniffelApp() {
                 </button>
               </motion.div>
 
-              <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-2xl">
-                <div className="overflow-x-auto overflow-y-visible">
+              <div className="flex min-h-0 flex-1 flex-col bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-2xl">
+                <div className="overflow-x-auto overflow-y-auto min-h-0 flex-1">
                   <table className="w-full border-collapse">
                     <thead>
                       <tr className="bg-zinc-50 dark:bg-zinc-800/50">
