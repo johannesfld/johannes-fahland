@@ -484,7 +484,7 @@ export function SchiffeVersenkenApp() {
   }, [game.single?.lastBotShot]);
 
   const botShotFeedbackText = (feedback: BotShotFeedback): string => {
-    const cell = formatCell(feedback.cell);
+    const cell = normalizeCellLabel(formatCell(feedback.cell));
     if (feedback.result === "sunk") return `Bot feuert auf ${cell}: Versenkt.`;
     if (feedback.result === "hit") return `Bot feuert auf ${cell}: Treffer.`;
     return `Bot feuert auf ${cell}: Kein Treffer.`;
@@ -510,8 +510,18 @@ export function SchiffeVersenkenApp() {
       ? "font-black"
       : "font-semibold text-slate-700 dark:text-slate-300";
 
+  const normalizeCellLabel = (rawLabel: string): string => {
+    const trimmed = rawLabel.trim();
+    const letterNumber = /^([A-Za-z])(\d{1,2})$/;
+    if (letterNumber.test(trimmed)) return trimmed.toUpperCase();
+    const numberLetter = /^(\d{1,2})([A-Za-z])$/;
+    const swapped = trimmed.match(numberLetter);
+    if (!swapped) return trimmed.toUpperCase();
+    return `${swapped[2].toUpperCase()}${swapped[1]}`;
+  };
+
   const overlayCellLabel = (feedback: BotShotFeedback): string =>
-    formatCell(feedback.cell);
+    normalizeCellLabel(formatCell(feedback.cell));
 
   const overlayHitLabel = (feedback: BotShotFeedback): "Ja" | "Nein" =>
     yesNoLabel(botShotWasHit(feedback));
@@ -1121,13 +1131,6 @@ export function SchiffeVersenkenApp() {
                           : "Wähle ein Feld und drücke Feuern."
                         : "Bot ist am Zug..."}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => dispatch({ type: "SINGLE_CLEAR_TARGET" })}
-                      className="shrink-0 rounded-lg border border-zinc-200 bg-zinc-50 px-2 py-1.5 text-[11px] font-semibold text-zinc-600 transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-xs dark:border-zinc-700 dark:bg-zinc-800/70 dark:text-zinc-300 dark:focus-visible:ring-offset-zinc-950"
-                    >
-                      Aufheben
-                    </button>
                     <button
                       type="button"
                       disabled={
