@@ -21,7 +21,7 @@ export function DesktopSidebar({
         desktopSidebarOpen ? "md:flex" : "md:hidden",
       ].join(" ")}
     >
-      <div className="relative flex h-full flex-col gap-5 overflow-y-auto px-4 pb-4 pt-6">
+      <div className="relative flex h-full flex-col gap-5 overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] pt-[max(1.5rem,env(safe-area-inset-top))]">
         <div className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-zinc-50/95 p-3 shadow-sm backdrop-blur-md dark:border-zinc-700/80 dark:bg-zinc-800/85">
           <BrandingLogo />
           <div className="min-w-0">

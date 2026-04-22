@@ -46,11 +46,15 @@ export function useSwipeDrawer({
 
     let startX = 0;
     let startY = 0;
+    let tracking = false;
     let dragging = false;
     let edgeSwipe = false;
     let locked = false;
     let openAtStart = false;
+    let insideDrawer = false;
     let dw = 0;
+
+    const DRAG_THRESHOLD = 10;
 
     function getWidth() {
       if (drawerRef.current) return drawerRef.current.offsetWidth;
@@ -82,31 +86,55 @@ export function useSwipeDrawer({
       openAtStart = isOpenRef.current;
       dw = getWidth();
       locked = false;
+      dragging = false;
+      insideDrawer = Boolean(
+        drawerRef.current?.contains(e.target as Node),
+      );
 
       if (!openAtStart && t.clientX < EDGE_ZONE) {
         edgeSwipe = true;
-        dragging = true;
-        setDragMode(true);
-      } else if (openAtStart) {
+        tracking = true;
+      } else if (openAtStart && !insideDrawer) {
         edgeSwipe = false;
-        dragging = true;
-        setDragMode(true);
+        tracking = true;
+      } else {
+        tracking = false;
       }
     }
 
+    function promoteToDrag() {
+      if (dragging) return;
+      dragging = true;
+      setDragMode(true);
+    }
+
     function onMove(e: TouchEvent) {
-      if (!dragging) return;
+      if (!tracking) return;
       const t = e.touches[0];
       const dx = t.clientX - startX;
       const dy = t.clientY - startY;
 
+      if (!dragging) {
+        if (Math.abs(dy) > Math.abs(dx) * 1.5 && Math.abs(dy) > DRAG_THRESHOLD) {
+          tracking = false;
+          return;
+        }
+        if (Math.abs(dx) >= DRAG_THRESHOLD) {
+          promoteToDrag();
+          locked = true;
+        } else {
+          return;
+        }
+      }
+
       if (!locked) {
-        if (Math.abs(dy) > Math.abs(dx) * 1.5 && Math.abs(dy) > 10) {
+        if (Math.abs(dy) > Math.abs(dx) * 1.5 && Math.abs(dy) > DRAG_THRESHOLD) {
           dragging = false;
+          tracking = false;
           setDragMode(false);
           return;
         }
-        if (Math.abs(dx) > 10) locked = true;
+        if (Math.abs(dx) > DRAG_THRESHOLD) locked = true;
       }
 
       const d = drawerRef.current;
@@ -128,8 +156,12 @@ export function useSwipeDrawer({
     }
 
     function onEnd() {
-      if (!dragging) return;
+      if (!dragging) {
+        tracking = false;
+        return;
+      }
       dragging = false;
+      tracking = false;
       setDragMode(false);
 
       const d = drawerRef.current;

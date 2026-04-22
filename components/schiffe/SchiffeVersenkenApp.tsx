@@ -291,6 +291,7 @@ export function SchiffeVersenkenApp() {
     y: 0,
     has: false,
   });
+  const dragCaptureRef = useRef<Element | null>(null);
 
   const clientToPlacementFraction = useCallback(
     (clientX: number, clientY: number): { fracR: number; fracC: number } | null => {
@@ -336,8 +337,16 @@ export function SchiffeVersenkenApp() {
   useEffect(() => {
     if (!placementDrag) return;
     const { pointerId, shipId } = placementDrag;
+    const releaseCap = () => {
+      const el = dragCaptureRef.current;
+      if (el) {
+        try { el.releasePointerCapture(pointerId); } catch { /* already released */ }
+        dragCaptureRef.current = null;
+      }
+    };
     const finish = (e: PointerEvent) => {
       if (e.pointerId !== pointerId) return;
+      releaseCap();
       const frac = clientToPlacementFraction(e.clientX, e.clientY);
       setPlacementDrag(null);
       setPlacementHover(null);
@@ -370,6 +379,7 @@ export function SchiffeVersenkenApp() {
     window.addEventListener("pointerup", onEnd);
     window.addEventListener("pointercancel", onEnd);
     return () => {
+      releaseCap();
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onEnd);
       window.removeEventListener("pointercancel", onEnd);
@@ -704,7 +714,7 @@ export function SchiffeVersenkenApp() {
           {game.phase === "place" && (
             <div className="flex min-h-0 flex-1 flex-col gap-2">
               <p className="shrink-0 rounded-xl border border-slate-200/70 bg-white/70 px-2 py-1.5 text-center text-[11px] font-semibold text-slate-700 sm:text-xs dark:border-slate-700/50 dark:bg-slate-900/50 dark:text-slate-200">
-                Schiffe setzen per Drag and Drop. Anklicken zum drehen.
+                Schiff wählen, dann aufs Feld tippen zum Setzen. Ziehen geht auch. Anklicken zum Drehen.
               </p>
               <div className="flex min-h-0 flex-1 flex-col gap-2 lg:flex-row lg:gap-4">
                 <div className="order-2 flex shrink-0 items-center gap-2 overflow-x-auto py-1 lg:order-1 lg:w-28 lg:flex-col lg:items-stretch lg:gap-2 lg:overflow-visible lg:py-0">
@@ -720,6 +730,8 @@ export function SchiffeVersenkenApp() {
                         }}
                         onPointerDown={(e) => {
                           e.preventDefault();
+                          (e.currentTarget as Element).setPointerCapture(e.pointerId);
+                          dragCaptureRef.current = e.currentTarget;
                           setBoardSelectedId(null);
                           setPickedId(f.id);
                           setPlacementDrag({
@@ -742,7 +754,10 @@ export function SchiffeVersenkenApp() {
                     );
                   })}
                 </div>
-                <div className="order-1 flex min-h-0 flex-1 items-center justify-center lg:order-2">
+                <div
+                  className="order-1 flex min-h-0 flex-1 items-center justify-center lg:order-2"
+                  style={placementDrag ? { touchAction: "none" } : undefined}
+                >
                   <BoardGrid
                     onRootRef={(el) => {
                       placementBoardRootRef.current = el;
@@ -763,7 +778,7 @@ export function SchiffeVersenkenApp() {
                             type="button"
                             aria-label="Schiff drehen"
                             title="Drehen"
-                            className="flex items-center justify-center rounded-xl border border-zinc-200/90 bg-white text-lg leading-none text-zinc-800 shadow-md ring-1 ring-black/10 transition duration-200 active:scale-[0.98] dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100 dark:shadow-black/30 dark:ring-white/10"
+                            className="flex items-center justify-center rounded-xl border border-slate-500/60 bg-slate-800/90 text-lg leading-none text-slate-100 shadow-lg backdrop-blur-sm transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
                             style={{
                               width: PLACEMENT_ROTATE_BTN_PX,
                               height: PLACEMENT_ROTATE_BTN_PX,
@@ -796,7 +811,7 @@ export function SchiffeVersenkenApp() {
                             type="button"
                             aria-label="Schiff entfernen"
                             title="Entfernen"
-                            className="flex items-center justify-center rounded-xl border border-red-200 bg-white text-base font-black leading-none text-red-700 shadow-md ring-1 ring-black/10 transition duration-200 active:scale-[0.98] dark:border-red-900/50 dark:bg-zinc-800 dark:text-red-300 dark:shadow-black/30 dark:ring-white/10"
+                            className="flex items-center justify-center rounded-xl border border-red-500/40 bg-slate-800/90 text-base font-black leading-none text-red-400 shadow-lg backdrop-blur-sm transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
                             style={{
                               width: PLACEMENT_ROTATE_BTN_PX,
                               height: PLACEMENT_ROTATE_BTN_PX,
@@ -838,6 +853,8 @@ export function SchiffeVersenkenApp() {
                           onPointerDown={(e) => {
                             if (!sh) return;
                             e.preventDefault();
+                            (e.currentTarget as Element).setPointerCapture(e.pointerId);
+                            dragCaptureRef.current = e.currentTarget;
                             setBoardSelectedId(sh.id);
                             setPickedId(sh.id);
                             setVertical(placedShipIsVertical(sh));
@@ -848,10 +865,24 @@ export function SchiffeVersenkenApp() {
                             updatePlacementHover(e.clientX, e.clientY, sh.id);
                           }}
                           onClick={() => {
-                            if (!sh) return;
-                            setBoardSelectedId(sh.id);
-                            setPickedId(sh.id);
-                            setVertical(placedShipIsVertical(sh));
+                            if (sh) {
+                              setBoardSelectedId(sh.id);
+                              setPickedId(sh.id);
+                              setVertical(placedShipIsVertical(sh));
+                              return;
+                            }
+                            if (!pickedId) return;
+                            const spec = FLEET.find((fl) => fl.id === pickedId);
+                            if (!spec) return;
+                            const cells = segmentCenteredOnPoint(
+                              r + 0.5, c + 0.5, spec.len, vertical,
+                            );
+                            if (!cells) return;
+                            const rest = shipsHere.filter((s) => s.id !== pickedId);
+                            if (!canAddShip(rest, { id: pickedId, cells })) return;
+                            dispatch({ type: "PLACE_SHIP", ship: { id: pickedId, cells } });
+                            setPickedId(null);
+                            setBoardSelectedId(null);
                           }}
                         >
                           {sh && sh.cells[0].r === r && sh.cells[0].c === c && (

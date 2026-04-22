@@ -56,7 +56,7 @@ export function MobileMenu({ mobileOpen, pathname, onOpen, onClose }: MobileMenu
         inert={!mobileOpen || undefined}
         aria-hidden={!mobileOpen}
         className={[
-          "fixed left-0 top-0 z-30 flex h-dvh w-[min(20rem,88vw)] flex-col overflow-y-auto border-r border-[var(--border)] bg-[var(--surface)] p-4 shadow-xl md:hidden safe-area-inset dark:bg-[var(--surface-muted)]",
+          "fixed left-0 top-0 z-30 flex h-dvh w-[min(20rem,88vw)] flex-col overflow-y-auto border-r border-[var(--border)] bg-[var(--surface)] pr-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))] shadow-xl md:hidden dark:bg-[var(--surface-muted)]",
           "transition-transform duration-300 ease-[var(--ease-smooth)]",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
         ].join(" ")}
