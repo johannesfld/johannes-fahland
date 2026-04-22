@@ -58,7 +58,9 @@ export function MobileMenu({ mobileOpen, pathname, onOpen, onClose }: MobileMenu
 
     return () => {
       window.removeEventListener("popstate", handlePop);
-      if (!closedByPop) history.back();
+      if (!closedByPop && window.location.pathname === pathname) {
+        history.back();
+      }
     };
   }, [mobileOpen, onClose]);
 

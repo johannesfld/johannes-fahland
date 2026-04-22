@@ -25,6 +25,7 @@ export function rowLabel(r: number) {
   return String.fromCodePoint("A".codePointAt(0)! + r);
 }
 
+/** Zeile (A–J) zuerst, dann Spalte (1–10), z. B. A1. */
 export function formatCell(rc: Cell) {
-  return `${colLabel(rc.c)}${rowLabel(rc.r)}`;
+  return `${rowLabel(rc.r)}${colLabel(rc.c)}`;
 }

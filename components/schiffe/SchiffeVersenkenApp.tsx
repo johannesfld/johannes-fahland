@@ -105,22 +105,22 @@ function BoardGrid({
         <div className="grid grid-cols-[1rem_minmax(0,1fr)] gap-0.5 sm:grid-cols-[1.5rem_minmax(0,1fr)] sm:gap-1">
           <div />
           <div className="grid grid-cols-10 gap-0.5 sm:gap-1">
-            {alphabetLabels.map((letter) => (
+            {Array.from({ length: GRID_SIZE }, (_, c) => (
               <div
-                key={letter}
+                key={c}
                 className="flex h-4 items-center justify-center rounded-sm bg-slate-900/70 font-mono text-[8px] font-bold text-slate-400 sm:h-5 sm:text-[10px]"
               >
-                {letter}
+                {c + 1}
               </div>
             ))}
           </div>
           <div className="grid h-full grid-rows-10 gap-0.5 sm:gap-1">
-            {Array.from({ length: GRID_SIZE }, (_, r) => (
+            {alphabetLabels.map((letter) => (
               <div
-                key={r}
+                key={letter}
                 className="flex min-h-0 items-center justify-center rounded-sm bg-slate-900/70 font-mono text-[8px] font-bold text-slate-400 sm:text-[10px]"
               >
-                {r + 1}
+                {letter}
               </div>
             ))}
           </div>
@@ -1145,7 +1145,8 @@ export function SchiffeVersenkenApp() {
                       const pendingShot = game.trackerPending
                         ? game.trackerShotGrid[game.trackerPending.r][game.trackerPending.c]
                         : null;
-                      const isFilled = pendingShot === "hit" || pendingShot === "miss";
+                      const isHit = pendingShot === "hit";
+                      const isMiss = pendingShot === "miss";
                       const isEmpty = pendingShot === "empty";
                       return (
                         <>
@@ -1169,6 +1170,10 @@ export function SchiffeVersenkenApp() {
                               >
                                 Kein Treffer
                               </button>
+                            </>
+                          )}
+                          {isHit && (
+                            <>
                               {showVersenktButton && (
                                 <button
                                   type="button"
@@ -1180,9 +1185,16 @@ export function SchiffeVersenkenApp() {
                                   Versenkt
                                 </button>
                               )}
+                              <button
+                                type="button"
+                                onClick={() => dispatch({ type: "TRACKER_UNDO" })}
+                                className="min-h-10 flex-1 rounded-xl border-2 border-red-300 bg-red-50 px-4 py-2 text-xs font-black text-red-700 transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-sm dark:border-red-800 dark:bg-red-950/40 dark:text-red-300 dark:focus-visible:ring-offset-zinc-950"
+                              >
+                                Aufheben
+                              </button>
                             </>
                           )}
-                          {isFilled && (
+                          {isMiss && (
                             <button
                               type="button"
                               onClick={() => dispatch({ type: "TRACKER_UNDO" })}
