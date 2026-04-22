@@ -1,0 +1,59 @@
+---
+description: Design & UI conventions for all Tailwind + React UI work (fit-to-viewport, 4er-Raster, micro-interactions).
+alwaysApply: true
+---
+
+# Design & UI Leitplanken
+
+Du arbeitest an einer Next.js 16 App mit Tailwind v4, React 19 und Geist-Fonts. Die Grundpalette (amber fuer Wizard/Akzent, sky fuer Schiffe, zinc fuer Neutral) ist gesetzt und wird beibehalten.
+
+## Design-System
+- Ausschliesslich Tailwind CSS-Klassen. Keine Inline-Styles ausser fuer dynamisch berechnete Pixel (z. B. Board-Sizing via ResizeObserver).
+- Keine neuen Font-Familien. Geist (`--font-geist-sans`) und Geist Mono sind gesetzt.
+- Keine neuen Farbsysteme: amber-* (Akzent), sky-* (Schiffe), zinc-* (Neutral), red-500 (Bot-Treffer), slate-* (Dark-Backgrounds) bleiben.
+
+## Spacing
+- 4er-Raster konsequent: `gap-2`, `gap-4`, `gap-6`, `gap-8`; `p-2`, `p-4`, `p-6`, `p-8`. Keine unregelmaessigen Werte wie `p-3.5` ohne klaren Grund.
+- Touch-Targets mindestens `min-h-11` bzw. `min-h-12`.
+
+## Typografie
+- Headlines nutzen `tracking-tight` oder `tracking-tighter`. `font-black` fuer starke Hierarchie.
+- `text-xs` bis `text-base` fuer Fliesstext, nie kleiner als `text-[10px]` (Uppercase-Labels).
+
+## Responsiveness (Mobile First)
+- Zuerst Mobile stylen, dann `sm:`, `md:`, `lg:` hinzufuegen.
+- Container sind `min-w-0` und nutzen `flex-1 min-h-0` in vertikalen Flex-Layouts, damit nichts ungewollt ueberlaeuft.
+
+## Scroll-Verhalten
+- Unterseiten (nicht Home-Dashboard-Feed) sind scroll-frei: `h-full min-h-0 overflow-hidden` auf dem Wrapper. Inhalt passt sich per Flex + Container-Queries an.
+- 10x10-Grids (Schiffe Versenken) sizen quadratisch auf verfuegbaren Platz: `aspect-square` im `flex-1 min-h-0`-Container, optional `ResizeObserver` fuer harten Pixel-Fit.
+- Falls Platz knapp wird: Inhalte in adaptive Tabs/Panels aufteilen statt Scroll zu aktivieren.
+
+## Layout
+- Nutze CSS-Grid fuer Raster: `grid-cols-*`, `grid-template-columns: auto repeat(10,1fr)` etc.
+- Karten gleiche Hoehe via `grid-auto-rows-fr`.
+- Keine absoluten Overlays, die ganze Viewports blockieren. Non-blocking Toasts statt `fixed inset-0`-Modals (Ausnahme: echte Modals mit Fokus-Trap).
+- Primar-Aktionen muessen jederzeit erreichbar bleiben und duerfen nie von Overlays verdeckt werden.
+
+## Micro-Interactions
+- Smooth Transitions via Tailwind `transition duration-200 ease-out`. Fuer komplexere Animationen Framer Motion mit `ease: [0.22, 1, 0.36, 1]`.
+- Hover-Lift subtil: `hover:-translate-y-0.5`, kein hartes Scale-Up.
+- Button-Tap: `active:scale-[0.98]` oder Framer `whileTap={{ scale: 0.97 }}`.
+- Staggered Enter: `transition={{ staggerChildren: 0.04 }}` auf Listen.
+- Immer `useReducedMotion()` bzw. `motion-safe:`/`motion-reduce:` beachten.
+
+## Icons
+- Lucide React (`lucide-react`) fuer neue Icons. Groesse per `size={18}` oder `className="h-4 w-4"`, optisch zu Texthoehe passend.
+- Bestehende Inline-SVGs in `components/ui/icons.tsx` duerfen bleiben (Legacy ok).
+
+## Fokus-States
+- Immer sichtbarer Fokus: `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-950`.
+
+## Hierarchie & Kontrast
+- Visual weight: grosse Headline -> Subhead `text-sm` -> Body `text-xs` in uppercase-Labels mit `tracking-[0.22em]`.
+- Ausreichend Whitespace zwischen Sektionen (`gap-4` min, `gap-6` Standard, `gap-8` fuer Hero-Abstaende).
+- Schatten dezent: `shadow-sm`/`shadow-md`. Harte schwarze Schatten vermeiden; im Dark-Mode `dark:shadow-black/30`.
+
+## Funktionalitaet bewahren
+- Bei UI-Refactorings niemals Reducer, State, Bot-Logik oder Spielregeln anfassen.
+- Event-Handler 1:1 uebernehmen, nur visuelles JSX umbauen.

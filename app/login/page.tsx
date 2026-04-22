@@ -4,25 +4,24 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { loginAction } from "@/app/actions/auth";
 import { SubmitButton } from "@/components/SubmitButton";
+import { AuthErrorBanner } from "@/components/auth/AuthErrorBanner";
+import {
+  authCardClass,
+  authFieldClass,
+  authSubmitButtonClass,
+  authSwapLinkClass,
+} from "@/components/auth/styles";
 
 type AuthState = { error: string | null };
 
 const initialState: AuthState = { error: null };
-
-const field =
-  "h-11 rounded-xl border-2 border-[var(--border)] bg-[var(--surface)] px-4 text-base font-normal text-[var(--foreground)] transition-all " +
-  "placeholder:text-zinc-400 focus:border-amber-500/60 focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)] " +
-  "dark:placeholder:text-zinc-500 sm:h-12";
-
-const card =
-  "rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-sm sm:p-6 dark:shadow-none";
 
 export default function LoginPage() {
   const [state, formAction] = useActionState(loginAction, initialState);
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6">
-      <div className={card}>
+      <div className={authCardClass}>
         <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
           Welcome
         </div>
@@ -34,7 +33,7 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <div className={card}>
+      <div className={authCardClass}>
         <h2 className="text-sm font-semibold tracking-tight">Login</h2>
 
         <form action={formAction} className="mt-4 flex flex-col gap-4">
@@ -45,7 +44,7 @@ export default function LoginPage() {
               type="text"
               autoComplete="username"
               required
-              className={field}
+              className={authFieldClass}
             />
           </label>
 
@@ -56,26 +55,15 @@ export default function LoginPage() {
               type="password"
               autoComplete="current-password"
               required
-              className={field}
+              className={authFieldClass}
             />
           </label>
 
-          {state.error ? (
-            <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:border-red-900/45 dark:bg-red-950/45 dark:text-red-200">
-              <span className="mt-0.5 font-semibold" aria-hidden>
-                !
-              </span>
-              <span>{state.error}</span>
-            </div>
-          ) : null}
+          {state.error ? <AuthErrorBanner message={state.error} /> : null}
 
           <SubmitButton
             pendingText="Signing in..."
-            className={
-              "inline-flex h-12 w-full touch-manipulation items-center justify-center rounded-xl px-4 text-sm font-semibold " +
-              "bg-zinc-900 text-white transition-all hover:bg-zinc-800 active:scale-[0.99] active:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-60 " +
-              "dark:bg-amber-500 dark:text-zinc-950 dark:hover:bg-amber-400 sm:h-11"
-            }
+            className={authSubmitButtonClass}
           >
             Login
           </SubmitButton>
@@ -85,7 +73,7 @@ export default function LoginPage() {
           Noch kein Konto?{" "}
           <Link
             href="/register"
-            className="font-medium text-amber-700 underline decoration-amber-500/40 underline-offset-2 transition hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-300"
+            className={authSwapLinkClass}
           >
             Jetzt registrieren
           </Link>

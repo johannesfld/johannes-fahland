@@ -1,0 +1,10 @@
+Projektweite UI-Regeln:
+- Nutze ausschliesslich Tailwind CSS-Klassen.
+- Arbeite strikt Mobile-First.
+- Halte das 4er-Raster fuer Spacing ein (p-/m-/gap-Werte in 2er-Schritten wie 2,4,6,8).
+- Behalte bestehende Farbpalette und Grundcharakter bei (amber/sky/zinc).
+- Unterseiten sind scroll-frei; nutze adaptive Tabs/Panels statt Overflow-Scroll.
+- 10x10-Grids muessen sich immer auf den verfuegbaren Bildschirmplatz anpassen.
+- Keine blockierenden Fullscreen-Overlays; primaere Aktionen muessen erreichbar bleiben.
+
+Details und konkrete Klassenkonventionen sind in `.cursor/rules/design.mdc` verbindlich geregelt.

@@ -87,7 +87,7 @@ export default function RootLayout({
         />
         <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
       </head>
-      <body className="h-dvh overflow-hidden">
+      <body className="h-dvh min-h-dvh overflow-hidden overscroll-none">
         <ThemeProvider>
           <PWAInstaller />
           <AppShell>{children}</AppShell>

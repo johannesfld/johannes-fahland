@@ -4,6 +4,11 @@ import { prisma } from "@/lib/prisma";
 
 const SESSION_COOKIE_NAME = "session";
 const SESSION_DAYS = 30;
+const AUTH_ENABLED = false;
+const GUEST_USER: CurrentUser = {
+  id: "guest",
+  username: "Gast",
+};
 
 function hashToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
@@ -19,6 +24,8 @@ export type CurrentUser = {
 };
 
 export async function createSession(userId: string) {
+  if (!AUTH_ENABLED) return;
+
   const token = newSessionToken();
   const tokenHash = hashToken(token);
   const expiresAt = new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000);
@@ -42,6 +49,8 @@ export async function createSession(userId: string) {
 }
 
 export async function deleteCurrentSession() {
+  if (!AUTH_ENABLED) return;
+
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
   
@@ -54,6 +63,10 @@ export async function deleteCurrentSession() {
 }
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
+  if (!AUTH_ENABLED) {
+    return GUEST_USER;
+  }
+
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE_NAME)?.value;
   if (!token) return null;

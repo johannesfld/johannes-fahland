@@ -1,187 +1,34 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { IconAlert, IconClose, IconMinus, IconPlus } from "@/components/ui/icons";
-
-type Player = {
-  name: string;
-  isDummy: boolean;
-  totalScore: number;
-  history: RoundResult[];
-};
-
-type RoundResult = {
-  roundNumber: number;
-  bid: number;
-  actual: number;
-  points: number;
-};
-
-type MainStage = "setup" | "game" | "finished";
-type GamePhase =
-  | "rules"
-  | "mixer-announcement"
-  | "bids"
-  | "actuals"
-  | "scoreboard";
-
-type GameState = {
-  mainStage: MainStage;
-  gamePhase: GamePhase;
-  players: Player[];
-  totalRounds: number;
-  roundNumber: number;
-  mixerIndex: number;
-  currentBidderIndex: number;
-  currentActualIndex: number;
-  pendingBids: number[];
-  pendingActuals: number[];
-};
-
-const STORAGE_KEY = "wizard-pro-score-v3";
-const DUMMY_PLAYER_NAME = "Bruv";
-
-const MAX_NAME_LEN = 32;
-
-const getRoundCount = (players: number) => Math.floor(60 / players);
-
-const calculatePoints = (bid: number, actual: number) => {
-  if (bid === actual) return 20 + actual * 10;
-  return -Math.abs(bid - actual) * 10;
-};
-
-const isDummyPlayer = (player: Player | undefined) =>
-  Boolean(player && (player.isDummy || player.name === DUMMY_PLAYER_NAME));
-
-const getEligibleMixerIndexes = (players: Player[]): number[] => {
-  const humanIndexes = players
-    .map((player, index) => ({ player, index }))
-    .filter(({ player }) => !isDummyPlayer(player))
-    .map(({ index }) => index);
-  if (humanIndexes.length > 0) return humanIndexes;
-  return players.map((_, index) => index);
-};
-
-const getRandomMixerIndex = (players: Player[]) => {
-  const eligibleMixerIndexes = getEligibleMixerIndexes(players);
-  return eligibleMixerIndexes[
-    Math.floor(Math.random() * eligibleMixerIndexes.length)
-  ];
-};
-
-const getNextMixerIndex = (players: Player[], currentMixerIndex: number) => {
-  const eligibleMixerIndexes = getEligibleMixerIndexes(players);
-  const currentPos = eligibleMixerIndexes.indexOf(currentMixerIndex);
-  if (currentPos === -1) return eligibleMixerIndexes[0] ?? 0;
-  return (
-    eligibleMixerIndexes[(currentPos + 1) % eligibleMixerIndexes.length] ?? 0
-  );
-};
-
-const getNextBidderIndex = (mixerIndex: number, playerCount: number) =>
-  (mixerIndex + 1) % playerCount;
-
-const getPlayerOrder = (startIndex: number, playerCount: number): number[] => {
-  const order: number[] = [];
-  for (let i = 0; i < playerCount; i++) {
-    order.push((startIndex + i) % playerCount);
-  }
-  return order;
-};
-
-const INITIAL_STATE: GameState = {
-  mainStage: "setup",
-  gamePhase: "mixer-announcement",
-  players: [],
-  totalRounds: 0,
-  roundNumber: 1,
-  mixerIndex: 0,
-  currentBidderIndex: 0,
-  currentActualIndex: 0,
-  pendingBids: [],
-  pendingActuals: [],
-};
-
-/**
- * Flex column (not `absolute`) so parents keep a real height on mobile — absolute-only roots
- * collapsed to 0px and showed only the dark gradient. `min-h` backs up the flex chain (svh/mobile).
- */
-const shell =
-  "relative z-0 flex h-full w-full min-h-0 flex-1 flex-col overflow-hidden font-sans selection:bg-amber-500/25 " +
-  "bg-gradient-to-b from-amber-50 via-stone-100 to-amber-100/95 text-amber-950 " +
-  "dark:from-[#080d18] dark:via-[#0f172a] dark:to-[#020617] dark:text-amber-50";
-
-const card =
-  "rounded-[2rem] border backdrop-blur-xl shadow-xl " +
-  "border-amber-200/60 bg-white/75 shadow-amber-900/5 " +
-  "dark:border-amber-900/35 dark:bg-slate-900/45 dark:shadow-black/40";
-
-const glow =
-  "pointer-events-none absolute inset-0 opacity-80 dark:opacity-100 " +
-  "bg-[radial-gradient(ellipse_100%_70%_at_50%_-25%,#fde68a,transparent)] " +
-  "dark:bg-[radial-gradient(circle_at_50%_-20%,#1e1b4b,transparent)]";
-
-const primaryBtn =
-  "w-full rounded-2xl bg-amber-500 py-4 text-sm font-black uppercase tracking-widest text-slate-950 shadow-lg " +
-  "transition-colors hover:bg-amber-400 active:bg-amber-600 dark:text-slate-950 dark:hover:bg-amber-400 " +
-  "touch-manipulation";
-
-const stepperBtn =
-  "flex h-16 flex-1 items-center justify-center rounded-xl border-2 border-amber-500 bg-white/90 text-amber-700 " +
-  "transition-colors hover:bg-amber-50 active:bg-amber-100 dark:border-amber-400 dark:bg-slate-900/80 dark:text-amber-300 " +
-  "dark:hover:bg-slate-800 md:h-16 md:w-16 md:flex-none touch-manipulation";
-
-const stageCenterWrap =
-  "relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto overscroll-y-contain px-3 py-3 " +
-  "pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pt-[max(0.75rem,env(safe-area-inset-top,0px))] sm:px-4 sm:py-4";
-
-function BigNumber({ value }: { value: number }) {
-  return (
-    <div
-      className={
-        "flex min-h-[5rem] min-w-[6rem] items-center justify-center rounded-2xl border-4 border-amber-500 " +
-        "bg-amber-50 text-5xl font-serif font-bold tabular-nums text-amber-900 shadow-inner shadow-amber-900/10 " +
-        "dark:border-amber-400 dark:bg-slate-950 dark:text-amber-200 md:min-h-[5.5rem] md:min-w-[8rem] md:text-6xl"
-      }
-      aria-live="polite"
-      aria-label={`Wert ${value}`}
-    >
-      {value}
-    </div>
-  );
-}
-
-function ErrorBanner({ message }: { message: string }) {
-  return (
-    <div
-      className={
-        "flex items-start justify-center gap-2 rounded-2xl border border-red-300/80 bg-red-50/95 p-3 text-center " +
-        "text-sm text-red-800 dark:border-red-500/40 dark:bg-red-950/50 dark:text-red-100"
-      }
-      role="alert"
-    >
-      <IconAlert className="mt-0.5 h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
-      <span>{message}</span>
-    </div>
-  );
-}
-
-function CloseGameButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={
-        "absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-xl border " +
-        "border-amber-200/80 bg-white/90 text-zinc-500 transition-colors hover:border-red-300 hover:text-red-600 " +
-        "dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-400 dark:hover:border-red-500/50 dark:hover:text-red-400 md:right-4 md:top-4"
-      }
-      aria-label="Spiel beenden"
-    >
-      <IconClose className="h-5 w-5" />
-    </button>
-  );
-}
+import { IconMinus, IconPlus } from "@/components/ui/icons";
+import { CloseGameButton, ErrorBanner, BigNumber } from "@/components/wizard/components/Common";
+import {
+  DUMMY_PLAYER_NAME,
+  MAX_NAME_LEN,
+  calculatePoints,
+  getNextBidderIndex,
+  getNextMixerIndex,
+  getPlayerOrder,
+  getRandomMixerIndex,
+  getRoundCount,
+  isDummyPlayer,
+} from "@/components/wizard/scoring";
+import { INITIAL_STATE } from "@/components/wizard/state";
+import {
+  clearWizardState,
+  loadWizardState,
+  saveWizardState,
+} from "@/components/wizard/storage";
+import {
+  card,
+  glow,
+  primaryBtn,
+  shell,
+  stageCenterWrap,
+  stepperBtn,
+} from "@/components/wizard/styles";
+import type { GameState } from "@/components/wizard/types";
 
 export default function WizardScoreMaster() {
   const [state, setState] = useState<GameState>(INITIAL_STATE);
@@ -193,63 +40,24 @@ export default function WizardScoreMaster() {
   const isHydrated = useRef(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed: unknown = JSON.parse(saved);
-        const ok =
-          parsed &&
-          typeof parsed === "object" &&
-          "mainStage" in parsed &&
-          "players" in parsed &&
-          Array.isArray((parsed as GameState).players) &&
-          Array.isArray((parsed as GameState).pendingBids) &&
-          Array.isArray((parsed as GameState).pendingActuals);
-        const gs = ok ? (parsed as GameState) : null;
-        const n = gs?.players.length ?? 0;
-        const inProgress =
-          gs?.mainStage === "game" || gs?.mainStage === "finished";
-        const lengthsMatch =
-          gs &&
-          gs.pendingBids.length === n &&
-          gs.pendingActuals.length === n;
-        const playerCountOk = !inProgress || (n >= 3 && n <= 6);
-        const valid =
-          gs &&
-          lengthsMatch &&
-          playerCountOk &&
-          (!inProgress ||
-            (Number.isFinite(gs.roundNumber) &&
-              Number.isFinite(gs.totalRounds) &&
-              gs.mixerIndex >= 0 &&
-              gs.mixerIndex < n &&
-              gs.currentBidderIndex >= 0 &&
-              gs.currentBidderIndex < n &&
-              gs.currentActualIndex >= 0 &&
-              gs.currentActualIndex < n));
-
-        queueMicrotask(() => {
-          if (valid) {
-            setState(gs);
-          } else {
-            localStorage.removeItem(STORAGE_KEY);
-            setState(INITIAL_STATE);
-          }
-          isHydrated.current = true;
-        });
-      } catch (e) {
-        console.error("Fehler beim Laden des Spielstands", e);
-        localStorage.removeItem(STORAGE_KEY);
+    try {
+      const loaded = loadWizardState();
+      queueMicrotask(() => {
+        if (loaded) {
+          setState(loaded);
+        }
         isHydrated.current = true;
-      }
-    } else {
+      });
+    } catch (e) {
+      console.error("Fehler beim Laden des Spielstands", e);
+      clearWizardState();
       isHydrated.current = true;
     }
   }, []);
 
   useEffect(() => {
     if (isHydrated.current) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      saveWizardState(state);
     }
   }, [state]);
 
@@ -436,12 +244,12 @@ export default function WizardScoreMaster() {
     state.roundNumber,
     state.totalRounds,
     state.mixerIndex,
-    state.players.length,
+    state.players,
   ]);
 
   const resetGame = useCallback(() => {
     if (confirm("Möchtest du das aktuelle Spiel wirklich beenden?")) {
-      localStorage.removeItem(STORAGE_KEY);
+      clearWizardState();
       setState(INITIAL_STATE);
       setPlayerNames(Array.from({ length: setupPlayerCount }, () => ""));
     }

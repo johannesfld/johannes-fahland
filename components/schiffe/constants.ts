@@ -1,0 +1,2 @@
+export const PLACEMENT_ROTATE_BTN_PX = 44;
+export const PLACEMENT_OVERLAY_GAP_PX = 8;

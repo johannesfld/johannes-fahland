@@ -1,23 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react";
-
-// --- Types & Constants ---
-type Category = "ones" | "twos" | "threes" | "fours" | "fives" | "sixes" | "onePair" | "twoPairs" | "threeKind" | "fourKind" | "fullHouse" | "smallStraight" | "largeStraight" | "kniffel" | "chance";
-type CellValue = { score: number | null; crossed: boolean };
-type PlayerScores = Record<Category, CellValue>;
-
-const FIXED_PTS: Partial<Record<Category, number>> = { smallStraight: 15, largeStraight: 20, kniffel: 50 };
-
-const CAT_LABELS: Record<string, string> = {
-  ones: "1er", twos: "2er", threes: "3er", fours: "4er", fives: "5er", sixes: "6er",
-  onePair: "Paar", twoPairs: "2 Paare", threeKind: "3 Gleiche", fourKind: "4 Gleiche",
-  fullHouse: "Full House", smallStraight: "Kl. Straße", largeStraight: "Gr. Straße",
-  kniffel: "Kniffel", chance: "Chance"
-};
-
-const TOP_CATEGORIES: Category[] = ["ones", "twos", "threes", "fours", "fives", "sixes"];
-const BOTTOM_CATEGORIES: Category[] = ["onePair", "twoPairs", "threeKind", "fourKind", "fullHouse", "smallStraight", "largeStraight", "kniffel", "chance"];
+import { useState } from "react";
+import { SumRow } from "@/components/kniffel/SumRow";
+import {
+  BOTTOM_CATEGORIES,
+  CAT_LABELS,
+  FIXED_PTS,
+  TOP_CATEGORIES,
+  type Category,
+  type PlayerScores,
+} from "@/components/kniffel/constants";
+import {
+  calculateTopSum,
+  calculateTotal,
+  createInitialScores,
+} from "@/components/kniffel/helpers";
 
 // --- Main Component ---
 export default function KniffelApp() {
@@ -27,9 +24,7 @@ export default function KniffelApp() {
   const [scores, setScores] = useState<PlayerScores[]>([]);
 
   const initGame = () => {
-    setScores(playerNames.map(() => 
-      Object.keys(CAT_LABELS).reduce((acc, key) => ({ ...acc, [key]: { score: null, crossed: false } }), {} as PlayerScores)
-    ));
+    setScores(createInitialScores(playerNames.length));
     setIsStarted(true);
   };
 
@@ -140,8 +135,8 @@ export default function KniffelApp() {
                       </tr>
                     ))}
                     {/* Summenzeilen */}
-                    <SumRow label="Oben (Summe)" players={scores} calc={s => sum(s, ["ones","twos","threes","fours","fives","sixes"])} />
-                    <SumRow label="Bonus (+25)" players={scores} calc={s => sum(s, ["ones","twos","threes","fours","fives","sixes"]) >= 63 ? 25 : 0} highlight />
+                    <SumRow label="Oben (Summe)" players={scores} calc={calculateTopSum} />
+                    <SumRow label="Bonus (+25)" players={scores} calc={s => calculateTopSum(s) >= 63 ? 25 : 0} highlight />
                     {BOTTOM_CATEGORIES.map((key) => (
                       <tr key={key} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30">
                         <td className="sticky left-0 z-10 bg-white dark:bg-zinc-900 p-4 font-bold border-r dark:border-zinc-700 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">{CAT_LABELS[key]}</td>
@@ -182,25 +177,5 @@ export default function KniffelApp() {
         )}
       </main>
     </div>
-  );
-}
-
-// --- Helpers ---
-const sum = (s: PlayerScores, keys: string[]) => keys.reduce((a, k) => a + (s[k as Category].score ?? 0), 0);
-const calculateTotal = (s: PlayerScores) => {
-  const top = sum(s, ["ones","twos","threes","fours","fives","sixes"]);
-  const bonus = top >= 63 ? 25 : 0;
-  const bottom = sum(s, ["onePair","twoPairs","threeKind","fourKind","fullHouse","smallStraight","largeStraight","kniffel","chance"]);
-  return top + bonus + bottom;
-};
-
-function SumRow({ label, players, calc, highlight, large }: { label: string, players: PlayerScores[], calc: (s: PlayerScores) => number, highlight?: boolean, large?: boolean }) {
-  return (
-    <tr className={`${highlight ? 'bg-amber-50 dark:bg-amber-900/10' : 'bg-zinc-50 dark:bg-zinc-800/30'}`}>
-      <td className="sticky left-0 z-10 bg-inherit p-4 font-black uppercase text-[10px] tracking-widest border-r dark:border-zinc-700">{label}</td>
-      {players.map((s, i) => (
-        <td key={i} className={`p-4 text-center font-black ${large ? 'text-xl text-amber-500' : 'text-zinc-600 dark:text-zinc-300'}`}>{calc(s)}</td>
-      ))}
-    </tr>
   );
 }
