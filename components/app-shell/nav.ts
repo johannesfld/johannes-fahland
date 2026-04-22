@@ -1,16 +1,19 @@
+import { Home, Sparkles, Dices, Ship, type LucideIcon } from "lucide-react";
+
 export type NavItem = {
   href: string;
   label: string;
+  icon: LucideIcon;
 };
 
 export const WIZARD_HREF = "/wizzard-punkterechner";
 export const SCHIFFE_HREF = "/schiffe-versenken";
 
 export const NAV: NavItem[] = [
-  { href: "/", label: "Home" },
-  { href: WIZARD_HREF, label: "Wizzard" },
-  { href: "/kniffel-rechner", label: "Kniffel" },
-  { href: SCHIFFE_HREF, label: "Schiffe versenken" },
+  { href: "/", label: "Home", icon: Home },
+  { href: WIZARD_HREF, label: "Wizzard", icon: Sparkles },
+  { href: "/kniffel-rechner", label: "Kniffel", icon: Dices },
+  { href: SCHIFFE_HREF, label: "Schiffe versenken", icon: Ship },
 ];
 
 export function navIsActive(pathname: string | null, href: string) {

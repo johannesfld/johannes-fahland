@@ -154,6 +154,11 @@ input[type="number"]::-webkit-inner-spin-button {
   padding-bottom: max(0px, env(safe-area-inset-bottom));
 }
 
+.board-grid button {
+  min-height: 0;
+  min-width: 0;
+}
+
 @media (display-mode: standalone) {
   html,
   body {

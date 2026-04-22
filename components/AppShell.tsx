@@ -3,12 +3,27 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { BrandingLogo } from "@/components/BrandingLogo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { IconClose, IconMenu } from "@/components/ui/icons";
 import { DesktopSidebar } from "@/components/app-shell/DesktopSidebar";
 import { MobileMenu } from "@/components/app-shell/MobileMenu";
 import { NAV, SCHIFFE_HREF, WIZARD_HREF, navIsActive, navTypographyByHref } from "@/components/app-shell/nav";
+
+const MotionLink = motion.create(Link);
+
+const ease = [0.22, 1, 0.36, 1] as const;
+
+const navContainerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.04 } },
+};
+
+const navItemVariants = {
+  hidden: { opacity: 0, y: -6 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.25, ease } },
+};
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -55,10 +70,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <header className="safe-area-inset sticky top-0 z-40 flex min-h-14 shrink-0 items-center border-b border-[var(--border)] bg-zinc-50/95 pt-[max(env(safe-area-inset-top),0.4rem)] backdrop-blur-md dark:border-zinc-700/80 dark:bg-zinc-800/85">
           <div className="mx-auto flex h-full w-full max-w-7xl items-center gap-3 px-4">
-            <button
+            <motion.button
               type="button"
               onClick={mobileOpen ? handleMobileClose : handleMobileOpen}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] text-[var(--foreground)] transition duration-200 hover:bg-zinc-100 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 md:hidden dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-950"
+              whileTap={{ scale: 0.95 }}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] text-[var(--foreground)] transition duration-200 hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 md:hidden dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-950"
               aria-label={mobileOpen ? "Menü schließen" : "Menü öffnen"}
             >
               {mobileOpen ? (
@@ -66,11 +82,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               ) : (
                 <IconMenu className="h-5 w-5" />
               )}
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               type="button"
               onClick={() => setDesktopSidebarOpen((prev) => !prev)}
-              className="hidden h-11 w-11 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] text-[var(--foreground)] transition duration-200 hover:bg-zinc-100 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 md:inline-flex dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-950"
+              whileTap={{ scale: 0.95 }}
+              className="hidden h-11 w-11 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] text-[var(--foreground)] transition duration-200 hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 md:inline-flex dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-950"
               aria-label={
                 desktopSidebarOpen ? "Sidebar einklappen" : "Sidebar ausklappen"
               }
@@ -80,7 +97,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               ) : (
                 <IconMenu className="h-5 w-5" />
               )}
-            </button>
+            </motion.button>
             <Link
               href="/"
               className="flex min-w-0 items-center gap-2 text-sm font-semibold tracking-tight text-zinc-800 transition-colors hover:text-amber-600 dark:text-zinc-100 dark:hover:text-amber-400"
@@ -89,29 +106,39 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span className="truncate max-[360px]:hidden standalone-compact-title">vibecode projekte</span>
             </Link>
             <div className="hidden flex-1 md:block" />
-            {!desktopSidebarOpen && (
-              <nav className="hidden items-center gap-1 md:flex">
-                {NAV.map((item) => {
-                  const active = navIsActive(pathname, item.href);
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      aria-current={active ? "page" : undefined}
-                      className={[
-                        "rounded-lg px-3 py-2 text-sm transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-950",
-                        navTypographyByHref(item.href),
-                        active
-                          ? "bg-amber-500/16 ring-1 ring-amber-500/25 dark:bg-amber-400/12 dark:ring-amber-400/20"
-                          : "hover:text-amber-600 dark:hover:text-amber-300",
-                      ].join(" ")}
-                    >
-                      {item.label}
-                    </Link>
-                  );
-                })}
-              </nav>
-            )}
+            <AnimatePresence>
+              {!desktopSidebarOpen && (
+                <motion.nav
+                  className="hidden items-center gap-1 md:flex"
+                  variants={navContainerVariants}
+                  initial="hidden"
+                  animate="show"
+                  exit="hidden"
+                >
+                  {NAV.map((item) => {
+                    const active = navIsActive(pathname, item.href);
+                    return (
+                      <MotionLink
+                        key={item.href}
+                        href={item.href}
+                        aria-current={active ? "page" : undefined}
+                        variants={navItemVariants}
+                        className={[
+                          "inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-950",
+                          navTypographyByHref(item.href),
+                          active
+                            ? "bg-amber-500/16 ring-1 ring-amber-500/25 dark:bg-amber-400/12 dark:ring-amber-400/20"
+                            : "hover:text-amber-600 dark:hover:text-amber-300",
+                        ].join(" ")}
+                      >
+                        <item.icon size={16} className="shrink-0 opacity-50" aria-hidden />
+                        {item.label}
+                      </MotionLink>
+                    );
+                  })}
+                </motion.nav>
+              )}
+            </AnimatePresence>
             <div className="flex-1 md:hidden" />
             <ThemeToggle className="md:ml-2" />
           </div>

@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "vibecode projekte",
   },
   formatDetection: {
@@ -83,7 +83,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta
           name="apple-mobile-web-app-status-bar-style"
-          content="default"
+          content="black-translucent"
         />
         <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
       </head>

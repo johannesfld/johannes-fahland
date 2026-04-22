@@ -125,7 +125,7 @@ function BoardGrid({
           </div>
           <div
             ref={innerRef}
-            className="grid aspect-square flex-1 grid-cols-10 grid-rows-10 gap-[2px] rounded-md border border-slate-700/70 bg-slate-900/80 p-[2px]"
+            className="board-grid grid aspect-square flex-1 grid-cols-10 grid-rows-10 gap-[2px] rounded-md border border-slate-700/70 bg-slate-900/80 p-[2px]"
           >
             {Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, i) => {
               const r = Math.floor(i / GRID_SIZE);

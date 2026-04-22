@@ -46,7 +46,7 @@ export function DesktopSidebar({
                 aria-current={active ? "page" : undefined}
                 style={{ animationDelay: `${index * 45}ms` }}
                 className={[
-                  "nav-item-enter group flex items-center rounded-xl px-3 py-2.5 text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 dark:focus-visible:ring-offset-zinc-900",
+                  "nav-item-enter group flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 dark:focus-visible:ring-offset-zinc-900",
                   "motion-safe:hover:translate-x-0.5",
                   navTypographyByHref(item.href),
                   active
@@ -54,6 +54,7 @@ export function DesktopSidebar({
                     : "text-zinc-600 hover:bg-zinc-100/95 hover:text-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-800/70 dark:hover:text-white",
                 ].join(" ")}
               >
+                <item.icon size={18} className="shrink-0 opacity-60" aria-hidden />
                 <span className="min-w-0 leading-snug">{item.label}</span>
               </Link>
             );

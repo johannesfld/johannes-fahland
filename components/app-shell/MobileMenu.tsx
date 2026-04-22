@@ -2,10 +2,25 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { IconClose } from "@/components/ui/icons";
 import { NAV, navIsActive, navTypographyByHref } from "@/components/app-shell/nav";
 import { useSwipeDrawer } from "@/components/app-shell/useSwipeDrawer";
+
+const MotionLink = motion.create(Link);
+
+const ease = [0.22, 1, 0.36, 1] as const;
+
+const navContainerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.04 } },
+};
+
+const navItemVariants = {
+  hidden: { opacity: 0, x: -10 },
+  show: { opacity: 1, x: 0, transition: { duration: 0.3, ease } },
+};
 
 type MobileMenuProps = {
   mobileOpen: boolean;
@@ -19,6 +34,14 @@ export function MobileMenu({ mobileOpen, pathname, onOpen, onClose }: MobileMenu
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useSwipeDrawer({ isOpen: mobileOpen, onOpen, onClose, drawerRef, overlayRef });
+
+  const prevPathname = useRef(pathname);
+  useEffect(() => {
+    if (prevPathname.current !== pathname && mobileOpen) {
+      onClose();
+    }
+    prevPathname.current = pathname;
+  }, [pathname, mobileOpen, onClose]);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -64,37 +87,45 @@ export function MobileMenu({ mobileOpen, pathname, onOpen, onClose }: MobileMenu
         <div className="mb-4 flex items-center justify-between gap-3">
           <span className="flex-1 text-sm font-semibold tracking-tight">Menu</span>
           <ThemeToggle className="shrink-0" />
-          <button
+          <motion.button
             type="button"
             onClick={onClose}
+            whileTap={{ scale: 0.95 }}
             className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] text-[var(--foreground)] transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800"
             aria-label="Menü schließen"
           >
             <IconClose className="h-5 w-5" />
-          </button>
+          </motion.button>
         </div>
-        <nav className="flex flex-col gap-1" aria-label="Hauptnavigation">
+        <motion.nav
+          className="flex flex-col gap-1"
+          aria-label="Hauptnavigation"
+          variants={navContainerVariants}
+          initial="hidden"
+          animate={mobileOpen ? "show" : "hidden"}
+        >
           {NAV.map((item) => {
             const active = navIsActive(pathname, item.href);
             return (
-              <Link
+              <MotionLink
                 key={item.href}
                 href={item.href}
-                onClick={onClose}
                 aria-current={active ? "page" : undefined}
+                variants={navItemVariants}
                 className={[
-                  "flex items-center rounded-xl px-3 py-3 text-base transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 dark:focus-visible:ring-offset-zinc-900",
+                  "flex items-center gap-3 rounded-xl px-3 py-3 text-base transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 dark:focus-visible:ring-offset-zinc-900",
                   navTypographyByHref(item.href),
                   active
                     ? "bg-amber-500/16 ring-1 ring-amber-500/30 dark:bg-amber-400/12 dark:ring-amber-400/24"
                     : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800/80",
                 ].join(" ")}
               >
+                <item.icon size={18} className="shrink-0 opacity-60" aria-hidden />
                 {item.label}
-              </Link>
+              </MotionLink>
             );
           })}
-        </nav>
+        </motion.nav>
         <div className="flex-1" />
         <p className="border-t border-[var(--border)] pt-4 text-center text-xs text-zinc-500 dark:text-zinc-400">
           von Johannes Fahland
