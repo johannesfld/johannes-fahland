@@ -280,8 +280,10 @@ export function SchiffeVersenkenApp() {
     valid: boolean;
   } | null>(null);
   const [placementDrag, setPlacementDrag] = useState<{
-    pointerId: number;
     shipId: FleetShipId;
+    pointerId?: number;
+    touchId?: number;
+    source: "pointer" | "touch";
   } | null>(null);
   const shipsHereRef = useRef(shipsHere);
   const verticalRef = useRef(vertical);
@@ -297,6 +299,7 @@ export function SchiffeVersenkenApp() {
     has: false,
   });
   const dragCaptureRef = useRef<Element | null>(null);
+  const touchDragMoveHandlerRef = useRef<((e: TouchEvent) => void) | null>(null);
 
   const clientToPlacementFraction = useCallback(
     (clientX: number, clientY: number): { fracR: number; fracC: number } | null => {
@@ -339,20 +342,23 @@ export function SchiffeVersenkenApp() {
     [clientToPlacementFraction],
   );
 
-  useEffect(() => {
-    if (!placementDrag) return;
-    const { pointerId, shipId } = placementDrag;
-    const releaseCap = () => {
-      const el = dragCaptureRef.current;
-      if (el) {
-        try { el.releasePointerCapture(pointerId); } catch { /* already released */ }
-        dragCaptureRef.current = null;
+  const releasePointerCapture = useCallback(() => {
+    const drag = placementDrag;
+    const pointerId = drag?.pointerId;
+    const el = dragCaptureRef.current;
+    if (el && pointerId !== undefined) {
+      try {
+        el.releasePointerCapture(pointerId);
+      } catch {
+        // ignore already released capture
       }
-    };
-    const finish = (e: PointerEvent) => {
-      if (e.pointerId !== pointerId) return;
-      releaseCap();
-      const frac = clientToPlacementFraction(e.clientX, e.clientY);
+    }
+    dragCaptureRef.current = null;
+  }, [placementDrag]);
+
+  const finishDrag = useCallback(
+    (clientX: number, clientY: number, shipId: FleetShipId) => {
+      const frac = clientToPlacementFraction(clientX, clientY);
       setPlacementDrag(null);
       setPlacementHover(null);
       lastPointerRef.current = { x: 0, y: 0, has: false };
@@ -369,7 +375,54 @@ export function SchiffeVersenkenApp() {
       const rest = shipsHereRef.current.filter((s) => s.id !== shipId);
       if (!canAddShip(rest, { id: shipId, cells })) return;
       dispatch({ type: "PLACE_SHIP", ship: { id: shipId, cells } });
-    };
+    },
+    [clientToPlacementFraction],
+  );
+
+  const beginDrag = useCallback(
+    ({
+      shipId,
+      clientX,
+      clientY,
+      pointerId,
+      captureElement,
+      source,
+      touchId,
+    }: {
+      shipId: FleetShipId;
+      clientX: number;
+      clientY: number;
+      pointerId?: number;
+      captureElement?: Element | null;
+      source: "pointer" | "touch";
+      touchId?: number;
+    }) => {
+      if (source === "pointer" && pointerId !== undefined && captureElement) {
+        try {
+          captureElement.setPointerCapture(pointerId);
+          dragCaptureRef.current = captureElement;
+        } catch {
+          dragCaptureRef.current = null;
+        }
+      } else {
+        dragCaptureRef.current = null;
+      }
+      setPlacementDrag({
+        shipId,
+        pointerId,
+        source,
+        touchId,
+      });
+      lastPointerRef.current = { x: clientX, y: clientY, has: true };
+      updatePlacementHover(clientX, clientY, shipId);
+    },
+    [updatePlacementHover],
+  );
+
+  useEffect(() => {
+    if (!placementDrag || placementDrag.source !== "pointer") return;
+    const { pointerId, shipId } = placementDrag;
+    if (pointerId === undefined) return;
     const onMove = (e: PointerEvent) => {
       if (e.pointerId !== pointerId) return;
       lastPointerRef.current = {
@@ -379,17 +432,63 @@ export function SchiffeVersenkenApp() {
       };
       updatePlacementHover(e.clientX, e.clientY, shipId);
     };
-    const onEnd = (e: PointerEvent) => finish(e);
+    const onEnd = (e: PointerEvent) => {
+      if (e.pointerId !== pointerId) return;
+      releasePointerCapture();
+      finishDrag(e.clientX, e.clientY, shipId);
+    };
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerup", onEnd);
     window.addEventListener("pointercancel", onEnd);
     return () => {
-      releaseCap();
+      releasePointerCapture();
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onEnd);
       window.removeEventListener("pointercancel", onEnd);
     };
-  }, [placementDrag, clientToPlacementFraction, updatePlacementHover]);
+  }, [finishDrag, placementDrag, releasePointerCapture, updatePlacementHover]);
+
+  useEffect(() => {
+    if (!placementDrag || placementDrag.source !== "touch") return;
+    const { shipId, touchId } = placementDrag;
+    if (touchId === undefined) return;
+    const onMove = (e: TouchEvent) => {
+      const touch = Array.from(e.changedTouches).find((t) => t.identifier === touchId);
+      if (!touch) return;
+      e.preventDefault();
+      lastPointerRef.current = {
+        x: touch.clientX,
+        y: touch.clientY,
+        has: true,
+      };
+      updatePlacementHover(touch.clientX, touch.clientY, shipId);
+    };
+    const onEnd = (e: TouchEvent) => {
+      const touch = Array.from(e.changedTouches).find((t) => t.identifier === touchId);
+      if (!touch) return;
+      finishDrag(touch.clientX, touch.clientY, shipId);
+    };
+    touchDragMoveHandlerRef.current = onMove;
+    window.addEventListener("touchmove", onMove, { passive: false });
+    window.addEventListener("touchend", onEnd, { passive: false });
+    window.addEventListener("touchcancel", onEnd, { passive: false });
+    return () => {
+      if (touchDragMoveHandlerRef.current) {
+        window.removeEventListener("touchmove", touchDragMoveHandlerRef.current);
+        touchDragMoveHandlerRef.current = null;
+      }
+      window.removeEventListener("touchend", onEnd);
+      window.removeEventListener("touchcancel", onEnd);
+    };
+  }, [finishDrag, placementDrag, updatePlacementHover]);
+
+  useEffect(() => {
+    return () => {
+      if (touchDragMoveHandlerRef.current) {
+        window.removeEventListener("touchmove", touchDragMoveHandlerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!placementDrag || !lastPointerRef.current.has) return;
@@ -745,15 +844,30 @@ export function SchiffeVersenkenApp() {
                         }}
                         onPointerDown={(e) => {
                           e.preventDefault();
-                          (e.currentTarget as Element).setPointerCapture(e.pointerId);
-                          dragCaptureRef.current = e.currentTarget;
                           setBoardSelectedId(null);
                           setPickedId(f.id);
-                          setPlacementDrag({
-                            pointerId: e.pointerId,
+                          beginDrag({
                             shipId: f.id,
+                            clientX: e.clientX,
+                            clientY: e.clientY,
+                            pointerId: e.pointerId,
+                            captureElement: e.currentTarget,
+                            source: "pointer",
                           });
-                          updatePlacementHover(e.clientX, e.clientY, f.id);
+                        }}
+                        onTouchStart={(e) => {
+                          const touch = e.changedTouches[0];
+                          if (!touch) return;
+                          e.preventDefault();
+                          setBoardSelectedId(null);
+                          setPickedId(f.id);
+                          beginDrag({
+                            shipId: f.id,
+                            clientX: touch.clientX,
+                            clientY: touch.clientY,
+                            source: "touch",
+                            touchId: touch.identifier,
+                          });
                         }}
                         className={[
                           "shrink-0 rounded-lg border px-2 py-1.5 text-[11px] font-bold transition duration-200 select-none touch-manipulation active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:px-4 sm:text-xs lg:w-full dark:focus-visible:ring-offset-zinc-950",
@@ -867,16 +981,33 @@ export function SchiffeVersenkenApp() {
                           onPointerDown={(e) => {
                             if (!sh) return;
                             e.preventDefault();
-                            (e.currentTarget as Element).setPointerCapture(e.pointerId);
-                            dragCaptureRef.current = e.currentTarget;
                             setBoardSelectedId(sh.id);
                             setPickedId(sh.id);
                             setVertical(placedShipIsVertical(sh));
-                            setPlacementDrag({
-                              pointerId: e.pointerId,
+                            beginDrag({
                               shipId: sh.id,
+                              clientX: e.clientX,
+                              clientY: e.clientY,
+                              pointerId: e.pointerId,
+                              captureElement: e.currentTarget,
+                              source: "pointer",
                             });
-                            updatePlacementHover(e.clientX, e.clientY, sh.id);
+                          }}
+                          onTouchStart={(e) => {
+                            if (!sh) return;
+                            const touch = e.changedTouches[0];
+                            if (!touch) return;
+                            e.preventDefault();
+                            setBoardSelectedId(sh.id);
+                            setPickedId(sh.id);
+                            setVertical(placedShipIsVertical(sh));
+                            beginDrag({
+                              shipId: sh.id,
+                              clientX: touch.clientX,
+                              clientY: touch.clientY,
+                              source: "touch",
+                              touchId: touch.identifier,
+                            });
                           }}
                           onClick={() => {
                             if (sh) {

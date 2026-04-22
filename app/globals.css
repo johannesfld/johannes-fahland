@@ -160,7 +160,9 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .route-scroll-lock {
-  overscroll-behavior: none;
+  overflow: hidden;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: none;
 }
 
 @media (hover: none) and (pointer: coarse) {
@@ -173,6 +175,12 @@ input[type="number"]::-webkit-inner-spin-button {
   .route-scroll-lock input,
   .route-scroll-lock textarea {
     touch-action: manipulation;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  .route-scroll-lock {
+    -webkit-overflow-scrolling: auto;
   }
 }
 

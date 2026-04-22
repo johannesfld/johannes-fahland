@@ -264,7 +264,7 @@ export default function WizardScoreMaster() {
     "text-[10px] font-black uppercase tracking-widest text-amber-700/70 sm:text-xs dark:text-amber-400/70";
 
   return (
-    <div className={shell}>
+    <div className={`${shell} overscroll-none`} style={{ touchAction: "manipulation" }}>
       <div className={glow} />
 
       <div className="relative flex min-h-0 flex-1 flex-col">
