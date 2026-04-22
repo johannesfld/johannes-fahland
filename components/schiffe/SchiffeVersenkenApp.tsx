@@ -96,7 +96,11 @@ function BoardGrid({
       className={`relative w-full max-h-full max-w-full rounded-2xl border border-slate-700/60 bg-slate-950/95 p-1.5 shadow-md transition-opacity duration-200 sm:p-2 ${
         dimmed ? "opacity-40" : "opacity-100"
       }`}
-      style={fitMaxWidthPx ? { maxWidth: `${fitMaxWidthPx}px` } : undefined}
+      style={
+        fitMaxWidthPx
+          ? { maxWidth: `${fitMaxWidthPx}px`, touchAction: "none" }
+          : { touchAction: "none" }
+      }
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl opacity-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.2)_0%,transparent_75%)]" />
@@ -765,10 +769,7 @@ export function SchiffeVersenkenApp() {
                     );
                   })}
                 </div>
-                <div
-                  className="order-1 flex min-h-0 flex-1 items-center justify-center lg:order-2"
-                  style={placementDrag ? { touchAction: "none" } : undefined}
-                >
+                <div className="order-1 flex min-h-0 flex-1 items-center justify-center lg:order-2">
                   <BoardGrid
                     onRootRef={(el) => {
                       placementBoardRootRef.current = el;

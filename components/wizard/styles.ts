@@ -27,5 +27,5 @@ export const stepperBtn =
   "touch-manipulation";
 
 export const stageCenterWrap =
-  "relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto overscroll-y-contain px-4 py-4 " +
+  "relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden px-4 py-4 " +
   "pb-[max(1rem,env(safe-area-inset-bottom,0px))] pt-[max(1rem,env(safe-area-inset-top,0px))]";

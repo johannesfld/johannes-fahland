@@ -269,7 +269,7 @@ export default function WizardScoreMaster() {
 
       <div className="relative flex min-h-0 flex-1 flex-col">
         {state.mainStage === "setup" && (
-          <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center overflow-y-auto overscroll-y-contain px-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pt-[max(0.75rem,env(safe-area-inset-top,0px))] sm:px-4 sm:py-4">
+          <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center overflow-hidden px-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pt-[max(0.75rem,env(safe-area-inset-top,0px))] sm:px-4 sm:py-4">
             <div
               className={`${card} mx-auto w-full max-w-md space-y-4 p-4 sm:space-y-6 sm:p-6`}
             >
@@ -658,7 +658,7 @@ export default function WizardScoreMaster() {
             )}
 
             {state.gamePhase === "scoreboard" && (
-              <div className="relative flex min-h-0 w-full flex-1 flex-col items-center justify-center overflow-y-auto overscroll-y-contain px-3 py-3 pb-16 sm:px-4 sm:py-4">
+              <div className="relative flex min-h-0 w-full flex-1 flex-col items-center justify-center overflow-hidden px-3 py-3 pb-16 sm:px-4 sm:py-4">
                 <CloseGameButton onClick={resetGame} />
                 <div className="mx-auto w-full max-w-md space-y-3 sm:space-y-4">
                   <div className="py-2 text-center sm:py-3 app-page-enter">
@@ -782,7 +782,7 @@ export default function WizardScoreMaster() {
 
         {state.mainStage === "finished" && (
           <div className="flex min-h-0 w-full flex-1 items-center justify-center px-3 py-3 sm:px-4 sm:py-4">
-            <div className="max-h-full w-full max-w-md space-y-3 overflow-y-auto text-center sm:space-y-6 app-page-enter">
+            <div className="max-h-full w-full max-w-md space-y-3 overflow-hidden text-center sm:space-y-6 app-page-enter">
               <div className="space-y-1 sm:space-y-2">
                 <h2 className="font-serif text-xl font-bold text-amber-800 sm:text-2xl md:text-3xl dark:text-amber-200">
                   Das Schicksal ist besiegelt!

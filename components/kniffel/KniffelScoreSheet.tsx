@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { UserPlus, X, Play, ChevronRight, RotateCcw } from "lucide-react";
+import { UserPlus, X, Play, RotateCcw } from "lucide-react";
 import { SumRow } from "@/components/kniffel/SumRow";
 import {
   BOTTOM_CATEGORIES,
@@ -21,13 +21,17 @@ import {
 const ease = [0.22, 1, 0.36, 1] as const;
 
 export default function KniffelApp() {
-  const [playerNames, setPlayerNames] = useState(["Spieler 1", "Spieler 2"]);
+  const [playerNames, setPlayerNames] = useState(["", ""]);
+  const [gamePlayerNames, setGamePlayerNames] = useState<string[]>([]);
   const [isStarted, setIsStarted] = useState(false);
-  const [activeIdx, setActiveIdx] = useState(0);
   const [scores, setScores] = useState<PlayerScores[]>([]);
 
   const initGame = () => {
-    setScores(createInitialScores(playerNames.length));
+    const finalizedNames = playerNames.map(
+      (name, i) => name.trim() || `Spieler ${i + 1}`,
+    );
+    setGamePlayerNames(finalizedNames);
+    setScores(createInitialScores(finalizedNames.length));
     setIsStarted(true);
   };
 
@@ -93,7 +97,7 @@ export default function KniffelApp() {
                   </div>
                 ))}
                 <button
-                  onClick={() => setPlayerNames([...playerNames, `Spieler ${playerNames.length + 1}`])}
+                  onClick={() => setPlayerNames([...playerNames, ""])}
                   className="inline-flex items-center gap-1.5 text-sm font-bold text-amber-600 transition-colors hover:text-amber-700"
                 >
                   <UserPlus size={16} aria-hidden />
@@ -116,39 +120,14 @@ export default function KniffelApp() {
               transition={{ duration: 0.4, ease }}
               className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden"
             >
-              <motion.div
-                key={activeIdx}
-                initial={{ opacity: 0, x: 12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, ease }}
-                className="shrink-0 bg-white dark:bg-zinc-900 p-4 rounded-2xl flex items-center justify-between border border-zinc-200 dark:border-zinc-800 shadow-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center font-bold text-white text-xl">
-                    {playerNames[activeIdx][0]}
-                  </div>
-                  <div>
-                    <span className="text-[10px] block uppercase font-bold text-zinc-400">Am Zug</span>
-                    <span className="font-bold">{playerNames[activeIdx]}</span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setActiveIdx((activeIdx + 1) % playerNames.length)}
-                  className="inline-flex items-center gap-1.5 bg-zinc-100 dark:bg-zinc-800 px-6 py-2 rounded-xl font-bold text-sm transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-700"
-                >
-                  Nächster
-                  <ChevronRight size={16} aria-hidden />
-                </button>
-              </motion.div>
-
               <div className="flex min-h-0 flex-1 flex-col bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-2xl">
                 <div className="overflow-x-auto overflow-y-auto min-h-0 flex-1">
                   <table className="w-full border-collapse">
                     <thead>
                       <tr className="bg-zinc-50 dark:bg-zinc-800/50">
                         <th className="sticky left-0 z-20 bg-zinc-50 dark:bg-zinc-800 p-4 text-left text-[10px] uppercase tracking-widest text-zinc-400 border-r dark:border-zinc-700">Feld</th>
-                        {playerNames.map((name, i) => (
-                          <th key={i} className={`p-4 text-center min-w-[120px] font-bold ${activeIdx === i ? 'text-amber-500 ring-2 ring-inset ring-amber-500' : ''}`}>{name}</th>
+                        {gamePlayerNames.map((name, i) => (
+                          <th key={i} className="p-4 text-center min-w-[120px] font-bold">{name}</th>
                         ))}
                       </tr>
                     </thead>

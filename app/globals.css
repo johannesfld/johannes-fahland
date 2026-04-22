@@ -159,6 +159,23 @@ input[type="number"]::-webkit-inner-spin-button {
   min-width: 0;
 }
 
+.route-scroll-lock {
+  overscroll-behavior: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .route-scroll-lock {
+    touch-action: none;
+  }
+
+  .route-scroll-lock button,
+  .route-scroll-lock a,
+  .route-scroll-lock input,
+  .route-scroll-lock textarea {
+    touch-action: manipulation;
+  }
+}
+
 @media (display-mode: standalone) {
   html,
   body {
