@@ -62,7 +62,7 @@ export function MobileMenu({ mobileOpen, pathname, onOpen, onClose }: MobileMenu
         history.back();
       }
     };
-  }, [mobileOpen, onClose]);
+  }, [mobileOpen, onClose, pathname]);
 
   return (
     <>

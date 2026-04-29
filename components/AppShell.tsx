@@ -9,7 +9,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { IconClose, IconMenu } from "@/components/ui/icons";
 import { DesktopSidebar } from "@/components/app-shell/DesktopSidebar";
 import { MobileMenu } from "@/components/app-shell/MobileMenu";
-import { NAV, SCHIFFE_HREF, WIZARD_HREF, navIsActive, navTypographyByHref } from "@/components/app-shell/nav";
+import { NAV, SCHIFFE_HREF, TURNIER_HREF, WIZARD_HREF, navIsActive, navTypographyByHref } from "@/components/app-shell/nav";
 
 const MotionLink = motion.create(Link);
 
@@ -31,7 +31,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
   const isFullBleedPage =
     (pathname?.startsWith(WIZARD_HREF) ?? false) ||
-    (pathname?.startsWith(SCHIFFE_HREF) ?? false);
+    (pathname?.startsWith(SCHIFFE_HREF) ?? false) ||
+    (pathname?.startsWith(TURNIER_HREF) ?? false);
 
   const shouldShowChrome = useMemo(() => {
     if (!pathname) return true;

@@ -162,7 +162,6 @@ export function SchiffeVersenkenApp() {
   );
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [mobilePlayBoard, setMobilePlayBoard] = useState<PlayBoardTab>("target");
-  const [mobilePlacePanel, setMobilePlacePanel] = useState<"board" | "fleet">("board");
   const [botOverlayEntered, setBotOverlayEntered] = useState(false);
   const [vertical, setVertical] = useState(false);
   const [pickedId, setPickedId] = useState<FleetShipId | null>(null);
@@ -536,7 +535,6 @@ export function SchiffeVersenkenApp() {
       const target = e.target as Node;
       if (settingsBtnRef.current?.contains(target)) return;
       if (settingsRef.current?.contains(target)) return;
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSettingsOpen(false);
     };
     document.addEventListener("pointerdown", handler);
@@ -546,12 +544,6 @@ export function SchiffeVersenkenApp() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (game.phase === "play") setMobilePlayBoard("target");
-  }, [game.phase]);
-
-  useEffect(() => {
-    if (game.phase !== "place") return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMobilePlacePanel("board");
   }, [game.phase]);
 
   useEffect(() => {
@@ -586,32 +578,8 @@ export function SchiffeVersenkenApp() {
     };
   }, [game.single?.lastBotShot]);
 
-  const botShotFeedbackText = (feedback: BotShotFeedback): string => {
-    const cell = normalizeCellLabel(formatCell(feedback.cell));
-    if (feedback.result === "sunk") return `Bot feuert auf ${cell}: Versenkt.`;
-    if (feedback.result === "hit") return `Bot feuert auf ${cell}: Treffer.`;
-    return `Bot feuert auf ${cell}: Kein Treffer.`;
-  };
-
-  const shipLabelById = (shipId: FleetShipId | null): string => {
-    if (!shipId) return "-";
-    const spec = FLEET.find((x) => x.id === shipId);
-    if (!spec) return "-";
-    return `${spec.len}er (${shipId.toUpperCase()})`;
-  };
-
   const botShotWasHit = (feedback: BotShotFeedback): boolean =>
     feedback.result === "hit" || feedback.result === "sunk";
-
-  const botShotWasSunk = (feedback: BotShotFeedback): boolean =>
-    feedback.result === "sunk";
-
-  const yesNoLabel = (value: boolean): "Ja" | "Nein" => (value ? "Ja" : "Nein");
-
-  const overlayRowValueClass = (active: boolean): string =>
-    active
-      ? "font-black"
-      : "font-semibold text-slate-700 dark:text-slate-300";
 
   const normalizeCellLabel = (rawLabel: string): string => {
     const trimmed = rawLabel.trim();
@@ -625,21 +593,6 @@ export function SchiffeVersenkenApp() {
 
   const overlayCellLabel = (feedback: BotShotFeedback): string =>
     normalizeCellLabel(formatCell(feedback.cell));
-
-  const overlayHitLabel = (feedback: BotShotFeedback): "Ja" | "Nein" =>
-    yesNoLabel(botShotWasHit(feedback));
-
-  const overlaySunkLabel = (feedback: BotShotFeedback): "Ja" | "Nein" =>
-    yesNoLabel(botShotWasSunk(feedback));
-
-  const overlayShipLabel = (feedback: BotShotFeedback): string =>
-    shipLabelById(feedback.hitShipId);
-
-  const overlayBadgeLabel = (feedback: BotShotFeedback): string => {
-    if (botShotWasSunk(feedback)) return "Treffer + Versenkt";
-    if (botShotWasHit(feedback)) return "Treffer";
-    return "Kein Treffer";
-  };
 
   const modeSelectCard = (
     <div className="flex min-h-0 flex-1 items-center justify-center">

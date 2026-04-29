@@ -19,14 +19,16 @@ export function useSwipeDrawer({
   overlayRef,
 }: SwipeDrawerOptions) {
   const isOpenRef = useRef(isOpen);
-  isOpenRef.current = isOpen;
-
   const onOpenRef = useRef(onOpen);
-  onOpenRef.current = onOpen;
   const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
 
   const pendingCleanup = useRef(false);
+
+  useEffect(() => {
+    isOpenRef.current = isOpen;
+    onOpenRef.current = onOpen;
+    onCloseRef.current = onClose;
+  }, [isOpen, onOpen, onClose]);
 
   useEffect(() => {
     if (!pendingCleanup.current) return;

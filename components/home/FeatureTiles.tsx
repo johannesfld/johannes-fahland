@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { Sparkles, Dices, Ship } from "lucide-react";
+import { Sparkles, Dices, Ship, Trophy } from "lucide-react";
 
 const MotionLink = motion.create(Link);
 
@@ -23,7 +23,7 @@ export function FeatureTiles() {
 
   return (
     <motion.div
-      className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:[grid-auto-rows:1fr] lg:grid-cols-3"
+      className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:[grid-auto-rows:1fr] lg:grid-cols-4"
       variants={prefersReduced ? undefined : containerVariants}
       initial="hidden"
       animate="show"
@@ -31,6 +31,7 @@ export function FeatureTiles() {
       <WizardTile reduced={prefersReduced} />
       <KniffelTile reduced={prefersReduced} />
       <SchiffeTile reduced={prefersReduced} />
+      <TurnierTile reduced={prefersReduced} />
     </motion.div>
   );
 }
@@ -126,6 +127,37 @@ function SchiffeTile({ reduced }: { reduced: boolean | null }) {
           1/2 Spieler
         </p>
         <span className="text-xs font-bold text-slate-600 transition-all group-hover:translate-x-1 dark:text-slate-400">
+          Öffnen →
+        </span>
+      </div>
+    </MotionLink>
+  );
+}
+
+function TurnierTile({ reduced }: { reduced: boolean | null }) {
+  return (
+    <MotionLink
+      href="/tischtennis-turnier"
+      variants={reduced ? undefined : tileVariants}
+      className="@container group relative flex h-full flex-col gap-4 overflow-hidden rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-100 to-white p-6 text-left shadow-md transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-amber-500 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.98] dark:border-amber-800/60 dark:from-[#1c1203] dark:to-[#0f0a02] dark:focus-visible:ring-offset-zinc-950"
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,#f59e0b30,transparent)] opacity-100" />
+      <div className="relative flex flex-1 flex-col items-center justify-center py-8">
+        <Trophy
+          size={32}
+          className="mb-3 text-amber-500 transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-0.5"
+          aria-hidden
+        />
+        <h2 className="text-center font-sans text-[clamp(1.6rem,9cqw,2.6rem)] font-black uppercase tracking-tight text-amber-600 transition-transform duration-500 group-hover:scale-105 dark:text-amber-300">
+          TURNIERTOOL
+        </h2>
+        <div className="mt-3 h-1.5 w-12 rounded-full bg-amber-300 transition-all duration-500 group-hover:w-24 group-hover:bg-amber-500 dark:bg-amber-700" />
+      </div>
+      <div className="relative mt-2 flex items-center justify-between border-t border-amber-200 pt-4 dark:border-amber-900/40">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-700/70 dark:text-amber-400/70">
+          Doppel Tischtennis
+        </p>
+        <span className="text-xs font-bold text-amber-600 transition-all group-hover:translate-x-1">
           Öffnen →
         </span>
       </div>

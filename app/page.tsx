@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { logoutAction } from "@/app/actions/auth";
 import { FeatureTiles } from "@/components/home/FeatureTiles";
 import { getCurrentUser } from "@/lib/auth";
 
