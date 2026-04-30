@@ -97,24 +97,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         allowDesktopDrawer={false}
       />
 
-      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
         {fullscreen ? (
-          <div
-            className="flex shrink-0 items-center justify-end border-b border-[var(--border)] bg-zinc-50/95 pt-[max(env(safe-area-inset-top,0px),0.35rem)] pr-[max(1rem,env(safe-area-inset-right))] pb-2 pl-[max(1rem,env(safe-area-inset-left))] backdrop-blur-md dark:border-zinc-700/80 dark:bg-zinc-800/85"
-            role="toolbar"
-            aria-label="Vollbild"
-          >
-            <div className="mx-auto flex h-11 w-full max-w-7xl items-center justify-end px-4">
-              <motion.button
-                type="button"
-                whileTap={{ scale: 0.97 }}
-                onClick={() => setFullscreen(false)}
-                className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] text-zinc-700 transition duration-200 hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-900"
-                aria-label="Vollbild verlassen"
-              >
-                <Minimize2 className="h-4 w-4" aria-hidden />
-              </motion.button>
-            </div>
+          <div className="pointer-events-none absolute top-[max(env(safe-area-inset-top,0px),0.5rem)] right-[max(1rem,env(safe-area-inset-right))] z-40">
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setFullscreen(false)}
+              className="pointer-events-auto inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] text-zinc-700 shadow-sm transition duration-200 hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-900"
+              aria-label="Vollbild verlassen"
+            >
+              <Minimize2 className="h-4 w-4" aria-hidden />
+            </motion.button>
           </div>
         ) : null}
         {!fullscreen ? (
