@@ -14,7 +14,7 @@ import { PodiumView } from "@/components/turnier/views/PodiumView";
 import { ScoreEntryView } from "@/components/turnier/views/ScoreEntryView";
 import { SetupView } from "@/components/turnier/views/SetupView";
 import { StandingsView } from "@/components/turnier/views/StandingsView";
-import { getPartnerCoverageStats } from "@/lib/turnier/partnerCoverage";
+import { getCoverageStats } from "@/lib/turnier/coverage";
 
 type TurnierTab = "setup" | "draw" | "scores" | "table" | "podium";
 
@@ -62,8 +62,8 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
     [tournament.players],
   );
   const partnerStats = useMemo(
-    () => getPartnerCoverageStats(tournament.rounds, activePlayerIds),
-    [tournament.rounds, activePlayerIds],
+    () => getCoverageStats(tournament.rounds, activePlayerIds, tournament.format),
+    [tournament.rounds, activePlayerIds, tournament.format],
   );
 
   const roundNumbers = useMemo(
@@ -111,6 +111,11 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
     roundNumbers.length === 0 ||
     (latestRoundNumber != null && viewedRoundNumber === latestRoundNumber);
 
+  const tableStandings = useMemo(
+    () => standingsForTournament(tournament, viewedRoundNumber),
+    [tournament, viewedRoundNumber],
+  );
+
   const statusLabel =
     tournament.status === "setup"
       ? "Setup"
@@ -122,12 +127,12 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
 
   const statusToneClass =
     tournament.status === "active"
-      ? "border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-300"
+      ? "border-emerald-400/60 bg-[#DAF7E9] text-[#1E5E3F] dark:border-[#8DC4AA]/40 dark:bg-[#1E5E3F]/50 dark:text-[#DAF7E9]"
       : tournament.status === "paused"
-        ? "border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-300"
+        ? "border-[#8DC4AA] bg-[#8DC4AA]/25 text-[#06331D] dark:border-[#4C9170]/50 dark:bg-[#4C9170]/20 dark:text-[#DAF7E9]"
         : tournament.status === "finished"
           ? "border-zinc-300 bg-zinc-100 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-200"
-          : "border-sky-300 bg-sky-50 text-sky-700 dark:border-sky-500/40 dark:bg-sky-500/10 dark:text-sky-300";
+          : "border-[#8DC4AA] bg-white text-[#1E5E3F] dark:border-[#4C9170]/40 dark:bg-[#06331D]/60 dark:text-[#8DC4AA]";
 
   const showPauseOverlayOnContent =
     tournament.status === "paused" && (tab === "draw" || tab === "scores" || tab === "podium");
@@ -173,18 +178,21 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
           {partnerStats.needed > 0 ? (
             <p className="text-xs text-zinc-600 dark:text-zinc-400">
               <span className="font-semibold text-zinc-800 dark:text-zinc-200">
-                Partnerpaare {partnerStats.covered} / {partnerStats.needed}
+                {tournament.format === "doubles" ? "Partnerpaare" : "Gegnerpaare"}{" "}
+                {partnerStats.covered} / {partnerStats.needed}
               </span>
               {roundNumbers.length > 0 ? (
                 <span className="text-zinc-500 dark:text-zinc-400">
                   {" "}
                   · ausgelost: Runde {latestRoundNumber} · geschätzt insgesamt ca.{" "}
-                  {partnerStats.estimatedRoundsTotal} Runden für alle Partnerpaare
+                  {partnerStats.estimatedRoundsTotal} Runden für alle{" "}
+                  {tournament.format === "doubles" ? "Partnerpaare" : "Gegnerpaare"}
                 </span>
               ) : (
                 <span className="text-zinc-500 dark:text-zinc-400">
                   {" "}
-                  · geschätzt ca. {partnerStats.estimatedRoundsTotal} Runden bis alle Partnerpaare
+                  · geschätzt ca. {partnerStats.estimatedRoundsTotal} Runden bis alle{" "}
+                  {tournament.format === "doubles" ? "Partnerpaare" : "Gegnerpaare"}
                 </span>
               )}
               {partnerStats.complete ? (
@@ -321,13 +329,14 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
             {showPauseOverlayOnContent ? <PausedScreenBanner /> : null}
             <DrawView
               round={selectedRound}
+              format={tournament.format}
               isPending={actions.isPending}
               readOnly={!canEditTournament}
               isViewingLatestRound={isViewingLatestRound}
               hasRounds={roundNumbers.length > 0}
               coverageComplete={partnerStats.complete}
-              partnerCovered={partnerStats.covered}
-              partnerNeeded={partnerStats.needed}
+              pairCovered={partnerStats.covered}
+              pairNeeded={partnerStats.needed}
               estimatedRoundsTotal={partnerStats.estimatedRoundsTotal}
               currentRoundNumber={latestRoundNumber}
               onDrawRound={actions.drawRound}
@@ -352,7 +361,19 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
           </div>
         ) : null}
 
-        {tab === "table" ? <StandingsView rows={standings} tournament={tournament} /> : null}
+        {tab === "table" ? (
+          <StandingsView
+            rows={tableStandings}
+            tournament={tournament}
+            viewedRoundNumber={viewedRoundNumber}
+            latestRoundNumber={latestRoundNumber}
+            isViewingLatestRound={isViewingLatestRound}
+            hasRounds={roundNumbers.length > 0}
+            onJumpToLatest={() =>
+              latestRoundNumber != null ? setViewedRoundNumber(latestRoundNumber) : null
+            }
+          />
+        ) : null}
 
         {tab === "podium" && tournament.status === "finished" ? (
           <div className="relative min-w-0">

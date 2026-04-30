@@ -16,7 +16,7 @@ const STATUS_TONE: Record<MatchStatus, string> = {
   pending:
     "border-zinc-300 bg-zinc-100 text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-300",
   playing:
-    "border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-300",
+    "border-[#8DC4AA] bg-[#DAF7E9] text-[#1E5E3F] dark:border-[#4C9170]/50 dark:bg-[#1E5E3F]/40 dark:text-[#DAF7E9]",
   completed:
     "border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-300",
 };
@@ -32,15 +32,15 @@ export function MatchCard({ match, children }: MatchCardProps) {
     "min-w-0 break-words rounded-xl p-3 text-sm font-semibold transition-colors duration-200 sm:text-base";
   const team1Tone = isCompleted
     ? team1Wins
-      ? "bg-sky-100 text-sky-900 ring-2 ring-emerald-500/60 dark:bg-sky-950/40 dark:text-sky-200"
-      : "bg-sky-50/60 text-sky-800/70 opacity-70 dark:bg-sky-950/20 dark:text-sky-300/70"
-    : "bg-sky-50 text-sky-800 dark:bg-sky-950/30 dark:text-sky-300";
+      ? "bg-[#DAF7E9] text-[#06331D] ring-2 ring-[#4C9170]/60 dark:bg-[#1E5E3F]/70 dark:text-[#DAF7E9]"
+      : "bg-[#DAF7E9]/50 text-[#1E5E3F]/70 opacity-70 dark:bg-[#06331D]/30 dark:text-[#8DC4AA]/70"
+    : "bg-[#DAF7E9]/90 text-[#1E5E3F] dark:bg-[#1E5E3F]/35 dark:text-[#DAF7E9]";
   const team2ToneBase = team1ToneBase;
   const team2Tone = isCompleted
     ? team2Wins
-      ? "bg-amber-100 text-amber-900 ring-2 ring-emerald-500/60 dark:bg-amber-950/40 dark:text-amber-200"
-      : "bg-amber-50/60 text-amber-800/70 opacity-70 dark:bg-amber-950/20 dark:text-amber-300/70"
-    : "bg-amber-50 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300";
+      ? "bg-[#8DC4AA] text-[#06331D] ring-2 ring-[#4C9170]/60 dark:bg-[#4C9170]/50 dark:text-[#06331D]"
+      : "bg-[#8DC4AA]/40 text-[#1E5E3F]/70 opacity-70 dark:bg-[#4C9170]/20 dark:text-[#DAF7E9]/70"
+    : "bg-[#8DC4AA]/50 text-[#06331D] dark:bg-[#4C9170]/30 dark:text-[#DAF7E9]";
 
   return (
     <article className={`${turnierCard} flex min-w-0 flex-col gap-3`}>
@@ -80,11 +80,11 @@ export function MatchCard({ match, children }: MatchCardProps) {
                 <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">
                   S{setEntry.setNumber}
                 </span>
-                <span className={team1Won ? "font-black text-sky-700 dark:text-sky-300" : ""}>
+                <span className={team1Won ? "font-black text-[#1E5E3F] dark:text-[#8DC4AA]" : ""}>
                   {setEntry.scoreTeam1}
                 </span>
                 <span className="text-zinc-400">:</span>
-                <span className={team2Won ? "font-black text-amber-700 dark:text-amber-300" : ""}>
+                <span className={team2Won ? "font-black text-[#06331D] dark:text-[#DAF7E9]" : ""}>
                   {setEntry.scoreTeam2}
                 </span>
               </span>

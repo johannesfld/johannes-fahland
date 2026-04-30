@@ -31,9 +31,9 @@ export function PodiumView({ standings, onShowTable }: PodiumViewProps) {
   }, []);
 
   return (
-    <section className="relative flex min-h-0 flex-1 flex-col items-center justify-end overflow-hidden rounded-3xl border border-amber-300/40 bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 p-4 sm:p-6">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_10%,rgba(251,191,36,0.22),transparent_45%)]" />
-      <h2 className="absolute top-6 text-center text-xl font-black tracking-tighter text-amber-300 sm:text-3xl">
+    <section className="relative flex min-h-0 flex-1 flex-col items-center justify-end overflow-hidden rounded-3xl border border-[#4C9170]/40 bg-gradient-to-b from-zinc-950 via-[#06331D] to-zinc-950 p-4 sm:p-6">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_10%,rgba(141,196,170,0.28),transparent_45%)]" />
+      <h2 className="absolute top-6 text-center text-xl font-black tracking-tighter text-[#DAF7E9] sm:text-3xl">
         Siegerehrung
       </h2>
 
@@ -41,14 +41,14 @@ export function PodiumView({ standings, onShowTable }: PodiumViewProps) {
         <PodiumCard
           visible={step >= 1}
           heightClass="h-28 sm:h-36"
-          tone="from-amber-700 to-amber-900"
+          tone="from-[#1E5E3F] to-[#06331D]"
           place="3."
           name={third?.name ?? "-"}
         />
         <PodiumCard
           visible={step >= 3}
           heightClass="h-40 sm:h-52"
-          tone="from-amber-400 to-amber-600"
+          tone="from-[#8DC4AA] to-[#4C9170]"
           place="1."
           name={first?.name ?? "-"}
           champion

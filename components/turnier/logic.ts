@@ -32,7 +32,10 @@ export function getCurrentRound(tournament: TournamentDetail | null) {
   return open ?? tournament.rounds[tournament.rounds.length - 1] ?? null;
 }
 
-export function standingsForTournament(tournament: TournamentDetail | null): StandingRow[] {
+export function standingsForTournament(
+  tournament: TournamentDetail | null,
+  throughRoundInclusive?: number | null,
+): StandingRow[] {
   if (!tournament) return [];
-  return buildStandings(tournament);
+  return buildStandings(tournament, { throughRoundInclusive });
 }

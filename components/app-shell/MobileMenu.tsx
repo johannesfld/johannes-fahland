@@ -5,7 +5,13 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { IconClose } from "@/components/ui/icons";
-import { NAV, navIsActive, navTypographyByHref } from "@/components/app-shell/nav";
+import {
+  NAV,
+  navActiveClassesByHref,
+  navInactiveRowClassesByHref,
+  navIsActive,
+  navTypographyByHref,
+} from "@/components/app-shell/nav";
 import { useSwipeDrawer } from "@/components/app-shell/useSwipeDrawer";
 
 const MotionLink = motion.create(Link);
@@ -27,9 +33,17 @@ type MobileMenuProps = {
   pathname: string | null;
   onOpen: () => void;
   onClose: () => void;
+  /** Overlay und Drawer auch ab `md` (z. B. UI-Vollbild ohne Header/Sidebar). */
+  allowDesktopDrawer?: boolean;
 };
 
-export function MobileMenu({ mobileOpen, pathname, onOpen, onClose }: MobileMenuProps) {
+export function MobileMenu({
+  mobileOpen,
+  pathname,
+  onOpen,
+  onClose,
+  allowDesktopDrawer = false,
+}: MobileMenuProps) {
   const drawerRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
@@ -69,7 +83,8 @@ export function MobileMenu({ mobileOpen, pathname, onOpen, onClose }: MobileMenu
       <div
         ref={overlayRef}
         className={[
-          "fixed inset-0 z-40 bg-black/45 backdrop-blur-[2px] transition-opacity duration-300 ease-[var(--ease-smooth)] md:hidden dark:bg-black/60",
+          "fixed inset-0 z-40 bg-black/45 backdrop-blur-[2px] transition-opacity duration-300 ease-[var(--ease-smooth)] dark:bg-black/60",
+          allowDesktopDrawer ? "" : "md:hidden",
           mobileOpen ? "opacity-100" : "pointer-events-none opacity-0",
         ].join(" ")}
         onClick={onClose}
@@ -81,7 +96,8 @@ export function MobileMenu({ mobileOpen, pathname, onOpen, onClose }: MobileMenu
         inert={!mobileOpen || undefined}
         aria-hidden={!mobileOpen}
         className={[
-          "fixed left-0 top-0 z-50 flex h-dvh w-[min(20rem,88vw)] flex-col overflow-y-auto border-r border-[var(--border)] bg-[var(--surface)] pr-4 pt-[max(1rem,env(safe-area-inset-top,0px))] pb-[max(1rem,env(safe-area-inset-bottom,0px))] pl-[max(1rem,env(safe-area-inset-left,0px))] shadow-xl md:hidden dark:bg-[var(--surface-muted)]",
+          "fixed left-0 top-0 z-50 flex h-dvh w-[min(20rem,88vw)] flex-col overflow-y-auto border-r border-[var(--border)] bg-[var(--surface)] pr-4 pt-[max(1rem,env(safe-area-inset-top,0px))] pb-[max(1rem,env(safe-area-inset-bottom,0px))] pl-[max(1rem,env(safe-area-inset-left,0px))] shadow-xl dark:bg-[var(--surface-muted)]",
+          allowDesktopDrawer ? "" : "md:hidden",
           "transition-transform duration-300 ease-[var(--ease-smooth)]",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
         ].join(" ")}
@@ -116,10 +132,8 @@ export function MobileMenu({ mobileOpen, pathname, onOpen, onClose }: MobileMenu
                 variants={navItemVariants}
                 className={[
                   "flex items-center gap-3 rounded-xl px-3 py-3 text-base transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 dark:focus-visible:ring-offset-zinc-900",
+                  active ? navActiveClassesByHref(item.href) : navInactiveRowClassesByHref(item.href),
                   navTypographyByHref(item.href),
-                  active
-                    ? "bg-amber-500/16 ring-1 ring-amber-500/30 dark:bg-amber-400/12 dark:ring-amber-400/24"
-                    : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800/80",
                 ].join(" ")}
               >
                 <item.icon size={18} className="shrink-0 opacity-60" aria-hidden />

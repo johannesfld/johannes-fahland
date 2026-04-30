@@ -2,6 +2,7 @@ export type TournamentStatus = "setup" | "active" | "paused" | "finished";
 export type RoundStatus = "drawn" | "playing" | "completed";
 export type MatchStatus = "pending" | "playing" | "completed";
 export type BestOf = 1 | 3 | 5;
+export type TournamentFormat = "singles" | "doubles";
 
 export type TournamentPlayer = {
   id: string;
@@ -45,6 +46,7 @@ export type TournamentDetail = {
   id: string;
   name: string;
   status: TournamentStatus;
+  format: TournamentFormat;
   bestOf: BestOf;
   winnerName: string | null;
   createdAt: string;
@@ -57,6 +59,7 @@ export type TournamentListItem = {
   id: string;
   name: string;
   status: TournamentStatus;
+  format: TournamentFormat;
   bestOf: BestOf;
   winnerName: string | null;
   createdAt: string;

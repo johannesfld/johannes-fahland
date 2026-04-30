@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppShell } from "@/components/AppShell";
+import { FullscreenProvider } from "@/components/FullscreenContext";
 import { PWAInstaller } from "@/components/PWAInstaller";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
@@ -90,7 +91,9 @@ export default function RootLayout({
       <body className="h-dvh min-h-dvh overflow-hidden overscroll-none">
         <ThemeProvider>
           <PWAInstaller />
-          <AppShell>{children}</AppShell>
+          <FullscreenProvider>
+            <AppShell>{children}</AppShell>
+          </FullscreenProvider>
         </ThemeProvider>
       </body>
     </html>

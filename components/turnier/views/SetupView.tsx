@@ -40,8 +40,11 @@ export function SetupView({
   };
   const activePlayers = tournament.players.filter((player) => player.active);
   const inactivePlayers = tournament.players.filter((player) => !player.active);
-  const minPlayersReached = activePlayers.length >= 4;
+  const minPlayers = tournament.format === "doubles" ? 4 : 2;
+  const minPlayersReached = activePlayers.length >= minPlayers;
   const canStart = !isPaused && tournament.status === "setup";
+  const showBestOfEditor = tournament.status === "setup" && !isPaused;
+  const formatLabel = tournament.format === "doubles" ? "Doppel (2 vs 2)" : "Einzel (1 vs 1)";
 
   return (
     <section className={`${turnierCard} flex min-w-0 flex-col gap-6`}>
@@ -50,11 +53,22 @@ export function SetupView({
         <p className="text-sm text-zinc-600 dark:text-zinc-300">
           {isPaused
             ? "Während der Pause kannst du Spieler ergänzen, entfernen oder reaktivieren."
-            : "Spieler verwalten und Best-of festlegen, dann das Turnier starten."}
+            : showBestOfEditor
+              ? "Spieler verwalten und Best-of festlegen, dann das Turnier starten."
+              : "Spieler verwalten. Best-of und Format sind nach dem Start fest."}
         </p>
       </div>
 
-      {!isPaused ? (
+      <div className="flex min-w-0 flex-col gap-2">
+        <p className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
+          Turnierformat
+        </p>
+        <p className="inline-flex min-h-11 w-fit items-center rounded-xl border border-zinc-300 bg-zinc-50 px-4 text-sm font-semibold text-zinc-800 dark:border-zinc-600 dark:bg-zinc-800/60 dark:text-zinc-100">
+          {formatLabel}
+        </p>
+      </div>
+
+      {showBestOfEditor ? (
         <div className="flex min-w-0 flex-col gap-2">
           <p className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
             Best-of pro Match
@@ -98,7 +112,7 @@ export function SetupView({
             placeholder="Spielername"
             autoComplete="nickname"
             enterKeyHint="done"
-            className="min-h-11 min-w-0 flex-1 rounded-xl border border-zinc-300 bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 dark:border-zinc-700 dark:bg-zinc-950"
+            className="min-h-11 min-w-0 flex-1 rounded-xl border border-zinc-300 bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4C9170]/60 dark:border-zinc-700 dark:bg-zinc-950"
           />
           <button
             type="submit"
@@ -116,7 +130,7 @@ export function SetupView({
         </p>
         {activePlayers.length === 0 ? (
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            Noch keine aktiven Spieler. Mindestens 4 für den Start nötig.
+            Noch keine aktiven Spieler. Mindestens {minPlayers} für den Start nötig.
           </p>
         ) : (
           <div className="flex flex-wrap gap-2">
@@ -156,7 +170,7 @@ export function SetupView({
         <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           {!minPlayersReached ? (
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Mindestens 4 aktive Spieler nötig, um das Turnier zu starten.
+              Mindestens {minPlayers} aktive Spieler nötig, um das Turnier zu starten.
             </p>
           ) : (
             <p className="text-sm text-emerald-700 dark:text-emerald-400">
@@ -175,7 +189,7 @@ export function SetupView({
       ) : null}
 
       {isPaused ? (
-        <p className="rounded-2xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200">
+        <p className="rounded-2xl border border-[#8DC4AA]/50 bg-[#DAF7E9]/90 p-3 text-sm text-[#1E5E3F] dark:border-[#4C9170]/40 dark:bg-[#06331D]/70 dark:text-[#DAF7E9]">
           Nach dem Fortsetzen wird die nächste Auslosung mit den aktuellen aktiven Spielern berechnet.
         </p>
       ) : null}

@@ -108,6 +108,92 @@ function pairTeamsIntoMatches(
   return { matches, byeTeam };
 }
 
+export type SinglesDrawResult = {
+  matches: Array<{ player1: DrawPlayer; player2: DrawPlayer }>;
+  benchedPlayerIds: string[];
+};
+
+export type SinglesDrawOptions = {
+  previousOpponentPairings?: Array<[string, string]>;
+};
+
+function pairAllPlayersIntoSinglesMatches(
+  players: DrawPlayer[],
+  forbiddenOpponentKeys: Set<string>,
+): Array<{ player1: DrawPlayer; player2: DrawPlayer }> | null {
+  if (players.length === 0) return [];
+  if (players.length % 2 !== 0) return null;
+
+  const remaining = [...players];
+  const matches: Array<{ player1: DrawPlayer; player2: DrawPlayer }> = [];
+
+  while (remaining.length > 0) {
+    const head = remaining.shift()!;
+    let partnerIndex = -1;
+    for (let i = 0; i < remaining.length; i += 1) {
+      const candidate = remaining[i];
+      if (!forbiddenOpponentKeys.has(pairKey(head.id, candidate.id))) {
+        partnerIndex = i;
+        break;
+      }
+    }
+    if (partnerIndex === -1) {
+      partnerIndex = 0;
+    }
+    const opponent = remaining.splice(partnerIndex, 1)[0];
+    matches.push({ player1: head, player2: opponent });
+  }
+
+  return matches;
+}
+
+export function createRandomSinglesDraw(
+  players: DrawPlayer[],
+  options: SinglesDrawOptions = {},
+): SinglesDrawResult {
+  if (players.length < 2) {
+    return { matches: [], benchedPlayerIds: players.map((p) => p.id) };
+  }
+
+  const forbiddenOpponentKeys = new Set(
+    (options.previousOpponentPairings ?? []).map(([a, b]) => pairKey(a, b)),
+  );
+
+  const ordered = shuffle(players).sort((a, b) => {
+    if (a.roundsPlayed !== b.roundsPlayed) return a.roundsPlayed - b.roundsPlayed;
+    return a.roundsSatOut - b.roundsSatOut;
+  });
+
+  const usableCount = Math.floor(ordered.length / 2) * 2;
+  const inRound = ordered.slice(0, usableCount);
+  const benchedPlayerIds = ordered.slice(usableCount).map((p) => p.id);
+
+  let bestMatches: Array<{ player1: DrawPlayer; player2: DrawPlayer }> | null = null;
+  let bestRepeats = Number.POSITIVE_INFINITY;
+
+  for (let attempt = 0; attempt < 80; attempt += 1) {
+    const candidate = pairAllPlayersIntoSinglesMatches(shuffle(inRound), forbiddenOpponentKeys);
+    if (!candidate) continue;
+    const repeats = candidate.reduce(
+      (acc, m) => acc + (forbiddenOpponentKeys.has(pairKey(m.player1.id, m.player2.id)) ? 1 : 0),
+      0,
+    );
+    if (repeats < bestRepeats) {
+      bestMatches = candidate;
+      bestRepeats = repeats;
+      if (repeats === 0) break;
+    }
+  }
+
+  const finalMatches =
+    bestMatches ?? pairAllPlayersIntoSinglesMatches(inRound, forbiddenOpponentKeys) ?? [];
+
+  return {
+    matches: finalMatches,
+    benchedPlayerIds,
+  };
+}
+
 export function createRandomDoublesDraw(
   players: DrawPlayer[],
   options: DrawOptions = {},

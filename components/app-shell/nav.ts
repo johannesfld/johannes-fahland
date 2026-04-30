@@ -24,18 +24,35 @@ export function navIsActive(pathname: string | null, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
+const navTextUnified = "text-zinc-900 dark:text-white";
+
 export function navTypographyByHref(href: string) {
   if (href === WIZARD_HREF) {
-    return "font-serif font-black tracking-tight text-zinc-700 dark:text-zinc-200";
+    return `font-serif font-black tracking-tight ${navTextUnified}`;
   }
   if (href === "/kniffel-rechner") {
-    return "font-sans italic font-black tracking-tight text-zinc-700 dark:text-zinc-200";
+    return `font-sans italic font-black tracking-tight ${navTextUnified}`;
   }
   if (href === SCHIFFE_HREF) {
-    return "font-sans font-black tracking-tight text-slate-800 text-zinc-700 dark:text-zinc-200";
+    return `font-sans font-black tracking-tight ${navTextUnified}`;
   }
   if (href === TURNIER_HREF) {
-    return "font-sans font-black tracking-tight text-amber-700 dark:text-amber-300";
+    return `font-mono font-black tracking-[0.08em] ${navTextUnified}`;
   }
-  return "font-medium tracking-tight text-zinc-700 dark:text-zinc-200";
+  return `font-medium tracking-tight ${navTextUnified}`;
+}
+
+/** Hintergrund + Ring für aktiven Nav-Eintrag (Sidebar / Drawer / Header). */
+export function navActiveClassesByHref(_href: string): string {
+  return "bg-zinc-200/90 ring-1 ring-zinc-300 dark:bg-white/10 dark:ring-white/20";
+}
+
+/** Inaktiver Eintrag: Zeilenhintergrund (Sidebar, Mobile). */
+export function navInactiveRowClassesByHref(_href: string): string {
+  return "hover:bg-zinc-100 hover:text-zinc-950 dark:hover:bg-zinc-800 dark:hover:text-white";
+}
+
+/** Inaktiver Eintrag: nur Text-Hover (kompakte Header-Leiste). */
+export function navHeaderInactiveHoverByHref(_href: string): string {
+  return "hover:text-zinc-950 dark:hover:text-white";
 }

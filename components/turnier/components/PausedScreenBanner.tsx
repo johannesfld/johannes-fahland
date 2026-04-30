@@ -8,8 +8,8 @@ export function PausedScreenBanner() {
       role="status"
       aria-live="polite"
     >
-      <div className="mx-4 h-fit max-w-md rounded-2xl border border-amber-400/40 bg-zinc-900/95 px-4 py-3 text-center shadow-md dark:bg-zinc-950/95">
-        <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-200">Spiel pausiert</p>
+      <div className="mx-4 h-fit max-w-md rounded-2xl border border-[#4C9170]/50 bg-[#06331D]/95 px-4 py-3 text-center shadow-md dark:bg-[#06331D]/95">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-[#DAF7E9]">Spiel pausiert</p>
         <p className="mt-1 text-xs text-zinc-300">Zum Fortsetzen oben auf „Fortsetzen“ klicken.</p>
       </div>
     </div>

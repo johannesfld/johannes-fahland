@@ -1,9 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
+import { Maximize2 } from "lucide-react";
 import { BrandingLogo } from "@/components/BrandingLogo";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { NAV, navIsActive, navTypographyByHref } from "@/components/app-shell/nav";
+import { useFullscreen } from "@/components/FullscreenContext";
+import {
+  NAV,
+  navActiveClassesByHref,
+  navInactiveRowClassesByHref,
+  navIsActive,
+  navTypographyByHref,
+} from "@/components/app-shell/nav";
 
 type DesktopSidebarProps = {
   pathname: string | null;
@@ -14,6 +23,8 @@ export function DesktopSidebar({
   pathname,
   desktopSidebarOpen,
 }: DesktopSidebarProps) {
+  const { setFullscreen } = useFullscreen();
+
   return (
     <aside
       className={[
@@ -48,10 +59,8 @@ export function DesktopSidebar({
                 className={[
                   "nav-item-enter group flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 dark:focus-visible:ring-offset-zinc-900",
                   "motion-safe:hover:translate-x-0.5",
+                  active ? navActiveClassesByHref(item.href) : navInactiveRowClassesByHref(item.href),
                   navTypographyByHref(item.href),
-                  active
-                    ? "bg-amber-500/16 ring-1 ring-amber-500/30 dark:bg-amber-400/12 dark:ring-amber-400/24"
-                    : "text-zinc-600 hover:bg-zinc-100/95 hover:text-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-800/70 dark:hover:text-white",
                 ].join(" ")}
               >
                 <item.icon size={18} className="shrink-0 opacity-60" aria-hidden />
@@ -64,7 +73,18 @@ export function DesktopSidebar({
         <div className="flex-1" />
 
         <div className="flex flex-col gap-2">
-          <ThemeToggle className="w-full justify-center" />
+          <div className="flex w-full items-center justify-center gap-2">
+            <motion.button
+              type="button"
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setFullscreen(true)}
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] text-zinc-700 transition duration-200 hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-900"
+              aria-label="Vollbild: Kopf- und Seitenleiste ausblenden"
+            >
+              <Maximize2 className="h-4 w-4" aria-hidden />
+            </motion.button>
+            <ThemeToggle className="min-w-0 flex-1 justify-center" />
+          </div>
           <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-muted)]/50 px-3 py-3 text-center dark:bg-zinc-900/35">
             <p className="text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">
               von{" "}

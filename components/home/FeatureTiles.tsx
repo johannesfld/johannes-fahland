@@ -139,25 +139,25 @@ function TurnierTile({ reduced }: { reduced: boolean | null }) {
     <MotionLink
       href="/tischtennis-turnier"
       variants={reduced ? undefined : tileVariants}
-      className="@container group relative flex h-full flex-col gap-4 overflow-hidden rounded-3xl border border-amber-200 bg-gradient-to-br from-amber-100 to-white p-6 text-left shadow-md transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-amber-500 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.98] dark:border-amber-800/60 dark:from-[#1c1203] dark:to-[#0f0a02] dark:focus-visible:ring-offset-zinc-950"
+      className="@container group relative flex h-full flex-col gap-4 overflow-hidden rounded-3xl border border-[#8DC4AA]/70 bg-gradient-to-br from-[#DAF7E9] to-white p-6 text-left shadow-md transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-[#4C9170] hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4C9170]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.98] dark:border-[#4C9170]/50 dark:from-[#06331D] dark:to-[#1E5E3F]/90 dark:shadow-black/30 dark:focus-visible:ring-offset-zinc-950"
     >
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,#f59e0b30,transparent)] opacity-100" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(76,145,112,0.22),transparent)] opacity-100 dark:bg-[radial-gradient(circle_at_50%_120%,rgba(141,196,170,0.18),transparent)]" />
       <div className="relative flex flex-1 flex-col items-center justify-center py-8">
         <Trophy
           size={32}
-          className="mb-3 text-amber-500 transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-0.5"
+          className="mb-3 text-[#4C9170] transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-0.5 dark:text-[#8DC4AA]"
           aria-hidden
         />
-        <h2 className="text-center font-sans text-[clamp(1.6rem,9cqw,2.6rem)] font-black uppercase tracking-tight text-amber-600 transition-transform duration-500 group-hover:scale-105 dark:text-amber-300">
+        <h2 className="text-center font-mono text-[clamp(1.45rem,8.5cqw,2.35rem)] font-black uppercase tracking-[0.12em] text-transparent bg-gradient-to-b from-[#1E5E3F] to-[#4C9170] bg-clip-text transition-transform duration-500 group-hover:scale-105 dark:from-[#DAF7E9] dark:to-[#8DC4AA]">
           TURNIERTOOL
         </h2>
-        <div className="mt-3 h-1.5 w-12 rounded-full bg-amber-300 transition-all duration-500 group-hover:w-24 group-hover:bg-amber-500 dark:bg-amber-700" />
+        <div className="mt-3 h-1.5 w-12 rounded-full bg-[#8DC4AA] transition-all duration-500 group-hover:w-24 group-hover:bg-[#4C9170] dark:bg-[#4C9170]/60 dark:group-hover:bg-[#8DC4AA]" />
       </div>
-      <div className="relative mt-2 flex items-center justify-between border-t border-amber-200 pt-4 dark:border-amber-900/40">
-        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-700/70 dark:text-amber-400/70">
-          Doppel Tischtennis
+      <div className="relative mt-2 flex items-center justify-between border-t border-[#8DC4AA]/50 pt-4 dark:border-[#4C9170]/35">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1E5E3F]/80 dark:text-[#DAF7E9]/75">
+          Einzel & Doppel
         </p>
-        <span className="text-xs font-bold text-amber-600 transition-all group-hover:translate-x-1">
+        <span className="text-xs font-bold text-[#4C9170] transition-all group-hover:translate-x-1 dark:text-[#8DC4AA]">
           Öffnen →
         </span>
       </div>

@@ -52,10 +52,16 @@ enum TournamentBestOf {
   FIVE
 }
 
+enum TournamentFormat {
+  SINGLES
+  DOUBLES
+}
+
 model Tournament {
   id          String             @id @default(cuid())
   name        String
   bestOf      TournamentBestOf   @default(THREE)
+  format      TournamentFormat   @default(DOUBLES)
   status      TournamentStatus   @default(setup)
   winnerName  String?
   createdAt   DateTime           @default(now())

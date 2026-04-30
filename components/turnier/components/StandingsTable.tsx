@@ -12,6 +12,8 @@ import type {
 type StandingsTableProps = {
   rows: StandingRow[];
   tournament: TournamentDetail;
+  /** Spieler-Detail: nur Runden bis einschließlich dieser Nummer (wie Tabellenwerte). */
+  throughRoundInclusive?: number | null;
 };
 
 type PlayerMatchEntry = {
@@ -26,9 +28,11 @@ type PlayerMatchEntry = {
 function collectPlayerMatches(
   rounds: RoundEntry[],
   playerId: string,
+  throughRoundInclusive?: number | null,
 ): PlayerMatchEntry[] {
   const entries: PlayerMatchEntry[] = [];
   for (const round of rounds) {
+    if (throughRoundInclusive != null && round.roundNumber > throughRoundInclusive) continue;
     for (const match of round.matches) {
       const me = match.players.find((player) => player.playerId === playerId);
       if (!me) continue;
@@ -56,16 +60,23 @@ function collectPlayerMatches(
   return entries.sort((a, b) => b.roundNumber - a.roundNumber);
 }
 
-export function StandingsTable({ rows, tournament }: StandingsTableProps) {
+export function StandingsTable({
+  rows,
+  tournament,
+  throughRoundInclusive,
+}: StandingsTableProps) {
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
 
   const playerMatchesById = useMemo(() => {
     const map = new Map<string, PlayerMatchEntry[]>();
     for (const row of rows) {
-      map.set(row.playerId, collectPlayerMatches(tournament.rounds, row.playerId));
+      map.set(
+        row.playerId,
+        collectPlayerMatches(tournament.rounds, row.playerId, throughRoundInclusive),
+      );
     }
     return map;
-  }, [rows, tournament.rounds]);
+  }, [rows, tournament.rounds, throughRoundInclusive]);
 
   return (
     <div className="flex min-w-0 flex-col overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
@@ -98,8 +109,8 @@ export function StandingsTable({ rows, tournament }: StandingsTableProps) {
                 onClick={() =>
                   setExpandedPlayerId((current) => (current === row.playerId ? null : row.playerId))
                 }
-                className={`grid w-full grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] items-center gap-2 px-3 py-3 text-left text-sm transition-colors duration-150 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 dark:hover:bg-zinc-800/40 sm:grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(6,minmax(0,1fr))] ${
-                  expanded ? "bg-amber-50/60 dark:bg-amber-500/5" : ""
+                className={`grid w-full grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(3,minmax(0,1fr))] items-center gap-2 px-3 py-3 text-left text-sm transition-colors duration-150 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4C9170]/60 dark:hover:bg-zinc-800/40 sm:grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(6,minmax(0,1fr))] ${
+                  expanded ? "bg-[#DAF7E9]/70 dark:bg-[#4C9170]/10" : ""
                 }`}
                 aria-expanded={expanded}
               >
@@ -167,11 +178,11 @@ function PlayerMatchList({ matches }: { matches: PlayerMatchEntry[] }) {
             R{entry.roundNumber} · M{entry.match.matchNumber}
           </span>
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
-            <span className="font-semibold text-sky-700 dark:text-sky-300">
+            <span className="font-semibold text-[#1E5E3F] dark:text-[#8DC4AA]">
               {entry.partners.length ? entry.partners.join(" / ") : "Solo"}
             </span>
             <span className="text-[10px] uppercase tracking-[0.22em] text-zinc-400">vs</span>
-            <span className="font-semibold text-amber-700 dark:text-amber-300">
+            <span className="font-semibold text-[#06331D] dark:text-[#DAF7E9]">
               {entry.opponents.join(" / ")}
             </span>
           </div>

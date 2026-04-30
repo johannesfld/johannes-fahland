@@ -8,9 +8,10 @@ import {
   actionBtn,
   selectChevron,
   selectStyled,
+  subtleBtn,
   turnierCard,
 } from "@/components/turnier/styles";
-import type { BestOf, TournamentListItem } from "@/components/turnier/types";
+import type { BestOf, TournamentFormat, TournamentListItem } from "@/components/turnier/types";
 
 function tournamentListStatusLabel(item: TournamentListItem): string {
   switch (item.status) {
@@ -35,6 +36,7 @@ export function TurnierList({ initialItems }: TurnierListProps) {
   const [items, setItems] = useState(initialItems);
   const [name, setName] = useState("");
   const [bestOf, setBestOf] = useState<BestOf>(3);
+  const [format, setFormat] = useState<TournamentFormat>("doubles");
   const [isPending, startTransition] = useTransition();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -42,51 +44,75 @@ export function TurnierList({ initialItems }: TurnierListProps) {
     <div className="mx-auto flex min-h-0 w-full max-w-7xl min-w-0 flex-1 flex-col gap-4 overflow-y-auto overflow-x-hidden px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6">
       <section className={`${turnierCard} flex flex-col gap-3`}>
         <h1 className="text-2xl font-black tracking-tighter">Tischtennis Turniere</h1>
-        <div className="flex min-w-0 flex-col gap-2 sm:flex-row">
-          <input
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            placeholder="Turniername"
-            className="min-h-11 min-w-0 flex-1 rounded-xl border border-zinc-300 bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 dark:border-zinc-700 dark:bg-zinc-950"
-          />
-          <select
-            value={bestOf}
-            onChange={(event) => setBestOf(Number(event.target.value) as BestOf)}
-            className={selectStyled}
-            style={selectChevron}
-          >
-            <option value={1}>Best of 1</option>
-            <option value={3}>Best of 3</option>
-            <option value={5}>Best of 5</option>
-          </select>
-          <button
-            type="button"
-            className={actionBtn}
-            disabled={isPending}
-            onClick={() =>
-              startTransition(() => {
-                if (!name.trim()) return;
-                void createTournament(name, bestOf).then((id) => {
-                  setItems((prev) => [
-                    {
-                      id,
-                      name,
-                      status: "setup",
-                      bestOf,
-                      winnerName: null,
-                      createdAt: new Date().toISOString(),
-                      updatedAt: new Date().toISOString(),
-                      playerCount: 0,
-                    },
-                    ...prev,
-                  ]);
-                  setName("");
-                });
-              })
-            }
-          >
-            Neues Turnier
-          </button>
+        <div className="flex min-w-0 flex-col gap-4">
+          <div className="flex min-w-0 flex-col gap-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
+              Format
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className={format === "doubles" ? actionBtn : subtleBtn}
+                onClick={() => setFormat("doubles")}
+              >
+                Doppel
+              </button>
+              <button
+                type="button"
+                className={format === "singles" ? actionBtn : subtleBtn}
+                onClick={() => setFormat("singles")}
+              >
+                Einzel
+              </button>
+            </div>
+          </div>
+          <div className="flex min-w-0 flex-col gap-2 sm:flex-row">
+            <input
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Turniername"
+              className="min-h-11 min-w-0 flex-1 rounded-xl border border-zinc-300 bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4C9170]/60 dark:border-zinc-700 dark:bg-zinc-950"
+            />
+            <select
+              value={bestOf}
+              onChange={(event) => setBestOf(Number(event.target.value) as BestOf)}
+              className={selectStyled}
+              style={selectChevron}
+            >
+              <option value={1}>Best of 1</option>
+              <option value={3}>Best of 3</option>
+              <option value={5}>Best of 5</option>
+            </select>
+            <button
+              type="button"
+              className={actionBtn}
+              disabled={isPending}
+              onClick={() =>
+                startTransition(() => {
+                  if (!name.trim()) return;
+                  void createTournament(name, bestOf, format).then((id) => {
+                    setItems((prev) => [
+                      {
+                        id,
+                        name,
+                        status: "setup",
+                        format,
+                        bestOf,
+                        winnerName: null,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        playerCount: 0,
+                      },
+                      ...prev,
+                    ]);
+                    setName("");
+                  });
+                })
+              }
+            >
+              Neues Turnier
+            </button>
+          </div>
         </div>
       </section>
 
@@ -99,7 +125,7 @@ export function TurnierList({ initialItems }: TurnierListProps) {
         {items.map((item) => (
           <article
             key={item.id}
-            className="group relative flex min-w-0 flex-col gap-2 overflow-hidden rounded-3xl border border-zinc-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-amber-500 dark:border-zinc-800 dark:bg-zinc-900"
+            className="group relative flex min-w-0 flex-col gap-2 overflow-hidden rounded-3xl border border-zinc-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-[#4C9170]/60 dark:border-zinc-800 dark:bg-zinc-900"
           >
             <Link
               href={`/tischtennis-turnier/${item.id}`}
@@ -110,7 +136,7 @@ export function TurnierList({ initialItems }: TurnierListProps) {
                   item.status === "active"
                     ? "text-xs font-black uppercase tracking-[0.22em] text-emerald-600 dark:text-emerald-400"
                     : item.status === "paused"
-                      ? "text-xs font-black uppercase tracking-[0.22em] text-amber-600 dark:text-amber-400"
+                      ? "text-xs font-black uppercase tracking-[0.22em] text-[#4C9170] dark:text-[#8DC4AA]"
                       : "text-xs font-black uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400"
                 }
               >
@@ -118,7 +144,8 @@ export function TurnierList({ initialItems }: TurnierListProps) {
               </p>
               <h2 className="truncate text-lg font-black tracking-tight">{item.name}</h2>
               <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                {item.playerCount} Spieler · Best of {item.bestOf}
+                {item.playerCount} Spieler · {item.format === "doubles" ? "Doppel" : "Einzel"} · Best of{" "}
+                {item.bestOf}
               </p>
               {item.status === "finished" && item.winnerName ? (
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">
@@ -154,7 +181,7 @@ export function TurnierList({ initialItems }: TurnierListProps) {
                     .finally(() => setDeletingId(null));
                 });
               }}
-              className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white/90 text-zinc-500 opacity-0 shadow-sm transition duration-200 ease-out hover:border-red-400 hover:text-red-500 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/60 group-hover:opacity-100 disabled:opacity-40 disabled:pointer-events-none dark:border-zinc-700 dark:bg-zinc-900/90 dark:text-zinc-300"
+              className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full border border-zinc-200 bg-white/90 text-zinc-500 opacity-0 shadow-sm transition duration-200 ease-out hover:border-red-400 hover:text-red-500 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/60 group-hover:opacity-100 [@media(hover:none)]:opacity-100 [@media(pointer:coarse)]:opacity-100 disabled:opacity-40 disabled:pointer-events-none dark:border-zinc-700 dark:bg-zinc-900/90 dark:text-zinc-300"
             >
               <Trash2 className="h-4 w-4" />
             </button>

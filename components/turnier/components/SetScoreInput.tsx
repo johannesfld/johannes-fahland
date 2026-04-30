@@ -27,7 +27,7 @@ export function SetScoreInput({
         placeholder="0"
         disabled={disabled}
         aria-label={`Satz ${setNumber} Team 1`}
-        className="min-h-12 w-full min-w-0 rounded-xl border border-zinc-300 bg-zinc-50 px-2 text-center text-lg font-bold text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 disabled:opacity-40 disabled:pointer-events-none dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+        className="min-h-12 w-full min-w-0 rounded-xl border border-zinc-300 bg-zinc-50 px-2 text-center text-lg font-bold text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4C9170]/60 disabled:opacity-40 disabled:pointer-events-none dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
       />
       <span className="text-base font-black text-zinc-400">:</span>
       <input
@@ -39,7 +39,7 @@ export function SetScoreInput({
         placeholder="0"
         disabled={disabled}
         aria-label={`Satz ${setNumber} Team 2`}
-        className="min-h-12 w-full min-w-0 rounded-xl border border-zinc-300 bg-zinc-50 px-2 text-center text-lg font-bold text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 disabled:opacity-40 disabled:pointer-events-none dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+        className="min-h-12 w-full min-w-0 rounded-xl border border-zinc-300 bg-zinc-50 px-2 text-center text-lg font-bold text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4C9170]/60 disabled:opacity-40 disabled:pointer-events-none dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
       />
     </div>
   );

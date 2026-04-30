@@ -1,6 +1,15 @@
 import type { StandingRow, TournamentDetail } from "@/components/turnier/types";
 
-export function buildStandings(tournament: TournamentDetail): StandingRow[] {
+export type BuildStandingsOptions = {
+  /** Nur Matches aus Runden mit `roundNumber <=` diesem Wert zählen. Ohne Option oder `null`: alle Runden. */
+  throughRoundInclusive?: number | null;
+};
+
+export function buildStandings(
+  tournament: TournamentDetail,
+  options?: BuildStandingsOptions,
+): StandingRow[] {
+  const maxRound = options?.throughRoundInclusive;
   const rows = new Map<string, StandingRow>();
 
   for (const player of tournament.players) {
@@ -23,6 +32,7 @@ export function buildStandings(tournament: TournamentDetail): StandingRow[] {
   }
 
   for (const round of tournament.rounds) {
+    if (maxRound != null && round.roundNumber > maxRound) continue;
     for (const match of round.matches) {
       if (match.sets.length === 0 || match.winnerTeam == null) continue;
 
