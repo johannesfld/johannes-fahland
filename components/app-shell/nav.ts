@@ -1,4 +1,5 @@
-import { Home, Sparkles, Dices, Ship, Trophy, type LucideIcon } from "lucide-react";
+import { rommeDisplay } from "@/components/romme/romme-display-font";
+import { Home, Sparkles, Dices, Ship, SquareStack, Trophy, type LucideIcon } from "lucide-react";
 
 export type NavItem = {
   href: string;
@@ -9,12 +10,14 @@ export type NavItem = {
 export const WIZARD_HREF = "/wizzard-punkterechner";
 export const SCHIFFE_HREF = "/schiffe-versenken";
 export const TURNIER_HREF = "/tischtennis-turnier";
+export const ROMME_HREF = "/romme";
 
 export const NAV: NavItem[] = [
   { href: "/", label: "Home", icon: Home },
-  { href: WIZARD_HREF, label: "Wizzard", icon: Sparkles },
+  { href: WIZARD_HREF, label: "Wizard", icon: Sparkles },
   { href: "/kniffel-rechner", label: "Kniffel", icon: Dices },
   { href: SCHIFFE_HREF, label: "Schiffe versenken", icon: Ship },
+  { href: ROMME_HREF, label: "Rommé", icon: SquareStack },
   { href: TURNIER_HREF, label: "Turniertool", icon: Trophy },
 ];
 
@@ -35,6 +38,9 @@ export function navTypographyByHref(href: string) {
   }
   if (href === SCHIFFE_HREF) {
     return `font-sans font-black tracking-tight ${navTextUnified}`;
+  }
+  if (href === ROMME_HREF) {
+    return `${rommeDisplay.className} text-xs font-semibold uppercase tracking-wide ${navTextUnified}`;
   }
   if (href === TURNIER_HREF) {
     return `font-mono font-black tracking-[0.08em] ${navTextUnified}`;

@@ -1,11 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { Maximize2 } from "lucide-react";
 import { BrandingLogo } from "@/components/BrandingLogo";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { useFullscreen } from "@/components/FullscreenContext";
 import {
   NAV,
   navActiveClassesByHref,
@@ -23,8 +19,6 @@ export function DesktopSidebar({
   pathname,
   desktopSidebarOpen,
 }: DesktopSidebarProps) {
-  const { setFullscreen } = useFullscreen();
-
   return (
     <aside
       className={[
@@ -72,27 +66,13 @@ export function DesktopSidebar({
 
         <div className="flex-1" />
 
-        <div className="flex flex-col gap-2">
-          <div className="flex w-full items-center justify-center gap-2">
-            <motion.button
-              type="button"
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setFullscreen(true)}
-              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] text-zinc-700 transition duration-200 hover:bg-zinc-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-50 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-900"
-              aria-label="Vollbild: Kopf- und Seitenleiste ausblenden"
-            >
-              <Maximize2 className="h-4 w-4" aria-hidden />
-            </motion.button>
-            <ThemeToggle className="min-w-0 flex-1 justify-center" />
-          </div>
-          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-muted)]/50 px-3 py-3 text-center dark:bg-zinc-900/35">
-            <p className="text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">
-              von{" "}
-              <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                Johannes Fahland
-              </span>
-            </p>
-          </div>
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-muted)]/50 px-3 py-3 text-center dark:bg-zinc-900/35">
+          <p className="text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+            von{" "}
+            <span className="font-medium text-zinc-700 dark:text-zinc-300">
+              Johannes Fahland
+            </span>
+          </p>
         </div>
       </div>
     </aside>

@@ -44,6 +44,7 @@ import type {
   PlayBoardTab,
 } from "@/components/schiffe/types";
 import { schiffeCard as card, schiffeGlow as glow, schiffeShell as shell } from "@/components/schiffe/styles";
+import { useFullscreen } from "@/components/FullscreenContext";
 
 const alphabetLabels = Array.from({ length: GRID_SIZE }, (_, c) =>
   String.fromCharCode(65 + c),
@@ -175,6 +176,7 @@ export function SchiffeVersenkenApp() {
   );
   const settingsBtnRef = useRef<HTMLButtonElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
+  const { fullscreen } = useFullscreen();
 
   const modeLabel =
     game.mode === "single" ? "1 Spieler vs Bot" : "2 Spieler Tracker";
@@ -649,7 +651,12 @@ export function SchiffeVersenkenApp() {
     <div className={shell}>
       <div className={glow} />
       <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-1 flex-col gap-2 overflow-hidden px-2 pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] pt-[max(0.5rem,env(safe-area-inset-top,0px))] [padding-left:max(0.5rem,env(safe-area-inset-left,0px))] [padding-right:max(0.5rem,env(safe-area-inset-right,0px))] sm:px-4 lg:px-6">
-        <header className="flex shrink-0 items-center gap-2">
+        <header
+          className={[
+            "flex shrink-0 items-center gap-2",
+            fullscreen ? "pr-14" : "",
+          ].join(" ")}
+        >
           <div className="min-w-0 flex-1">
             <p className="hidden text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 sm:block dark:text-slate-400">
               Taktikspiel

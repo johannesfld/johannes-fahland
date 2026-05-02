@@ -1,3 +1,6 @@
+"use client";
+
+import { useFullscreen } from "@/components/FullscreenContext";
 import { IconAlert, IconClose } from "@/components/ui/icons";
 
 export function BigNumber({ value }: { value: number }) {
@@ -32,14 +35,18 @@ export function ErrorBanner({ message }: { message: string }) {
 }
 
 export function CloseGameButton({ onClick }: { onClick: () => void }) {
+  const { fullscreen } = useFullscreen();
+  const position = fullscreen
+    ? "absolute left-3 top-3 z-10 md:left-4 md:top-4"
+    : "absolute right-3 top-3 z-10 md:right-4 md:top-4";
   return (
     <button
       type="button"
       onClick={onClick}
       className={
-        "absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-xl border " +
+        `${position} inline-flex h-10 w-10 items-center justify-center rounded-xl border ` +
         "border-amber-200/80 bg-white/90 text-zinc-500 transition-colors hover:border-red-300 hover:text-red-600 " +
-        "dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-400 dark:hover:border-red-500/50 dark:hover:text-red-400 md:right-4 md:top-4"
+        "dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-400 dark:hover:border-red-500/50 dark:hover:text-red-400"
       }
       aria-label="Spiel beenden"
     >
