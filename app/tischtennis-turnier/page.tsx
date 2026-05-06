@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getTournamentList } from "@/app/actions/turnier";
 import { TurnierList } from "@/components/turnier/TurnierList";
 

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { notFound } from "next/navigation";
 import { getTournamentById } from "@/app/actions/turnier";
 import { TurnierApp } from "@/components/turnier/TurnierApp";
