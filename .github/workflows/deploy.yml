@@ -21,7 +21,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
+      - name: Install build dependencies (host arch)
         run: npm ci
 
       - name: Generate Prisma Client
@@ -38,6 +38,47 @@ jobs:
 
       - name: Copy static into standalone
         run: cp -r .next/static .next/standalone/.next/static
+
+      - name: Replace native modules with ARM64 binaries
+        run: |
+          set -e
+          # Standalone hat ein minimales node_modules mit nur den vom Server-Code
+          # importierten Modulen. Native Binaries darin sind x64. Wir installieren
+          # die Plattform-spezifischen optionalDependencies fuer ARM64 in einem
+          # temporaeren Verzeichnis und mergen sie ins standalone.
+          mkdir -p /tmp/arm64-deps
+          cp package.json package-lock.json /tmp/arm64-deps/
+          cd /tmp/arm64-deps
+          npm install --cpu=arm64 --os=linux --libc=glibc --include=optional \
+            --omit=dev --no-audit --no-fund --ignore-scripts
+
+          # Liste aller plattform-spezifischen Pakete fuer ARM64-glibc
+          # (libsql + sharp). Andere Packages bleiben unveraendert vom Build.
+          ARM64_PKGS=(
+            "@libsql/linux-arm64-gnu"
+            "@img/sharp-linux-arm64"
+            "@img/sharp-libvips-linux-arm64"
+          )
+
+          STANDALONE_NM="$GITHUB_WORKSPACE/.next/standalone/node_modules"
+          for pkg in "${ARM64_PKGS[@]}"; do
+            SRC="/tmp/arm64-deps/node_modules/$pkg"
+            DEST="$STANDALONE_NM/$pkg"
+            if [ -d "$SRC" ]; then
+              echo "Copying $pkg -> standalone"
+              mkdir -p "$(dirname "$DEST")"
+              rm -rf "$DEST"
+              cp -r "$SRC" "$DEST"
+            else
+              echo "WARN: $pkg not found in arm64 install"
+            fi
+          done
+
+          # x64-spezifische Binaries aus standalone entfernen damit Pi sie nicht laedt
+          rm -rf "$STANDALONE_NM/@libsql/linux-x64-gnu" || true
+          rm -rf "$STANDALONE_NM/@libsql/linux-x64-musl" || true
+          rm -rf "$STANDALONE_NM/@img/sharp-linux-x64" || true
+          rm -rf "$STANDALONE_NM/@img/sharp-libvips-linux-x64" || true
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -66,14 +107,16 @@ jobs:
             --exclude='dev.db' \
             /tmp/nextjs-build/ /home/johannes/apps/my-website/
 
-      - name: Generate Prisma Client for ARM64
-        working-directory: /home/johannes/apps/my-website
-        run: npx prisma generate
-
       - name: Restart with PM2
         run: |
-          pm2 restart active-site \
-            || pm2 start node --name "active-site" -- /home/johannes/apps/my-website/server.js
+          set -a
+          . /home/johannes/apps/my-website/.env
+          set +a
+          pm2 delete active-site 2>/dev/null || true
+          PORT=3000 HOSTNAME=0.0.0.0 pm2 start /home/johannes/apps/my-website/server.js \
+            --name "active-site" \
+            --cwd /home/johannes/apps/my-website \
+            --update-env
           pm2 save
 
       - name: Cleanup artifact
