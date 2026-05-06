@@ -1,4 +1,5 @@
 name: Deploy Website
+
 on:
   push:
     branches:
@@ -6,35 +7,79 @@ on:
       - master
 
 jobs:
-  deploy:
-    runs-on: self-hosted
+  build:
+    name: Build on GitHub Cloud
+    runs-on: ubuntu-latest
+
     steps:
-      # 1. Code in den Standard-Runner-Ordner laden
-      - name: Code vom Repo holen
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # 2. Code zum Zielordner schieben (ohne die .env zu löschen!)
-      - name: Dateien zum Zielordner kopieren
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --include=dev
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Build Next.js
+        run: npm run build
+        env:
+          NODE_OPTIONS: '--max-old-space-size=4096'
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nextjs-build
+          path: |
+            .next/
+            public/
+            package.json
+            package-lock.json
+            prisma/
+            next.config.ts
+          retention-days: 1
+
+  deploy:
+    name: Deploy to Pi
+    runs-on: self-hosted
+    needs: build
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: nextjs-build
+          path: /tmp/nextjs-build
+
+      - name: Sync build to target directory
         run: |
           mkdir -p /home/johannes/apps/my-website
-          # rsync kopiert nur Änderungen und lässt die .env Datei in Ruhe
-          rsync -av --exclude='.git' --exclude='.env' ./ /home/johannes/apps/my-website/
+          rsync -av --delete \
+            --exclude='.env' \
+            --exclude='node_modules' \
+            --exclude='dev.db' \
+            /tmp/nextjs-build/ /home/johannes/apps/my-website/
 
-      # 3. Build & Restart im Zielordner
-      - name: Build and Restart
+      - name: Install production dependencies (native binaries for ARM64)
         working-directory: /home/johannes/apps/my-website
         run: |
-          # Platz schaffen vor dem Start
-          npm cache clean --force
-          
-          # Installation & Build
-          npm install --no-audit --no-fund
-          npx prisma generate
-          
-          # Dem Pi beim Build helfen (RAM Limit)
-          export NODE_OPTIONS="--max-old-space-size=1024"
-          npm run build
-          
-          # Neustart
-          pm2 restart next-website || pm2 start npm --name "next-website" -- start
+          npm ci --omit=dev --no-audit --no-fund
+
+      - name: Generate Prisma Client for ARM64
+        working-directory: /home/johannes/apps/my-website
+        run: npx prisma generate
+
+      - name: Restart with PM2
+        run: |
+          cd /home/johannes/apps/my-website
+          pm2 restart active-site || pm2 start npm --name "active-site" -- start
           pm2 save
+
+      - name: Cleanup artifact
+        run: rm -rf /tmp/nextjs-build
