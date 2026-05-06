@@ -22,7 +22,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --include=dev
+        run: npm ci
 
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -33,17 +33,17 @@ jobs:
           NODE_OPTIONS: '--max-old-space-size=4096'
           DATABASE_URL: 'file:/tmp/dummy.db'
 
+      - name: Copy public into standalone
+        run: cp -r public .next/standalone/public
+
+      - name: Copy static into standalone
+        run: cp -r .next/static .next/standalone/.next/static
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: nextjs-build
-          path: |
-            .next/
-            public/
-            package.json
-            package-lock.json
-            prisma/
-            next.config.ts
+          path: .next/standalone/
           retention-days: 1
 
   deploy:
@@ -58,19 +58,13 @@ jobs:
           name: nextjs-build
           path: /tmp/nextjs-build
 
-      - name: Sync build to target directory
+      - name: Sync standalone build to target directory
         run: |
           mkdir -p /home/johannes/apps/my-website
           rsync -av --delete \
             --exclude='.env' \
-            --exclude='node_modules' \
             --exclude='dev.db' \
             /tmp/nextjs-build/ /home/johannes/apps/my-website/
-
-      - name: Install production dependencies (native binaries for ARM64)
-        working-directory: /home/johannes/apps/my-website
-        run: |
-          npm ci --omit=dev --no-audit --no-fund
 
       - name: Generate Prisma Client for ARM64
         working-directory: /home/johannes/apps/my-website
@@ -78,8 +72,8 @@ jobs:
 
       - name: Restart with PM2
         run: |
-          cd /home/johannes/apps/my-website
-          pm2 restart active-site || pm2 start npm --name "active-site" -- start
+          pm2 restart active-site \
+            || pm2 start node --name "active-site" -- /home/johannes/apps/my-website/server.js
           pm2 save
 
       - name: Cleanup artifact
