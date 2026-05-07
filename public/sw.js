@@ -1,11 +1,14 @@
-const CACHE_NAME = "vibecode-v3";
+const CACHE_NAME = "vibecode-v4";
+const OLD_CACHES = ["vibecode-v3", "vibecode-v2", "vibecode-v1"];
+
 const PRECACHE_URLS = [
   "/manifest.json",
-  "/icon-192x192.svg",
-  "/icon-512x512.svg",
+  "/brand/icon-192.png",
+  "/brand/icon-512.png",
+  "/brand/apple-touch-icon.png",
+  "/offline",
 ];
 
-// Install — precache only static assets (not HTML: stale HTML breaks Next.js hydration)
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) =>
@@ -19,15 +22,25 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) =>
-      Promise.all(
-        cacheNames.map((name) => {
-          if (name !== CACHE_NAME) return caches.delete(name);
-        }),
+    Promise.all([
+      caches.keys().then((cacheNames) =>
+        Promise.all(
+          cacheNames.map((name) => {
+            if (name !== CACHE_NAME || OLD_CACHES.includes(name)) {
+              return caches.delete(name);
+            }
+          }),
+        ),
       ),
-    ),
+      self.clients.claim(),
+    ]),
   );
-  self.clients.claim();
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("fetch", (event) => {
@@ -38,19 +51,42 @@ self.addEventListener("fetch", (event) => {
 
   const accept = event.request.headers.get("accept") ?? "";
 
-  // Never cache-first HTML: old shells + new chunks = broken interactivity
+  // Never cache HTML: stale shells break Next.js hydration
   if (
     event.request.mode === "navigate" ||
     accept.includes("text/html") ||
     url.pathname.startsWith("/_next/data/")
   ) {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match("/")),
+      fetch(event.request).catch(() =>
+        caches.match("/offline").then((r) => r || caches.match("/")),
+      ),
     );
     return;
   }
 
-  // Hashed Next chunks: network first (avoids stale bundles), cache for offline retry
+  // Static brand assets: stale-while-revalidate
+  if (
+    url.pathname.startsWith("/brand/") ||
+    url.pathname === "/manifest.json" ||
+    url.pathname.startsWith("/icon-")
+  ) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(async (cache) => {
+        const cached = await cache.match(event.request);
+        const networkFetch = fetch(event.request).then((response) => {
+          if (response.ok && response.type === "basic") {
+            cache.put(event.request, response.clone());
+          }
+          return response;
+        });
+        return cached ?? networkFetch;
+      }),
+    );
+    return;
+  }
+
+  // Hashed Next.js chunks: network first, cache for offline retry
   if (url.pathname.startsWith("/_next/static/")) {
     event.respondWith(
       fetch(event.request)
@@ -72,11 +108,7 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        if (
-          response.ok &&
-          response.type === "basic" &&
-          !accept.includes("text/html")
-        ) {
+        if (response.ok && response.type === "basic") {
           const copy = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, copy);

@@ -3,31 +3,106 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #fafaf9;
-  --foreground: #18181b;
+  /* --- Legacy aliases (used by existing components, kept for compat) --- */
+  --background: #FAFAF7;
+  --foreground: #1C1A17;
   --surface: #ffffff;
-  --surface-muted: #f4f4f5;
-  --border: rgba(24, 24, 27, 0.09);
+  --surface-muted: #F2F1ED;
+  --border: rgba(28, 26, 23, 0.09);
   --ring-focus: rgba(245, 158, 11, 0.35);
   --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
   color-scheme: light;
+
+  /* --- Vibe tokens: global surface --- */
+  --vibe-bg-base:     #FAFAF7;
+  --vibe-bg-elevated: #FFFFFF;
+  --vibe-bg-sunken:   #F2F1ED;
+
+  /* --- Vibe tokens: foreground --- */
+  --vibe-fg-base:  #1C1A17;
+  --vibe-fg-muted: #6B6862;
+  --vibe-fg-faint: #A19D96;
+
+  /* --- Vibe tokens: lines --- */
+  --vibe-line:        rgba(28, 26, 23, 0.10);
+  --vibe-line-strong: rgba(28, 26, 23, 0.18);
+  --vibe-ring:        rgba(245, 158, 11, 0.32);
+
+  /* --- Vibe tokens: motion --- */
+  --vibe-ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --vibe-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --vibe-dur-1: 120ms;
+  --vibe-dur-2: 220ms;
+  --vibe-dur-3: 360ms;
+  --vibe-dur-4: 600ms;
+
+  /* --- Vibe tokens: radii --- */
+  --vibe-r-tight:   0.5rem;
+  --vibe-r-base:    0.875rem;
+  --vibe-r-soft:    1.25rem;
+  --vibe-r-pillow:  2rem;
+  --vibe-r-balloon: 2.5rem;
+
+  /* --- Vibe tokens: shadows --- */
+  --vibe-shadow-1:    0 1px 2px rgba(28, 26, 23, 0.06);
+  --vibe-shadow-2:    0 4px 16px -4px rgba(28, 26, 23, 0.10);
+  --vibe-shadow-3:    0 24px 60px -20px rgba(28, 26, 23, 0.18);
+  --vibe-shadow-glow: 0 0 0 1px var(--vibe-ring) inset, 0 8px 30px -10px var(--vibe-ring);
+
+  /* --- Tool accent placeholders (overridden per-tool by wrapper) --- */
+  --accent:      #C8881A;
+  --accent-soft: #FFE7B0;
+  --accent-ink:  #1A0F00;
+  --accent-glow: radial-gradient(ellipse at 50% 0%, rgba(200, 136, 26, 0.18) 0%, transparent 70%);
+  --accent-line: rgba(200, 136, 26, 0.20);
 }
 
 .dark {
-  --background: #0c0c0e;
-  --foreground: #ececee;
-  --surface: #141418;
+  /* --- Legacy aliases --- */
+  --background: #0B0B0E;
+  --foreground: #ECECEE;
+  --surface: #16161B;
   --surface-muted: #1a1a20;
-  --border: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.07);
   --ring-focus: rgba(251, 191, 36, 0.28);
   color-scheme: dark;
+
+  /* --- Vibe tokens: global surface --- */
+  --vibe-bg-base:     #0B0B0E;
+  --vibe-bg-elevated: #16161B;
+  --vibe-bg-sunken:   #060608;
+
+  /* --- Vibe tokens: foreground --- */
+  --vibe-fg-base:  #ECECEE;
+  --vibe-fg-muted: #A0A0A6;
+  --vibe-fg-faint: #6E6E76;
+
+  /* --- Vibe tokens: lines --- */
+  --vibe-line:        rgba(255, 255, 255, 0.07);
+  --vibe-line-strong: rgba(255, 255, 255, 0.14);
+  --vibe-ring:        rgba(251, 191, 36, 0.28);
+
+  /* --- Vibe tokens: shadows --- */
+  --vibe-shadow-1:    0 1px 2px rgba(0, 0, 0, 0.30);
+  --vibe-shadow-2:    0 4px 16px -4px rgba(0, 0, 0, 0.40);
+  --vibe-shadow-3:    0 24px 60px -20px rgba(0, 0, 0, 0.55);
+  --vibe-shadow-glow: 0 0 0 1px var(--vibe-ring) inset, 0 8px 30px -10px var(--vibe-ring);
+
+  /* --- Tool accent placeholders --- */
+  --accent:      #D4921E;
+  --accent-soft: #3A2200;
+  --accent-ink:  #FFE7B0;
+  --accent-glow: radial-gradient(ellipse at 50% 0%, rgba(212, 146, 30, 0.20) 0%, transparent 70%);
+  --accent-line: rgba(212, 146, 30, 0.18);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--vibe-bg-base);
+  --color-foreground: var(--vibe-fg-base);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-fraunces);
+  --font-hand: var(--font-caveat);
 }
 
 @keyframes app-page-enter {

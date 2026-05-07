@@ -1,40 +1,70 @@
 {
-  "name": "Vibecode Projekte",
+  "name": "Vibecode",
   "short_name": "Vibecode",
-  "description": "Manage your projects efficiently with Vibecode Projekte",
+  "description": "Privater Tool-Hub: Wizard, Kniffel, Schiffe, Rommé, Turnier.",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "browser"],
   "orientation": "any",
-  "theme_color": "#fafaf9",
-  "background_color": "#fafaf9",
-  "categories": ["productivity", "games"],
-  "screenshots": [
-    {
-      "src": "/icon-512x512.svg",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    }
-  ],
+  "theme_color": "#FAFAF7",
+  "background_color": "#FAFAF7",
+  "lang": "de",
+  "dir": "ltr",
+  "categories": ["productivity", "games", "utilities"],
   "icons": [
     {
-      "src": "/icon-192x192.svg",
+      "src": "/brand/icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-512x512.svg",
+      "src": "/brand/icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-192x192.svg",
-      "sizes": "192x192",
-      "type": "image/svg+xml",
+      "src": "/brand/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/icon-monochrome.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "monochrome"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Wizard öffnen",
+      "short_name": "Wizard",
+      "url": "/wizzard-punkterechner",
+      "icons": [{ "src": "/brand/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Tischtennis-Turnier",
+      "short_name": "Turnier",
+      "url": "/tischtennis-turnier",
+      "icons": [{ "src": "/brand/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/hub.png",
+      "sizes": "1170x2532",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/screenshots/hub-desktop.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide"
     }
   ]
 }
