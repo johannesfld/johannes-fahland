@@ -198,7 +198,7 @@ export default function RommeScoreApp() {
 
   return (
     <div
-      className={`${rommeDisplay.variable} flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100`}
+      className={`${rommeDisplay.variable} flex h-full min-h-0 flex-1 flex-col bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100`}
     >
       <header className="mx-auto flex w-full max-w-5xl shrink-0 items-end justify-between px-4 pb-4 pt-4 sm:px-6 sm:pt-6">
         <div>
@@ -224,7 +224,7 @@ export default function RommeScoreApp() {
       </header>
 
       <main
-        className={`mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col px-4 sm:px-6 ${isStarted ? "pb-28 sm:pb-32" : "pb-4"}`}
+        className={`mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-y-auto px-4 sm:px-6 ${isStarted ? "pb-40 sm:pb-44" : "pb-4"}`}
       >
         <AnimatePresence mode="wait">
           {!isStarted ? (
@@ -286,9 +286,9 @@ export default function RommeScoreApp() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, ease }}
-              className="flex min-h-0 flex-1 flex-col overflow-hidden"
+              className="flex min-h-0 flex-1 flex-col"
             >
-              <div className="min-h-0 shrink-0 overflow-x-auto rounded-2xl border border-red-900/20 bg-white shadow-xl dark:border-red-950/50 dark:bg-zinc-900">
+              <div className="overflow-x-auto rounded-2xl border border-red-900/20 bg-white shadow-xl dark:border-red-950/50 dark:bg-zinc-900">
                 <table
                   style={narrowTableMinWidth ? { minWidth: narrowTableMinWidth } : undefined}
                   className={`${rommeDisplay.className} border-collapse text-xs sm:text-sm ${
@@ -429,7 +429,38 @@ export default function RommeScoreApp() {
                       );
                     })}
                   </tbody>
-                  <tfoot>
+                </table>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+
+      {isStarted ? (
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 border-t border-zinc-200/90 bg-zinc-50/95 px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95">
+          <div className="pointer-events-auto mx-auto w-full max-w-5xl sm:px-2">
+            {totals.length > 0 ? (
+              <div className="mb-2 overflow-x-auto rounded-xl border border-red-900/20 bg-white dark:border-red-950/50 dark:bg-zinc-900">
+                <table
+                  style={narrowTableMinWidth ? { minWidth: narrowTableMinWidth } : undefined}
+                  className={`${rommeDisplay.className} w-full border-collapse text-xs sm:text-sm`}
+                >
+                  <colgroup>
+                    <col className="w-[2.75rem] min-w-[2.5rem] shrink-0" />
+                    {gamePlayerNames.map((_, i) => (
+                      <col
+                        key={i}
+                        style={
+                          narrowPlayerColShare
+                            ? { width: narrowPlayerColShare }
+                            : isNarrow
+                              ? { width: "25vw", minWidth: "4.25rem" }
+                              : { width: colPct }
+                        }
+                      />
+                    ))}
+                  </colgroup>
+                  <tbody>
                     <tr className="border-t-2 border-red-900/25 bg-red-950/[0.08] dark:border-red-800/40 dark:bg-red-950/35">
                       <td className="sticky left-0 z-10 border-r border-zinc-200 bg-red-50 px-1 py-3 text-center text-[9px] font-bold uppercase tracking-wide text-red-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-red-100 sm:px-2 sm:text-[10px]">
                         Gesamt
@@ -451,17 +482,10 @@ export default function RommeScoreApp() {
                         </td>
                       ))}
                     </tr>
-                  </tfoot>
+                  </tbody>
                 </table>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
-
-      {isStarted ? (
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 border-t border-zinc-200/90 bg-zinc-50/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95">
-          <div className="pointer-events-auto mx-auto w-full max-w-5xl sm:px-2">
+            ) : null}
             <button
               type="button"
               onClick={addRound}
