@@ -79,6 +79,7 @@ jobs:
           name: pi-release
           path: .next/standalone/
           retention-days: 1
+          include-hidden-files: true
 
   deploy:
     runs-on: self-hosted
