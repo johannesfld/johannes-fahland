@@ -1,0 +1,118 @@
+name: Deploy to Pi
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Build
+        run: npm run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+          DATABASE_URL: file:/tmp/dummy.db
+
+      - name: Assemble standalone bundle
+        run: |
+          cp -r public .next/standalone/public
+          cp -r .next/static .next/standalone/.next/static
+
+      - name: Install ARM64 native binaries
+        run: |
+          mkdir -p /tmp/arm64-deps
+          cd /tmp/arm64-deps
+          cp $GITHUB_WORKSPACE/package.json .
+          npm install --cpu=arm64 --os=linux --libc=glibc --ignore-scripts 2>/dev/null || true
+
+          STANDALONE_NM=$GITHUB_WORKSPACE/.next/standalone/node_modules
+
+          # @libsql arm64
+          for pkg in @libsql/linux-arm64-gnu @libsql/linux-arm64-musl; do
+            if [ -d "/tmp/arm64-deps/node_modules/$pkg" ]; then
+              mkdir -p "$STANDALONE_NM/$pkg"
+              cp -r /tmp/arm64-deps/node_modules/$pkg/. "$STANDALONE_NM/$pkg/"
+            fi
+          done
+
+          # sharp arm64
+          for pkg in @img/sharp-linux-arm64 @img/sharp-libvips-linux-arm64; do
+            if [ -d "/tmp/arm64-deps/node_modules/$pkg" ]; then
+              mkdir -p "$STANDALONE_NM/$pkg"
+              cp -r /tmp/arm64-deps/node_modules/$pkg/. "$STANDALONE_NM/$pkg/"
+            fi
+          done
+
+          # next/swc arm64
+          for pkg in @next/swc-linux-arm64-gnu @next/swc-linux-arm64-musl; do
+            if [ -d "/tmp/arm64-deps/node_modules/$pkg" ]; then
+              mkdir -p "$STANDALONE_NM/$pkg"
+              cp -r /tmp/arm64-deps/node_modules/$pkg/. "$STANDALONE_NM/$pkg/"
+            fi
+          done
+
+          # Strip x64 binaries to reduce artifact size
+          find "$STANDALONE_NM" -name '*linux-x64*' -type d | xargs rm -rf || true
+
+      - name: Write deploy meta
+        run: |
+          echo "{\"sha\":\"$GITHUB_SHA\",\"ref\":\"$GITHUB_REF\",\"built\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" \
+            > .next/standalone/.deploy-meta.json
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pi-release
+          path: .next/standalone/
+          retention-days: 1
+
+  deploy:
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pi-release
+          path: /tmp/pi-release
+
+      - name: Deploy via rsync
+        run: |
+          rsync -a --delete \
+            --exclude='.env' \
+            --exclude='data/' \
+            /tmp/pi-release/ \
+            /home/johannes/apps/active-site/
+
+      - name: Restart PM2
+        run: |
+          pm2 delete active-site 2>/dev/null || true
+          cd /home/johannes/apps/active-site
+          PORT=3000 HOSTNAME=0.0.0.0 pm2 start server.js --name active-site
+          pm2 save
+
+      - name: Smoke test
+        run: |
+          for i in 1 2 3 4 5; do
+            sleep 2
+            curl -sf http://localhost:3000/ && echo "OK" && exit 0
+          done
+          echo "Smoke test failed" && exit 1
+
+      - name: Cleanup
+        if: always()
+        run: rm -rf /tmp/pi-release /tmp/arm64-deps
