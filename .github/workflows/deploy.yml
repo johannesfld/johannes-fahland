@@ -103,6 +103,15 @@ jobs:
             /tmp/pi-release/ \
             /home/johannes/apps/active-site/
 
+      - name: Rebuild native modules for Pi architecture
+        run: |
+          cd /home/johannes/apps/active-site/node_modules/better-sqlite3
+          # The binary from the x64 build won't run on ARM. Try prebuild-install
+          # first (fast — fetches the ARM64 prebuilt binary from upstream releases).
+          # Fall back to a local source build if no prebuild matches.
+          npx --yes prebuild-install --runtime=node || npm rebuild better-sqlite3 --build-from-source
+          file build/Release/better_sqlite3.node || true
+
       - name: Restart PM2
         run: |
           pm2 delete active-site 2>/dev/null || true
