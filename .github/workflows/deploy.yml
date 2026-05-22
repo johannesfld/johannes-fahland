@@ -41,13 +41,17 @@ jobs:
 
           STANDALONE_NM=$GITHUB_WORKSPACE/.next/standalone/node_modules
 
-          # @libsql arm64
-          for pkg in @libsql/linux-arm64-gnu @libsql/linux-arm64-musl; do
-            if [ -d "/tmp/arm64-deps/node_modules/$pkg" ]; then
-              mkdir -p "$STANDALONE_NM/$pkg"
-              cp -r /tmp/arm64-deps/node_modules/$pkg/. "$STANDALONE_NM/$pkg/"
-            fi
-          done
+          # better-sqlite3 arm64 prebuild (fetched via prebuild-install)
+          if [ -d "$STANDALONE_NM/better-sqlite3" ]; then
+            cd "$STANDALONE_NM/better-sqlite3"
+            npx --yes prebuild-install \
+              --platform=linux \
+              --arch=arm64 \
+              --target=$(node -p "process.versions.node") \
+              --runtime=node || \
+            npx --yes prebuild-install --platform=linux --arch=arm64 || true
+            cd $GITHUB_WORKSPACE
+          fi
 
           # sharp arm64
           for pkg in @img/sharp-linux-arm64 @img/sharp-libvips-linux-arm64; do
@@ -110,7 +114,14 @@ jobs:
         run: |
           for i in 1 2 3 4 5; do
             sleep 2
-            curl -sf http://localhost:3000/ && echo "OK" && exit 0
+            curl -sf http://localhost:3000/ >/dev/null || continue
+            # Route that hits prisma → catches native-binary mismatches
+            body=$(curl -sf http://localhost:3000/tischtennis-turnier) || continue
+            if echo "$body" | grep -q "page couldn"; then
+              echo "Smoke test failed: /tischtennis-turnier rendered server error"
+              exit 1
+            fi
+            echo "OK" && exit 0
           done
           echo "Smoke test failed" && exit 1
 
