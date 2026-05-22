@@ -41,16 +41,26 @@ jobs:
 
           STANDALONE_NM=$GITHUB_WORKSPACE/.next/standalone/node_modules
 
-          # better-sqlite3 arm64 prebuild (fetched via prebuild-install)
-          if [ -d "$STANDALONE_NM/better-sqlite3" ]; then
-            cd "$STANDALONE_NM/better-sqlite3"
-            npx --yes prebuild-install \
-              --platform=linux \
-              --arch=arm64 \
-              --target=$(node -p "process.versions.node") \
-              --runtime=node || \
-            npx --yes prebuild-install --platform=linux --arch=arm64 || true
-            cd $GITHUB_WORKSPACE
+          # better-sqlite3 arm64 prebuild — REQUIRED. Build runs on x64,
+          # Pi is arm64. Without this, every Prisma call crashes at runtime.
+          BS3_DIR="$STANDALONE_NM/better-sqlite3"
+          if [ ! -d "$BS3_DIR" ]; then
+            echo "ERROR: better-sqlite3 missing from standalone bundle"
+            exit 1
+          fi
+          (
+            cd "$BS3_DIR"
+            # Try the runner's Node version first (artifacts also produced for it),
+            # then a generic arm64 fetch, then fall back to whatever the package
+            # ships as default prebuild target.
+            npx --yes prebuild-install --platform=linux --arch=arm64 --runtime=node \
+              || npx --yes prebuild-install --platform=linux --arch=arm64
+          )
+          BIN="$BS3_DIR/build/Release/better_sqlite3.node"
+          file "$BIN"
+          if ! file "$BIN" | grep -qE 'ARM aarch64|aarch64'; then
+            echo "ERROR: better-sqlite3 binary is not ARM64 after prebuild-install"
+            exit 1
           fi
 
           # sharp arm64
@@ -103,14 +113,9 @@ jobs:
             /tmp/pi-release/ \
             /home/johannes/apps/active-site/
 
-      - name: Rebuild native modules for Pi architecture
+      - name: Verify ARM64 binary on Pi
         run: |
-          cd /home/johannes/apps/active-site/node_modules/better-sqlite3
-          # The binary from the x64 build won't run on ARM. Try prebuild-install
-          # first (fast — fetches the ARM64 prebuilt binary from upstream releases).
-          # Fall back to a local source build if no prebuild matches.
-          npx --yes prebuild-install --runtime=node || npm rebuild better-sqlite3 --build-from-source
-          file build/Release/better_sqlite3.node || true
+          file /home/johannes/apps/active-site/node_modules/better-sqlite3/build/Release/better_sqlite3.node
 
       - name: Restart PM2
         run: |
