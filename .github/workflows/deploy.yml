@@ -123,6 +123,7 @@ jobs:
         run: |
           mkdir -p /home/johannes/apps/data
           cd /home/johannes/apps/active-site
+          set -a && source .env && set +a
           node scripts/migrate.mjs
 
       - name: Restart PM2
