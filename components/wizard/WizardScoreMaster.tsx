@@ -127,6 +127,53 @@ export default function WizardScoreMaster() {
     });
   }, [setupPlayerCount, playerNames]);
 
+  const handleBidBack = useCallback(() => {
+    setError(null);
+    if (state.currentBidderIndex === 0) {
+      setState((prev) => ({ ...prev, gamePhase: "mixer-announcement" }));
+    } else {
+      setState((prev) => ({
+        ...prev,
+        currentBidderIndex: prev.currentBidderIndex - 1,
+      }));
+    }
+  }, [state.currentBidderIndex]);
+
+  const handleActualBack = useCallback(() => {
+    setError(null);
+    if (state.currentActualIndex === 0) {
+      setState((prev) => ({
+        ...prev,
+        gamePhase: "bids",
+        currentBidderIndex: biddingPlayerOrder.length - 1,
+      }));
+    } else {
+      setState((prev) => ({
+        ...prev,
+        currentActualIndex: prev.currentActualIndex - 1,
+      }));
+    }
+  }, [state.currentActualIndex, biddingPlayerOrder.length]);
+
+  const handleScoreboardBack = useCallback(() => {
+    setError(null);
+    // Undo the round: revert players to pre-round state
+    setState((prev) => ({
+      ...prev,
+      gamePhase: "actuals",
+      currentActualIndex: prev.players.length - 1,
+      players: prev.players.map((p) => {
+        const last = p.history[p.history.length - 1];
+        if (!last || last.roundNumber !== prev.roundNumber) return p;
+        return {
+          ...p,
+          totalScore: p.totalScore - last.points,
+          history: p.history.slice(0, -1),
+        };
+      }),
+    }));
+  }, []);
+
   const handleBidSubmit = useCallback(() => {
     setError(null);
 
@@ -555,17 +602,38 @@ export default function WizardScoreMaster() {
                     </div>
                   </div>
 
+                  {state.currentBidderIndex > 0 && (
+                    <div className="overflow-hidden rounded-xl border border-amber-200/50 bg-white/40 dark:border-amber-900/25 dark:bg-slate-900/30">
+                      {biddingPlayerOrder.slice(0, state.currentBidderIndex).map((pi) => (
+                        <div key={pi} className="flex items-center justify-between px-3 py-1.5 text-xs border-b last:border-0 border-amber-100/60 dark:border-slate-800/50">
+                          <span className="font-medium text-amber-900 dark:text-amber-100">{state.players[pi]?.name}</span>
+                          <span className="font-bold text-amber-700 dark:text-amber-400">{state.pendingBids[pi]}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   {error ? <ErrorBanner message={error} /> : null}
 
-                  <button
-                    type="button"
-                    onClick={handleBidSubmit}
-                    className={primaryBtn}
-                  >
-                    {state.currentBidderIndex === biddingPlayerOrder.length - 1
-                      ? "Bestätigen und weiter"
-                      : "Bestätigen"}
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={handleBidBack}
+                      className="flex-none rounded-2xl border-2 border-amber-300/60 bg-white/60 px-4 py-4 text-sm font-black text-amber-700 transition-colors hover:bg-amber-50 dark:border-slate-600 dark:bg-slate-800/60 dark:text-amber-300 dark:hover:bg-slate-800 touch-manipulation"
+                      aria-label="Zurück"
+                    >
+                      ←
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleBidSubmit}
+                      className={`${primaryBtn} flex-1`}
+                    >
+                      {state.currentBidderIndex === biddingPlayerOrder.length - 1
+                        ? "Bestätigen und weiter"
+                        : "Bestätigen"}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -642,17 +710,55 @@ export default function WizardScoreMaster() {
                     </div>
                   </div>
 
+                  {/* Ansagen-Übersicht aller Spieler */}
+                  <div className="overflow-hidden rounded-xl border border-amber-200/50 bg-white/40 dark:border-amber-900/25 dark:bg-slate-900/30">
+                    {actualOrder.map((pi) => {
+                      const isDone = pi < actualOrder[state.currentActualIndex];
+                      const isCurrent = pi === currentActualBidderIndex;
+                      return (
+                        <div
+                          key={pi}
+                          className={`flex items-center justify-between px-3 py-1.5 text-xs border-b last:border-0 border-amber-100/60 dark:border-slate-800/50 ${isCurrent ? "bg-amber-400/10 dark:bg-amber-500/10" : ""}`}
+                        >
+                          <span className={`font-medium ${isCurrent ? "text-amber-900 dark:text-amber-50" : "text-amber-700/70 dark:text-amber-300/60"}`}>
+                            {state.players[pi]?.name}
+                          </span>
+                          <span className="flex gap-2 tabular-nums">
+                            <span className="text-amber-600/70 dark:text-amber-500/60">
+                              Ansage: {state.pendingBids[pi]}
+                            </span>
+                            {isDone && (
+                              <span className="font-bold text-amber-900 dark:text-amber-100">
+                                → {state.pendingActuals[pi]}
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
                   {error ? <ErrorBanner message={error} /> : null}
 
-                  <button
-                    type="button"
-                    onClick={handleActualSubmit}
-                    className={primaryBtn}
-                  >
-                    {state.currentActualIndex === state.players.length - 1
-                      ? "Bestätigen und Abrechnung"
-                      : "Bestätigen"}
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={handleActualBack}
+                      className="flex-none rounded-2xl border-2 border-amber-300/60 bg-white/60 px-4 py-4 text-sm font-black text-amber-700 transition-colors hover:bg-amber-50 dark:border-slate-600 dark:bg-slate-800/60 dark:text-amber-300 dark:hover:bg-slate-800 touch-manipulation"
+                      aria-label="Zurück"
+                    >
+                      ←
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleActualSubmit}
+                      className={`${primaryBtn} flex-1`}
+                    >
+                      {state.currentActualIndex === state.players.length - 1
+                        ? "Bestätigen und Abrechnung"
+                        : "Bestätigen"}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -762,18 +868,28 @@ export default function WizardScoreMaster() {
                     </div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleNextRound}
-                    className={
-                      "w-full rounded-2xl bg-gradient-to-r from-amber-600 to-amber-400 py-4 text-base font-black uppercase tracking-widest text-slate-950 shadow-xl " +
-                      "transition-all hover:from-amber-500 hover:to-amber-300 active:from-amber-700 active:to-amber-500 touch-manipulation app-page-enter"
-                    }
-                  >
-                    {state.roundNumber >= state.totalRounds
-                      ? "Spiel beenden"
-                      : "Nächste Runde"}
-                  </button>
+                  <div className="flex gap-2 app-page-enter">
+                    <button
+                      type="button"
+                      onClick={handleScoreboardBack}
+                      className="flex-none rounded-2xl border-2 border-amber-300/60 bg-white/60 px-4 py-4 text-sm font-black text-amber-700 transition-colors hover:bg-amber-50 dark:border-slate-600 dark:bg-slate-800/60 dark:text-amber-300 dark:hover:bg-slate-800 touch-manipulation"
+                      aria-label="Zurück zur Abrechnung"
+                    >
+                      ←
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleNextRound}
+                      className={
+                        "flex-1 rounded-2xl bg-gradient-to-r from-amber-600 to-amber-400 py-4 text-base font-black uppercase tracking-widest text-slate-950 shadow-xl " +
+                        "transition-all hover:from-amber-500 hover:to-amber-300 active:from-amber-700 active:to-amber-500 touch-manipulation"
+                      }
+                    >
+                      {state.roundNumber >= state.totalRounds
+                        ? "Spiel beenden"
+                        : "Nächste Runde"}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
