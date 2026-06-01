@@ -38,6 +38,11 @@ import {
   shipAt,
 } from "@/components/schiffe/logic";
 import { gameReducer, initialGame } from "@/components/schiffe/state";
+import {
+  clearSchiffeState,
+  loadSchiffeState,
+  saveSchiffeState,
+} from "@/components/schiffe/storage";
 import type {
   BotShotFeedback,
   GameMode,
@@ -154,7 +159,12 @@ function BoardGrid({
 }
 
 export function SchiffeVersenkenApp() {
-  const [game, dispatch] = useReducer(gameReducer, undefined, initialGame);
+  const [game, dispatch] = useReducer(
+    gameReducer,
+    undefined,
+    () => loadSchiffeState() ?? initialGame(),
+  );
+  const isHydrated = useRef(false);
   const [colors, setColors] = useState<SchiffeColorSettings>(() =>
     loadColorSettings(),
   );
@@ -177,6 +187,18 @@ export function SchiffeVersenkenApp() {
   const settingsBtnRef = useRef<HTMLButtonElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
   const { fullscreen } = useFullscreen();
+
+  useEffect(() => {
+    if (!isHydrated.current) {
+      isHydrated.current = true;
+      return;
+    }
+    if (game.phase === "modeSelect") {
+      clearSchiffeState();
+    } else {
+      saveSchiffeState(game);
+    }
+  }, [game]);
 
   const modeLabel =
     game.mode === "single" ? "1 Spieler vs Bot" : "2 Spieler Tracker";

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UserPlus, X, Play, RotateCcw } from "lucide-react";
 import { SumRow } from "@/components/kniffel/SumRow";
@@ -17,6 +17,11 @@ import {
   calculateTotal,
   createInitialScores,
 } from "@/components/kniffel/helpers";
+import {
+  clearKniffelState,
+  loadKniffelState,
+  saveKniffelState,
+} from "@/components/kniffel/storage";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -25,6 +30,23 @@ export default function KniffelApp() {
   const [gamePlayerNames, setGamePlayerNames] = useState<string[]>([]);
   const [isStarted, setIsStarted] = useState(false);
   const [scores, setScores] = useState<PlayerScores[]>([]);
+  const isHydrated = useRef(false);
+
+  useEffect(() => {
+    const saved = loadKniffelState();
+    if (saved) {
+      setPlayerNames(saved.playerNames);
+      setGamePlayerNames(saved.playerNames);
+      setScores(saved.scores);
+      setIsStarted(saved.isStarted);
+    }
+    isHydrated.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated.current) return;
+    saveKniffelState({ playerNames: gamePlayerNames, scores, isStarted });
+  }, [gamePlayerNames, scores, isStarted]);
 
   const initGame = () => {
     const finalizedNames = playerNames.map(
@@ -54,7 +76,13 @@ export default function KniffelApp() {
         </div>
         {isStarted && (
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              clearKniffelState();
+              setGamePlayerNames([]);
+              setScores([]);
+              setIsStarted(false);
+              setPlayerNames(["", ""]);
+            }}
             className="inline-flex items-center gap-1.5 text-xs font-bold text-red-500 uppercase transition-colors hover:text-red-600"
           >
             <RotateCcw size={14} aria-hidden />

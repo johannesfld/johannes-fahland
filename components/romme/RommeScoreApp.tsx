@@ -1,9 +1,14 @@
 "use client";
 
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Play, RotateCcw, SquareStack, Trophy, UserPlus, X } from "lucide-react";
 import { rommeDisplay } from "@/components/romme/romme-display-font";
+import {
+  clearRommeState,
+  loadRommeState,
+  saveRommeState,
+} from "@/components/romme/storage";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -93,6 +98,23 @@ export default function RommeScoreApp() {
   const [gamePlayerNames, setGamePlayerNames] = useState<string[]>([]);
   const [isStarted, setIsStarted] = useState(false);
   const [rounds, setRounds] = useState<RommeRound[]>([]);
+  const isHydrated = useRef(false);
+
+  useEffect(() => {
+    const saved = loadRommeState();
+    if (saved) {
+      setPlayerNames(saved.playerNames);
+      setGamePlayerNames(saved.playerNames);
+      setRounds(saved.rounds);
+      setIsStarted(saved.isStarted);
+    }
+    isHydrated.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated.current) return;
+    saveRommeState({ playerNames: gamePlayerNames, rounds, isStarted });
+  }, [gamePlayerNames, rounds, isStarted]);
 
   const playerCount = gamePlayerNames.length;
 
@@ -136,6 +158,7 @@ export default function RommeScoreApp() {
   };
 
   const resetAll = () => {
+    clearRommeState();
     setPlayerNames(["", ""]);
     setGamePlayerNames([]);
     setRounds([]);
