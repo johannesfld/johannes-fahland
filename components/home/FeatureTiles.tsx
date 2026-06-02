@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Sparkles, Dices, Ship, SquareStack, Trophy, Grid3x3 } from "lucide-react";
+import { Sparkles, Dices, Ship, SquareStack, Trophy, Grid3x3, Zap } from "lucide-react";
 import { FeatureTile } from "./FeatureTile";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -163,6 +163,34 @@ export function FeatureTiles() {
                 opacity={0.05 + i * 0.012}
               />
             ))}
+          </svg>
+        }
+      />
+
+      {/* Snake */}
+      <FeatureTile
+        href="/snake"
+        tool="snake"
+        icon={Zap}
+        meta="Solo · Highscore"
+        reduced={reduced}
+        index={6}
+        wordmark={
+          <span className="font-sans text-5xl font-black uppercase tracking-tight leading-none">
+            SNAKE
+          </span>
+        }
+        pattern={
+          <svg className="absolute inset-0 h-full w-full" aria-hidden>
+            <polyline
+              points="20%,70% 20%,40% 50%,40% 50%,65% 75%,65% 75%,30%"
+              stroke="var(--accent)"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+              opacity="0.12"
+            />
           </svg>
         }
       />
