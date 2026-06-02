@@ -7,12 +7,13 @@ type SerializedGameState = Omit<GameState, "trackerManualMisses"> & {
 };
 
 export function loadSchiffeState(): GameState | null {
+  if (typeof window === "undefined") return null;
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = window.localStorage.getItem(KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as SerializedGameState;
     if (!parsed.phase || !Array.isArray(parsed.myShips)) {
-      localStorage.removeItem(KEY);
+      window.localStorage.removeItem(KEY);
       return null;
     }
     return {
@@ -20,19 +21,33 @@ export function loadSchiffeState(): GameState | null {
       trackerManualMisses: new Set(parsed.trackerManualMisses ?? []),
     };
   } catch {
-    localStorage.removeItem(KEY);
+    try {
+      window.localStorage.removeItem(KEY);
+    } catch {
+      /* ignore */
+    }
     return null;
   }
 }
 
 export function saveSchiffeState(state: GameState): void {
+  if (typeof window === "undefined") return;
   const serialized: SerializedGameState = {
     ...state,
     trackerManualMisses: Array.from(state.trackerManualMisses),
   };
-  localStorage.setItem(KEY, JSON.stringify(serialized));
+  try {
+    window.localStorage.setItem(KEY, JSON.stringify(serialized));
+  } catch {
+    /* ignore */
+  }
 }
 
 export function clearSchiffeState(): void {
-  localStorage.removeItem(KEY);
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(KEY);
+  } catch {
+    /* ignore */
+  }
 }
