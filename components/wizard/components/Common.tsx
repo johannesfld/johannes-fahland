@@ -7,9 +7,9 @@ export function BigNumber({ value }: { value: number }) {
   return (
     <div
       className={
-        "flex min-h-[5rem] min-w-[6rem] items-center justify-center rounded-2xl border-4 border-amber-500 " +
-        "bg-amber-50 text-5xl font-serif font-bold tabular-nums text-amber-900 shadow-inner shadow-amber-900/10 " +
-        "dark:border-amber-400 dark:bg-slate-950 dark:text-amber-200 md:min-h-[5.5rem] md:min-w-[8rem] md:text-6xl"
+        "flex min-h-[5rem] min-w-[6rem] items-center justify-center rounded-2xl border-4 border-[var(--accent)] " +
+        "bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] text-5xl font-serif font-bold tabular-nums text-[var(--accent)] " +
+        "md:min-h-[5.5rem] md:min-w-[8rem] md:text-6xl"
       }
       aria-live="polite"
       aria-label={`Wert ${value}`}
@@ -45,8 +45,7 @@ export function CloseGameButton({ onClick }: { onClick: () => void }) {
       onClick={onClick}
       className={
         `${position} inline-flex h-10 w-10 items-center justify-center rounded-xl border ` +
-        "border-amber-200/80 bg-white/90 text-zinc-500 transition-colors hover:border-red-300 hover:text-red-600 " +
-        "dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-400 dark:hover:border-red-500/50 dark:hover:text-red-400"
+        "border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/90 text-[var(--vibe-fg-muted)] transition-colors hover:border-red-400/50 hover:text-red-500"
       }
       aria-label="Spiel beenden"
     >

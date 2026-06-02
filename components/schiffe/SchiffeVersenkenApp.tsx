@@ -49,6 +49,7 @@ import type {
   PlayBoardTab,
 } from "@/components/schiffe/types";
 import { schiffeCard as card, schiffeGlow as glow, schiffeShell as shell } from "@/components/schiffe/styles";
+import { ToolShell } from "@/components/tool-shell/ToolShell";
 import { useFullscreen } from "@/components/FullscreenContext";
 
 const alphabetLabels = Array.from({ length: GRID_SIZE }, (_, c) =>
@@ -637,7 +638,7 @@ export function SchiffeVersenkenApp() {
           <button
             type="button"
             onClick={() => dispatch({ type: "SET_MODE", mode: "single" })}
-            className="group rounded-2xl border border-slate-200/80 bg-white/90 p-4 text-left shadow-sm transition duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50/90 hover:shadow-md active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 dark:border-slate-600/50 dark:bg-slate-900/70 dark:hover:border-slate-400 dark:hover:bg-slate-800 dark:focus-visible:ring-offset-zinc-950"
+            className="group rounded-2xl border border-slate-200/80 bg-white/90 p-4 text-left shadow-sm transition duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50/90 hover:shadow-md active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 dark:border-slate-600/50 dark:bg-slate-900/70 dark:hover:border-slate-400 dark:hover:bg-slate-800 dark:focus-visible:ring-offset-zinc-950"
           >
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 dark:text-slate-300">
               1 Spieler
@@ -652,7 +653,7 @@ export function SchiffeVersenkenApp() {
           <button
             type="button"
             onClick={() => dispatch({ type: "SET_MODE", mode: "twoPlayerTracker" })}
-            className="group rounded-2xl border border-slate-200/80 bg-white/90 p-4 text-left shadow-sm transition duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50/90 hover:shadow-md active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 dark:border-slate-600/50 dark:bg-slate-900/70 dark:hover:border-slate-400 dark:hover:bg-slate-800 dark:focus-visible:ring-offset-zinc-950"
+            className="group rounded-2xl border border-slate-200/80 bg-white/90 p-4 text-left shadow-sm transition duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50/90 hover:shadow-md active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 dark:border-slate-600/50 dark:bg-slate-900/70 dark:hover:border-slate-400 dark:hover:bg-slate-800 dark:focus-visible:ring-offset-zinc-950"
           >
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 dark:text-slate-300">
               2 Spieler
@@ -670,7 +671,7 @@ export function SchiffeVersenkenApp() {
   );
 
   return (
-    <div className={shell}>
+    <ToolShell tool="schiffe" fullBleed className={shell}>
       <div className={glow} />
       <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-1 flex-col gap-2 overflow-hidden px-2 pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] pt-[max(0.5rem,env(safe-area-inset-top,0px))] [padding-left:max(0.5rem,env(safe-area-inset-left,0px))] [padding-right:max(0.5rem,env(safe-area-inset-right,0px))] sm:px-4 lg:px-6">
         <header
@@ -696,7 +697,7 @@ export function SchiffeVersenkenApp() {
             ref={settingsBtnRef}
             type="button"
             onClick={() => setSettingsOpen((o) => !o)}
-            className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-white px-2 text-[11px] font-bold text-zinc-800 shadow-sm transition duration-200 hover:bg-zinc-50 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:px-4 sm:text-xs dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-950"
+            className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-white px-2 text-[11px] font-bold text-zinc-800 shadow-sm transition duration-200 hover:bg-zinc-50 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:px-4 sm:text-xs dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-950"
           >
             Einstellungen
           </button>
@@ -708,7 +709,7 @@ export function SchiffeVersenkenApp() {
                 dispatch({ type: "RESET" });
               }
             }}
-            className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-xl border border-red-200 bg-white px-2 text-[11px] font-bold text-red-700 shadow-sm transition duration-200 hover:bg-red-50 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:px-4 sm:text-xs dark:border-red-900/50 dark:bg-zinc-900 dark:text-red-300 dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-950"
+            className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-xl border border-red-200 bg-white px-2 text-[11px] font-bold text-red-700 shadow-sm transition duration-200 hover:bg-red-50 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:px-4 sm:text-xs dark:border-red-900/50 dark:bg-zinc-900 dark:text-red-300 dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-950"
           >
             Neu
           </button>
@@ -852,7 +853,7 @@ export function SchiffeVersenkenApp() {
                           });
                         }}
                         className={[
-                          "shrink-0 rounded-lg border px-2 py-1.5 text-[11px] font-bold transition duration-200 select-none touch-manipulation active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:px-4 sm:text-xs lg:w-full dark:focus-visible:ring-offset-zinc-950",
+                          "shrink-0 rounded-lg border px-2 py-1.5 text-[11px] font-bold transition duration-200 select-none touch-manipulation active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:px-4 sm:text-xs lg:w-full dark:focus-visible:ring-offset-zinc-950",
                           placed
                             ? "cursor-grab border-slate-500 bg-slate-50 text-slate-950 active:cursor-grabbing dark:border-slate-400 dark:bg-slate-900/40 dark:text-slate-100"
                             : pickedId === f.id
@@ -886,7 +887,7 @@ export function SchiffeVersenkenApp() {
                             type="button"
                             aria-label="Schiff drehen"
                             title="Drehen"
-                            className="flex items-center justify-center rounded-xl border border-slate-500/60 bg-slate-800/90 text-lg leading-none text-slate-100 shadow-lg backdrop-blur-sm transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
+                            className="flex items-center justify-center rounded-xl border border-slate-500/60 bg-slate-800/90 text-lg leading-none text-slate-100 shadow-lg backdrop-blur-sm transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60"
                             style={{
                               width: PLACEMENT_ROTATE_BTN_PX,
                               height: PLACEMENT_ROTATE_BTN_PX,
@@ -919,7 +920,7 @@ export function SchiffeVersenkenApp() {
                             type="button"
                             aria-label="Schiff entfernen"
                             title="Entfernen"
-                            className="flex items-center justify-center rounded-xl border border-red-500/40 bg-slate-800/90 text-base font-black leading-none text-red-400 shadow-lg backdrop-blur-sm transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
+                            className="flex items-center justify-center rounded-xl border border-red-500/40 bg-slate-800/90 text-base font-black leading-none text-red-400 shadow-lg backdrop-blur-sm transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60"
                             style={{
                               width: PLACEMENT_ROTATE_BTN_PX,
                               height: PLACEMENT_ROTATE_BTN_PX,
@@ -1075,7 +1076,7 @@ export function SchiffeVersenkenApp() {
                 type="button"
                 disabled={!fleetIsCompleteAndValid(game.myShips)}
                 onClick={() => dispatch({ type: "ADVANCE_PLACEMENT" })}
-                className="shrink-0 rounded-2xl bg-amber-500 py-2 text-xs font-black uppercase tracking-wider text-slate-950 shadow-sm transition duration-200 hover:bg-amber-400 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:py-2.5 sm:text-sm dark:bg-amber-400 dark:text-slate-950 dark:hover:bg-amber-300 dark:focus-visible:ring-offset-zinc-950"
+                className="shrink-0 rounded-2xl bg-[var(--accent)] py-2 text-xs font-black uppercase tracking-wider text-[var(--accent-ink)] shadow-sm transition duration-200 hover:brightness-95 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:py-2.5 sm:text-sm"
               >
                 {game.mode === "single" ? "Spiel starten" : "Weiter zum Tippfeld"}
               </button>
@@ -1251,7 +1252,7 @@ export function SchiffeVersenkenApp() {
                         game.single.turn !== "player" || !game.single.selectedTarget
                       }
                       onClick={() => dispatch({ type: "SINGLE_FIRE" })}
-                      className="shrink-0 rounded-xl bg-amber-500 px-6 py-2 text-xs font-black uppercase tracking-wider text-slate-950 shadow-sm transition duration-200 hover:bg-amber-400 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-sm dark:bg-amber-400 dark:focus-visible:ring-offset-zinc-950"
+                      className="shrink-0 rounded-xl bg-amber-500 px-6 py-2 text-xs font-black uppercase tracking-wider text-slate-950 shadow-sm transition duration-200 hover:bg-amber-400 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm dark:bg-amber-400 dark:focus-visible:ring-offset-zinc-950"
                     >
                       Feuern
                     </button>
@@ -1273,7 +1274,7 @@ export function SchiffeVersenkenApp() {
                                 type="button"
                                 disabled={markHitMissDisabled}
                                 onClick={() => dispatch({ type: "TRACKER_MARK", mark: "hit" })}
-                                className="min-h-10 flex-1 rounded-xl px-4 py-2 text-xs font-black transition duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-sm dark:focus-visible:ring-offset-zinc-950"
+                                className="min-h-10 flex-1 rounded-xl px-4 py-2 text-xs font-black transition duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm dark:focus-visible:ring-offset-zinc-950"
                                 style={{ backgroundColor: colors.hit, color: textColorForBg(colors.hit) }}
                               >
                                 Treffer
@@ -1282,7 +1283,7 @@ export function SchiffeVersenkenApp() {
                                 type="button"
                                 disabled={markHitMissDisabled}
                                 onClick={() => dispatch({ type: "TRACKER_MARK", mark: "miss" })}
-                                className="min-h-10 flex-1 rounded-xl border-2 px-4 py-2 text-xs font-black transition duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-sm dark:focus-visible:ring-offset-zinc-950"
+                                className="min-h-10 flex-1 rounded-xl border-2 px-4 py-2 text-xs font-black transition duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm dark:focus-visible:ring-offset-zinc-950"
                                 style={{ backgroundColor: colors.miss, color: textColorForBg(colors.miss), borderColor: colors.miss }}
                               >
                                 Kein Treffer
@@ -1297,7 +1298,7 @@ export function SchiffeVersenkenApp() {
                                   title="Versenkt"
                                   aria-label="Versenkt"
                                   onClick={() => dispatch({ type: "TRACKER_SUNK" })}
-                                  className="min-h-10 rounded-xl border-2 border-amber-700 bg-amber-100 px-4 py-2 text-xs font-black text-amber-950 transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-sm dark:border-amber-500 dark:bg-amber-950/50 dark:text-amber-100 dark:focus-visible:ring-offset-zinc-950"
+                                  className="min-h-10 rounded-xl border-2 border-amber-700 bg-amber-100 px-4 py-2 text-xs font-black text-amber-950 transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm dark:border-amber-500 dark:bg-amber-950/50 dark:text-amber-100 dark:focus-visible:ring-offset-zinc-950"
                                 >
                                   Versenkt
                                 </button>
@@ -1305,7 +1306,7 @@ export function SchiffeVersenkenApp() {
                               <button
                                 type="button"
                                 onClick={() => dispatch({ type: "TRACKER_UNDO" })}
-                                className="min-h-10 flex-1 rounded-xl border-2 border-red-300 bg-red-50 px-4 py-2 text-xs font-black text-red-700 transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-sm dark:border-red-800 dark:bg-red-950/40 dark:text-red-300 dark:focus-visible:ring-offset-zinc-950"
+                                className="min-h-10 flex-1 rounded-xl border-2 border-red-300 bg-red-50 px-4 py-2 text-xs font-black text-red-700 transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm dark:border-red-800 dark:bg-red-950/40 dark:text-red-300 dark:focus-visible:ring-offset-zinc-950"
                               >
                                 Aufheben
                               </button>
@@ -1315,7 +1316,7 @@ export function SchiffeVersenkenApp() {
                             <button
                               type="button"
                               onClick={() => dispatch({ type: "TRACKER_UNDO" })}
-                              className="min-h-10 flex-1 rounded-xl border-2 border-red-300 bg-red-50 px-4 py-2 text-xs font-black text-red-700 transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 sm:text-sm dark:border-red-800 dark:bg-red-950/40 dark:text-red-300 dark:focus-visible:ring-offset-zinc-950"
+                              className="min-h-10 flex-1 rounded-xl border-2 border-red-300 bg-red-50 px-4 py-2 text-xs font-black text-red-700 transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm dark:border-red-800 dark:bg-red-950/40 dark:text-red-300 dark:focus-visible:ring-offset-zinc-950"
                             >
                               Aufheben
                             </button>
@@ -1359,7 +1360,7 @@ export function SchiffeVersenkenApp() {
                     <button
                       type="button"
                       onClick={() => dispatch({ type: "SET_MODE", mode: game.mode as GameMode })}
-                      className="min-h-11 rounded-2xl bg-amber-500 px-4 py-2 text-sm font-black uppercase tracking-wider text-slate-950 shadow-sm transition duration-200 hover:bg-amber-400 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 dark:bg-amber-400 dark:hover:bg-amber-300 dark:focus-visible:ring-offset-zinc-950"
+                      className="min-h-11 rounded-2xl bg-amber-500 px-4 py-2 text-sm font-black uppercase tracking-wider text-slate-950 shadow-sm transition duration-200 hover:bg-amber-400 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 dark:bg-amber-400 dark:hover:bg-amber-300 dark:focus-visible:ring-offset-zinc-950"
                     >
                       Gleicher Modus
                     </button>
@@ -1367,7 +1368,7 @@ export function SchiffeVersenkenApp() {
                   <button
                     type="button"
                     onClick={() => dispatch({ type: "RESET" })}
-                    className="min-h-11 rounded-2xl border border-zinc-300 bg-white px-4 py-2 text-sm font-black uppercase tracking-wider text-zinc-900 transition duration-200 hover:bg-zinc-50 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60 focus-visible:ring-offset-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-950"
+                    className="min-h-11 rounded-2xl border border-zinc-300 bg-white px-4 py-2 text-sm font-black uppercase tracking-wider text-zinc-900 transition duration-200 hover:bg-zinc-50 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-950"
                   >
                     Moduswahl
                   </button>
@@ -1410,7 +1411,7 @@ export function SchiffeVersenkenApp() {
           </div>
         </div>
       )}
-    </div>
+    </ToolShell>
   );
 }
 

@@ -9,6 +9,8 @@ import {
   loadRommeState,
   saveRommeState,
 } from "@/components/romme/storage";
+import { ToolShell } from "@/components/tool-shell/ToolShell";
+import { cn } from "@/components/ui/styles";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -68,15 +70,20 @@ function WinnerTrophyDisplay({
   interactive: boolean;
   onClick?: () => void;
 }) {
-  const tone = "text-red-800 dark:text-red-300";
-  const icon = <Trophy className={`h-5 w-5 sm:h-6 sm:w-6 ${tone}`} strokeWidth={2} aria-hidden />;
+  const icon = (
+    <Trophy
+      className="h-5 w-5 sm:h-6 sm:w-6 text-[var(--accent)]"
+      strokeWidth={2}
+      aria-hidden
+    />
+  );
 
   if (interactive) {
     return (
       <button
         type="button"
         onClick={onClick}
-        className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-red-900/35 bg-red-950/[0.06] transition-colors hover:border-red-800 hover:bg-red-950/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-red-800/50 dark:bg-red-950/30 dark:hover:bg-red-950/50 dark:focus-visible:ring-offset-zinc-950 ${tone}`}
+        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-[var(--vibe-r-lg)] border border-[var(--accent-line)] bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] text-[var(--accent)] transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_15%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2"
         aria-label="Gewinner, erneut wählen"
       >
         {icon}
@@ -85,7 +92,7 @@ function WinnerTrophyDisplay({
   }
 
   return (
-    <span className={`inline-flex items-center justify-center ${tone}`} aria-hidden>
+    <span className="inline-flex items-center justify-center text-[var(--accent)]" aria-hidden>
       {icon}
     </span>
   );
@@ -204,7 +211,7 @@ export default function RommeScoreApp() {
   };
 
   const ring =
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-zinc-950";
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2";
 
   const colPct = playerCount > 0 ? `${90 / playerCount}%` : "22%";
 
@@ -220,103 +227,135 @@ export default function RommeScoreApp() {
       : undefined;
 
   return (
-    <div
-      className={`${rommeDisplay.variable} flex h-full min-h-0 flex-1 flex-col bg-zinc-50 font-sans text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100`}
-    >
-      <header className="mx-auto flex w-full max-w-5xl shrink-0 items-end justify-between px-4 pb-4 pt-4 sm:px-6 sm:pt-6">
-        <div>
-          <h1
-            className={`${rommeDisplay.className} text-3xl font-bold uppercase tracking-tight text-red-900 underline decoration-red-300 decoration-4 underline-offset-4 dark:text-red-200 dark:decoration-red-900 sm:text-4xl md:text-5xl`}
-          >
-            Rommé
-          </h1>
-          <p className="mt-2 text-xs font-medium uppercase tracking-widest text-zinc-500 sm:text-sm">
-            Punkte
-          </p>
+    <ToolShell tool="romme" className={`${rommeDisplay.variable} px-4 py-4 sm:px-6 sm:py-5`}>
+      {/* Header */}
+      <header className="mx-auto mb-5 flex w-full max-w-5xl shrink-0 items-end justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-[var(--vibe-r-md)] bg-[color-mix(in_srgb,var(--accent)_12%,transparent)]">
+            <SquareStack size={20} className="text-[var(--accent)]" aria-hidden />
+          </div>
+          <div>
+            <h1
+              className={cn(
+                rommeDisplay.className,
+                "font-bold uppercase tracking-tight leading-none text-[var(--accent)]",
+                "text-3xl sm:text-4xl",
+              )}
+            >
+              Rommé
+            </h1>
+            <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)] opacity-60">
+              Punkte
+            </p>
+          </div>
         </div>
-        {isStarted ? (
+        {isStarted && (
           <button
             type="button"
             onClick={resetAll}
-            className={`inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-xs font-bold uppercase text-red-600 transition-colors hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 ${ring}`}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-[var(--vibe-r-md)] px-3 py-2 text-xs font-semibold",
+              "text-[var(--vibe-fg-faint)] transition-colors hover:text-red-500",
+              ring,
+            )}
           >
-            <RotateCcw size={14} aria-hidden />
+            <RotateCcw size={13} aria-hidden />
             Reset
           </button>
-        ) : null}
+        )}
       </header>
 
       <main
-        className={`mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-y-auto px-4 sm:px-6 ${isStarted ? "pb-40 sm:pb-44" : "pb-4"}`}
+        className={cn(
+          "mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-y-auto",
+          isStarted
+            ? "pb-[calc(9rem+64px+env(safe-area-inset-bottom,0px))] sm:pb-44"
+            : "pb-4",
+        )}
       >
         <AnimatePresence mode="wait">
           {!isStarted ? (
             <motion.div
               key="setup"
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.4, ease }}
-              className="overflow-y-auto rounded-3xl border border-red-900/20 bg-white p-6 shadow-xl dark:border-red-950/50 dark:bg-zinc-900"
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.28, ease }}
             >
-              <h2 className="mb-4 text-center text-xl font-bold">Wer spielt mit?</h2>
-              <div className="mb-6 grid gap-3">
-                {playerNames.map((name, i) => (
-                  <div key={i} className="flex gap-2">
-                    <input
-                      value={name}
-                      onChange={(e) => {
-                        const n = [...playerNames];
-                        n[i] = e.target.value;
-                        setPlayerNames(n);
-                      }}
-                      placeholder={`Spieler ${i + 1}`}
-                      className={`min-h-11 flex-1 rounded-xl border-none bg-zinc-100 p-3 dark:bg-zinc-800 ${ring}`}
-                    />
-                    {playerNames.length > 2 ? (
-                      <button
-                        type="button"
-                        onClick={() => setPlayerNames(playerNames.filter((_, idx) => idx !== i))}
-                        className={`min-h-11 min-w-11 shrink-0 rounded-xl text-zinc-400 transition-colors hover:text-red-500 ${ring}`}
-                        aria-label="Spieler entfernen"
-                      >
-                        <X size={18} aria-hidden className="mx-auto" />
-                      </button>
-                    ) : null}
-                  </div>
-                ))}
+              <div className="rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] p-6 shadow-[var(--vibe-shadow-soft)]">
+                <h2 className="mb-5 text-lg font-semibold tracking-tight">Wer spielt mit?</h2>
+                <div className="grid gap-2.5 mb-6">
+                  {playerNames.map((name, i) => (
+                    <div key={i} className="flex gap-2">
+                      <input
+                        value={name}
+                        onChange={(e) => {
+                          const n = [...playerNames];
+                          n[i] = e.target.value;
+                          setPlayerNames(n);
+                        }}
+                        placeholder={`Spieler ${i + 1}`}
+                        className={cn(
+                          "flex-1 min-h-11 rounded-[var(--vibe-r-md)] border border-[var(--vibe-line)]",
+                          "bg-[var(--vibe-bg-sunken)] px-3 text-sm text-[var(--vibe-fg-base)]",
+                          "placeholder:text-[var(--vibe-fg-faint)]",
+                          "focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/25",
+                          "transition-colors",
+                        )}
+                      />
+                      {playerNames.length > 2 && (
+                        <button
+                          type="button"
+                          onClick={() => setPlayerNames(playerNames.filter((_, idx) => idx !== i))}
+                          className="flex h-11 w-11 items-center justify-center rounded-[var(--vibe-r-md)] text-[var(--vibe-fg-faint)] transition-colors hover:text-red-500"
+                          aria-label="Spieler entfernen"
+                        >
+                          <X size={16} aria-hidden />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setPlayerNames([...playerNames, ""])}
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--accent)] transition-opacity hover:opacity-75"
+                  >
+                    <UserPlus size={15} aria-hidden />
+                    Spieler hinzufügen
+                  </button>
+                </div>
                 <button
                   type="button"
-                  onClick={() => setPlayerNames([...playerNames, ""])}
-                  className={`inline-flex min-h-11 items-center gap-1.5 text-sm font-bold text-red-800 transition-colors hover:text-red-950 dark:text-red-300 dark:hover:text-red-200 ${ring}`}
+                  onClick={initGame}
+                  className={cn(
+                    "inline-flex w-full items-center justify-center gap-2 rounded-[var(--vibe-r-lg)]",
+                    "bg-[var(--accent)] py-3.5 text-sm font-bold text-[var(--accent-ink)]",
+                    "shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]",
+                    "transition-all hover:brightness-95 active:scale-[0.985]",
+                    ring,
+                  )}
                 >
-                  <UserPlus size={16} aria-hidden />
-                  Spieler hinzufügen
+                  <Play size={16} aria-hidden />
+                  SPIEL STARTEN
                 </button>
               </div>
-              <button
-                type="button"
-                onClick={initGame}
-                className={`inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-red-900 py-4 font-black text-white shadow-lg shadow-red-900/25 transition-all hover:bg-red-950 active:scale-[0.98] dark:bg-red-800 dark:hover:bg-red-900 ${ring}`}
-              >
-                <Play size={18} aria-hidden />
-                SPIEL STARTEN
-              </button>
             </motion.div>
           ) : (
             <motion.div
               key="game"
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease }}
+              transition={{ duration: 0.28, ease }}
               className="flex min-h-0 flex-1 flex-col"
             >
-              <div className="overflow-x-auto rounded-2xl border border-red-900/20 bg-white shadow-xl dark:border-red-950/50 dark:bg-zinc-900">
+              <div className="overflow-x-auto rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] shadow-[var(--vibe-shadow-soft)]">
                 <table
                   style={narrowTableMinWidth ? { minWidth: narrowTableMinWidth } : undefined}
-                  className={`${rommeDisplay.className} border-collapse text-xs sm:text-sm ${
-                    narrowManyPlayersScroll ? "w-max min-w-full table-fixed" : "w-full min-w-0 table-fixed"
-                  }`}
+                  className={cn(
+                    rommeDisplay.className,
+                    "border-collapse text-xs sm:text-sm",
+                    narrowManyPlayersScroll ? "w-max min-w-full table-fixed" : "w-full min-w-0 table-fixed",
+                  )}
                 >
                   <colgroup>
                     <col className="w-[2.75rem] min-w-[2.5rem] shrink-0" />
@@ -334,10 +373,10 @@ export default function RommeScoreApp() {
                     ))}
                   </colgroup>
                   <thead>
-                    <tr className="border-b border-zinc-200 bg-red-950/[0.06] dark:border-zinc-700 dark:bg-red-950/30">
+                    <tr className="border-b border-[var(--vibe-line)] bg-[color-mix(in_srgb,var(--accent)_6%,transparent)]">
                       <th
                         scope="col"
-                        className="sticky left-0 z-20 border-r border-zinc-200 bg-red-50 px-1 py-3 text-center text-[9px] font-bold uppercase leading-tight tracking-wide text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 sm:px-2 sm:text-[10px]"
+                        className="sticky left-0 z-20 bg-[var(--vibe-bg-sunken)] border-r border-[var(--vibe-line)] px-1 py-3 text-center text-[9px] font-bold uppercase leading-tight tracking-wide text-[var(--vibe-fg-faint)] sm:px-2 sm:text-[10px]"
                       >
                         #
                       </th>
@@ -345,25 +384,25 @@ export default function RommeScoreApp() {
                         <th
                           key={i}
                           scope="col"
-                          className="min-w-0 px-1 py-3 text-center align-middle text-[10px] font-semibold uppercase leading-tight tracking-wide text-zinc-800 dark:text-zinc-100 sm:px-2 sm:text-xs"
+                          className="min-w-0 px-1 py-3 text-center align-middle text-[10px] font-semibold uppercase leading-tight tracking-wide text-[var(--vibe-fg-base)] sm:px-2 sm:text-xs"
                         >
                           <span className="relative inline-flex items-center justify-center gap-0">
                             <span className="line-clamp-2 max-w-[min(100%,7rem)] break-words text-center sm:max-w-[10rem]">
                               {name}
                             </span>
-                            {i === dealerIndex ? (
+                            {i === dealerIndex && (
                               <SquareStack
                                 size={18}
-                                className="ml-0.5 -translate-y-px shrink-0 text-red-800 dark:text-red-300 sm:h-5 sm:w-5"
+                                className="ml-0.5 -translate-y-px shrink-0 text-[var(--accent)] sm:h-5 sm:w-5"
                                 aria-label="Mischer"
                               />
-                            ) : null}
+                            )}
                           </span>
                         </th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                  <tbody className="divide-y divide-[var(--vibe-line)]">
                     {rounds.map((round, ri) => {
                       const isLast = ri === rounds.length - 1;
                       const rowDealer = ri % playerCount;
@@ -372,15 +411,13 @@ export default function RommeScoreApp() {
                           key={ri}
                           className={
                             isLast
-                              ? "bg-red-950/[0.04] dark:bg-red-950/20"
-                              : "hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30"
+                              ? "bg-[color-mix(in_srgb,var(--accent)_4%,transparent)]"
+                              : "hover:bg-[var(--vibe-bg-sunken)]/50 transition-colors"
                           }
                         >
-                          <td className="sticky left-0 z-10 border-r border-zinc-200 bg-white px-1 py-2.5 text-center text-[10px] font-semibold tabular-nums text-zinc-500 shadow-[2px_0_4px_rgba(0,0,0,0.04)] dark:border-zinc-700 dark:bg-zinc-900 sm:px-2 sm:text-xs">
-                            <span className="tabular-nums text-zinc-700 dark:text-zinc-300">{ri + 1}</span>
-                            <span className="sr-only">
-                              , Mischer: {gamePlayerNames[rowDealer]}
-                            </span>
+                          <td className="sticky left-0 z-10 border-r border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] px-1 py-2.5 text-center text-[10px] font-semibold tabular-nums text-[var(--vibe-fg-muted)] sm:px-2 sm:text-xs">
+                            <span className="tabular-nums text-[var(--vibe-fg-base)]">{ri + 1}</span>
+                            <span className="sr-only">, Mischer: {gamePlayerNames[rowDealer]}</span>
                           </td>
                           {gamePlayerNames.map((_, pi) => {
                             const isWinner = round.winnerIndex === pi;
@@ -399,7 +436,7 @@ export default function RommeScoreApp() {
                                     {display === "trophy" ? (
                                       <WinnerTrophyDisplay interactive={false} />
                                     ) : (
-                                      <span className="inline-block min-w-[2.25rem] text-center tabular-nums text-sm font-semibold text-zinc-900 dark:text-zinc-100 sm:min-w-[2.5rem] sm:text-base">
+                                      <span className="inline-block min-w-[2.25rem] text-center tabular-nums text-sm font-semibold text-[var(--vibe-fg-base)] sm:min-w-[2.5rem] sm:text-base">
                                         {display === null ? "–" : display}
                                       </span>
                                     )}
@@ -416,7 +453,12 @@ export default function RommeScoreApp() {
                                     <button
                                       type="button"
                                       onClick={() => setWinner(ri, pi)}
-                                      className={`inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-red-800 transition-colors hover:border-red-400 hover:bg-red-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-red-300 dark:hover:border-red-700 dark:hover:bg-red-950/40 ${ring}`}
+                                      className={cn(
+                                        "inline-flex min-h-11 min-w-11 items-center justify-center rounded-[var(--vibe-r-lg)]",
+                                        "border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] text-[var(--vibe-fg-muted)]",
+                                        "transition-colors hover:border-[var(--accent-line)] hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] hover:text-[var(--accent)]",
+                                        ring,
+                                      )}
                                       aria-label={`Als Gewinner wählen: ${gamePlayerNames[pi]}`}
                                     >
                                       <Trophy className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={2} aria-hidden />
@@ -440,7 +482,13 @@ export default function RommeScoreApp() {
                                       inputMode="numeric"
                                       value={val ?? ""}
                                       onChange={(e) => setScore(ri, pi, e.target.value)}
-                                      className={`h-10 w-full max-w-[4.5rem] min-w-0 rounded-lg border border-zinc-200 bg-zinc-50 px-1 text-center text-sm font-semibold tabular-nums dark:border-zinc-600 dark:bg-zinc-800 sm:h-11 sm:max-w-[5rem] sm:text-base ${ring}`}
+                                      className={cn(
+                                        "h-10 w-full max-w-[4.5rem] min-w-0 rounded-[var(--vibe-r-md)]",
+                                        "border-2 border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)]",
+                                        "px-1 text-center text-sm font-semibold tabular-nums",
+                                        "focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/25",
+                                        "sm:h-11 sm:max-w-[5rem] sm:text-base transition-colors",
+                                      )}
                                       aria-label={`Punkte Runde ${ri + 1} ${gamePlayerNames[pi]}`}
                                     />
                                   )}
@@ -459,14 +507,14 @@ export default function RommeScoreApp() {
         </AnimatePresence>
       </main>
 
-      {isStarted ? (
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 border-t border-zinc-200/90 bg-zinc-50/95 px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95">
+      {isStarted && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 border-t border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/95 px-4 pt-2 pb-[calc(max(0.75rem,env(safe-area-inset-bottom,0px))+64px)] backdrop-blur-md md:pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
           <div className="pointer-events-auto mx-auto w-full max-w-5xl sm:px-2">
-            {totals.length > 0 ? (
-              <div className="mb-2 overflow-x-auto rounded-xl border border-red-900/20 bg-white dark:border-red-950/50 dark:bg-zinc-900">
+            {totals.length > 0 && (
+              <div className="mb-2 overflow-x-auto rounded-[var(--vibe-r-lg)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]">
                 <table
                   style={narrowTableMinWidth ? { minWidth: narrowTableMinWidth } : undefined}
-                  className={`${rommeDisplay.className} w-full border-collapse text-xs sm:text-sm`}
+                  className={cn(rommeDisplay.className, "w-full border-collapse text-xs sm:text-sm")}
                 >
                   <colgroup>
                     <col className="w-[2.75rem] min-w-[2.5rem] shrink-0" />
@@ -484,21 +532,21 @@ export default function RommeScoreApp() {
                     ))}
                   </colgroup>
                   <tbody>
-                    <tr className="border-t-2 border-red-900/25 bg-red-950/[0.08] dark:border-red-800/40 dark:bg-red-950/35">
-                      <td className="sticky left-0 z-10 border-r border-zinc-200 bg-red-50 px-1 py-3 text-center text-[9px] font-bold uppercase tracking-wide text-red-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-red-100 sm:px-2 sm:text-[10px]">
+                    <tr className="border-t-2 border-[var(--accent-line)] bg-[color-mix(in_srgb,var(--accent)_8%,transparent)]">
+                      <td className="sticky left-0 z-10 border-r border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] px-1 py-3 text-center text-[9px] font-bold uppercase tracking-wide text-[var(--vibe-fg-faint)] sm:px-2 sm:text-[10px]">
                         Gesamt
                       </td>
                       {totals.map((t, i) => (
                         <td key={i} className="min-w-0 px-1 py-3 text-center sm:px-2">
                           <div className="flex flex-wrap items-center justify-center gap-1">
-                            {leaderIndices.has(i) ? (
+                            {leaderIndices.has(i) && (
                               <Trophy
                                 size={16}
-                                className="shrink-0 text-amber-600 dark:text-amber-400"
+                                className="shrink-0 text-[var(--accent)]"
                                 aria-label="Führend"
                               />
-                            ) : null}
-                            <span className="text-center text-base font-bold tabular-nums text-red-950 dark:text-red-100 sm:text-lg">
+                            )}
+                            <span className="text-center text-base font-bold tabular-nums text-[var(--accent)] sm:text-lg">
                               {t}
                             </span>
                           </div>
@@ -508,22 +556,24 @@ export default function RommeScoreApp() {
                   </tbody>
                 </table>
               </div>
-            ) : null}
+            )}
             <button
               type="button"
               onClick={addRound}
               disabled={!canAddRound}
-              className={`min-h-12 w-full rounded-2xl border-2 py-3 text-sm font-bold uppercase tracking-wide transition-all sm:text-base ${ring} ${
+              className={cn(
+                "min-h-12 w-full rounded-[var(--vibe-r-lg)] border-2 py-3 text-sm font-bold uppercase tracking-wide transition-all sm:text-base",
+                ring,
                 canAddRound
-                  ? "border-red-900/40 bg-white text-red-950 hover:border-red-900 hover:bg-red-50 active:scale-[0.98] dark:border-red-800/60 dark:bg-zinc-900 dark:text-red-100 dark:hover:bg-red-950/40"
-                  : "cursor-not-allowed border-zinc-200 bg-zinc-100 text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500"
-              }`}
+                  ? "border-[var(--accent-line)] bg-[var(--vibe-bg-elevated)] text-[var(--accent)] hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] active:scale-[0.98]"
+                  : "cursor-not-allowed border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] text-[var(--vibe-fg-faint)]",
+              )}
             >
               Nächste Runde
             </button>
           </div>
         </div>
-      ) : null}
-    </div>
+      )}
+    </ToolShell>
   );
 }

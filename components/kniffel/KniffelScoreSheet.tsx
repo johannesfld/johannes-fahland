@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { UserPlus, X, Play, RotateCcw } from "lucide-react";
+import { UserPlus, X, Play, RotateCcw, Dices } from "lucide-react";
 import { SumRow } from "@/components/kniffel/SumRow";
 import {
   BOTTOM_CATEGORIES,
@@ -22,6 +22,8 @@ import {
   loadKniffelState,
   saveKniffelState,
 } from "@/components/kniffel/storage";
+import { ToolShell } from "@/components/tool-shell/ToolShell";
+import { cn } from "@/components/ui/styles";
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -65,178 +67,230 @@ export default function KniffelApp() {
     });
   };
 
+  const resetGame = () => {
+    clearKniffelState();
+    setGamePlayerNames([]);
+    setScores([]);
+    setIsStarted(false);
+    setPlayerNames(["", ""]);
+  };
+
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans p-4 sm:p-8">
-      <header className="max-w-5xl mx-auto mb-4 w-full shrink-0 flex justify-between items-end">
-        <div>
-          <h1 className="text-5xl font-black italic tracking-tighter text-amber-500 underline decoration-zinc-300 dark:decoration-zinc-700 decoration-4 underline-offset-4">
-            KNIFFEL
-          </h1>
-          <p className="text-zinc-500 text-sm font-medium mt-2 uppercase tracking-widest">Digital Scorecard</p>
+    <ToolShell tool="kniffel" className="px-4 py-4 sm:px-6 sm:py-5">
+      {/* Header */}
+      <header className="mx-auto mb-5 flex w-full max-w-5xl shrink-0 items-end justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-[var(--vibe-r-md)] bg-[color-mix(in_srgb,var(--accent)_12%,transparent)]">
+            <Dices size={20} className="text-[var(--accent)]" aria-hidden />
+          </div>
+          <div>
+            <h1 className="font-sans text-4xl font-black italic tracking-tight leading-none text-[var(--accent-ink)]">
+              KNIFFEL
+            </h1>
+            <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)] opacity-60">
+              Digital Scorecard
+            </p>
+          </div>
         </div>
         {isStarted && (
           <button
-            onClick={() => {
-              clearKniffelState();
-              setGamePlayerNames([]);
-              setScores([]);
-              setIsStarted(false);
-              setPlayerNames(["", ""]);
-            }}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-red-500 uppercase transition-colors hover:text-red-600"
+            onClick={resetGame}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-[var(--vibe-r-md)] px-3 py-2 text-xs font-semibold",
+              "text-[var(--vibe-fg-faint)] transition-colors hover:text-red-500",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40",
+            )}
           >
-            <RotateCcw size={14} aria-hidden />
+            <RotateCcw size={13} aria-hidden />
             Reset
           </button>
         )}
       </header>
 
-      <main className="max-w-5xl mx-auto flex min-h-0 w-full flex-1 flex-col overflow-hidden">
+      <main className="mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-hidden">
         <AnimatePresence mode="wait">
           {!isStarted ? (
             <motion.div
               key="setup"
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.4, ease }}
-              className="bg-white dark:bg-zinc-900 p-6 rounded-3xl shadow-xl border border-zinc-200 dark:border-zinc-800 overflow-y-auto"
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.28, ease }}
+              className="overflow-y-auto"
             >
-              <h2 className="text-xl font-bold mb-4 text-center">Wer spielt mit?</h2>
-              <div className="grid gap-3 mb-6">
-                {playerNames.map((name, i) => (
-                  <div key={i} className="flex gap-2">
-                    <input
-                      value={name}
-                      onChange={e => {
-                        const n = [...playerNames]; n[i] = e.target.value; setPlayerNames(n);
-                      }}
-                      placeholder={`Spieler ${i + 1}`}
-                      className="flex-1 bg-zinc-100 dark:bg-zinc-800 border-none rounded-xl p-3 focus:ring-2 focus:ring-amber-500 outline-none"
-                    />
-                    {playerNames.length > 1 && (
-                      <button
-                        onClick={() => setPlayerNames(playerNames.filter((_, idx) => idx !== i))}
-                        className="p-3 text-zinc-400 transition-colors hover:text-red-500"
-                      >
-                        <X size={18} aria-hidden />
-                      </button>
-                    )}
-                  </div>
-                ))}
+              <div className="rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] p-6 shadow-[var(--vibe-shadow-soft)]">
+                <h2 className="mb-5 text-lg font-semibold tracking-tight">Wer spielt mit?</h2>
+                <div className="grid gap-2.5 mb-6">
+                  {playerNames.map((name, i) => (
+                    <div key={i} className="flex gap-2">
+                      <input
+                        value={name}
+                        onChange={e => {
+                          const n = [...playerNames]; n[i] = e.target.value; setPlayerNames(n);
+                        }}
+                        placeholder={`Spieler ${i + 1}`}
+                        className={cn(
+                          "flex-1 min-h-11 rounded-[var(--vibe-r-md)] border border-[var(--vibe-line)]",
+                          "bg-[var(--vibe-bg-sunken)] px-3 text-sm text-[var(--vibe-fg-base)]",
+                          "placeholder:text-[var(--vibe-fg-faint)]",
+                          "focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]/25",
+                          "transition-colors",
+                        )}
+                      />
+                      {playerNames.length > 1 && (
+                        <button
+                          onClick={() => setPlayerNames(playerNames.filter((_, idx) => idx !== i))}
+                          className="flex h-11 w-11 items-center justify-center rounded-[var(--vibe-r-md)] text-[var(--vibe-fg-faint)] transition-colors hover:text-red-500"
+                        >
+                          <X size={16} aria-hidden />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => setPlayerNames([...playerNames, ""])}
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--accent)] transition-opacity hover:opacity-75"
+                  >
+                    <UserPlus size={15} aria-hidden />
+                    Spieler hinzufügen
+                  </button>
+                </div>
                 <button
-                  onClick={() => setPlayerNames([...playerNames, ""])}
-                  className="inline-flex items-center gap-1.5 text-sm font-bold text-amber-600 transition-colors hover:text-amber-700"
+                  onClick={initGame}
+                  className={cn(
+                    "inline-flex w-full items-center justify-center gap-2 rounded-[var(--vibe-r-lg)]",
+                    "bg-[var(--accent)] py-3.5 text-sm font-bold text-[var(--accent-ink)]",
+                    "shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]",
+                    "transition-all hover:brightness-95 active:scale-[0.985]",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2",
+                  )}
                 >
-                  <UserPlus size={16} aria-hidden />
-                  Spieler hinzufügen
+                  <Play size={16} aria-hidden />
+                  SPIEL STARTEN
                 </button>
               </div>
-              <button
-                onClick={initGame}
-                className="inline-flex w-full items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-amber-500/20 active:scale-[0.98]"
-              >
-                <Play size={18} aria-hidden />
-                SPIEL STARTEN
-              </button>
             </motion.div>
           ) : (
             <motion.div
               key="game"
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease }}
-              className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden"
+              transition={{ duration: 0.28, ease }}
+              className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] shadow-[var(--vibe-shadow-soft)]"
             >
-              <div className="flex min-h-0 flex-1 flex-col bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 overflow-hidden shadow-2xl">
-                <div className="overflow-x-auto overflow-y-auto min-h-0 flex-1">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="bg-zinc-50 dark:bg-zinc-800/50">
-                        <th className="sticky left-0 z-20 bg-zinc-50 dark:bg-zinc-800 p-4 text-left text-[10px] uppercase tracking-widest text-zinc-400 border-r dark:border-zinc-700">Feld</th>
-                        {gamePlayerNames.map((name, i) => (
-                          <th key={i} className="p-4 text-center min-w-[120px] font-bold">{name}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-sm">
-                      {TOP_CATEGORIES.map((key) => (
-                        <tr key={key} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30">
-                          <td className="sticky left-0 z-10 bg-white dark:bg-zinc-900 p-4 font-bold border-r dark:border-zinc-700 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">{CAT_LABELS[key]}</td>
-                          {scores.map((pScore, pIdx) => (
-                            <td key={pIdx} className="p-2">
-                              <div className="flex justify-center items-center gap-1">
-                                {FIXED_PTS[key] ? (
-                                  <button 
-                                    onClick={() => updateCell(pIdx, key, pScore[key].score ? null : FIXED_PTS[key]!, false)}
-                                    className={`flex-1 h-10 rounded-lg border-2 font-black transition-all ${pScore[key].score ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-zinc-100 dark:border-zinc-800 text-zinc-300'}`}
-                                  >
-                                    {pScore[key].score || FIXED_PTS[key]}
-                                  </button>
-                                ) : (
-                                  <input
-                                    type="number" inputMode="numeric"
-                                    value={pScore[key].score ?? ""}
-                                    disabled={pScore[key].crossed}
-                                    onChange={e => updateCell(pIdx, key, e.target.value === "" ? null : parseInt(e.target.value))}
-                                    className="w-14 h-10 bg-zinc-50 dark:bg-zinc-800 border-2 border-zinc-100 dark:border-zinc-800 rounded-lg text-center font-bold focus:border-amber-500 outline-none disabled:opacity-20 transition-all"
-                                  />
-                                )}
-                                <button 
-                                  onClick={() => updateCell(pIdx, key, null, !pScore[key].crossed)}
-                                  className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center transition-all ${pScore[key].crossed ? 'bg-red-500 border-red-500 text-white' : 'border-zinc-100 dark:border-zinc-800 text-zinc-200 dark:text-zinc-700'}`}
-                                >
-                                  <X size={14} aria-hidden />
-                                </button>
-                              </div>
-                            </td>
-                          ))}
-                        </tr>
+              <div className="overflow-x-auto overflow-y-auto min-h-0 flex-1">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)]">
+                      <th className="sticky left-0 z-20 bg-[var(--vibe-bg-sunken)] p-4 text-left text-[10px] font-semibold uppercase tracking-widest text-[var(--vibe-fg-faint)] border-r border-[var(--vibe-line)]">
+                        Feld
+                      </th>
+                      {gamePlayerNames.map((name, i) => (
+                        <th key={i} className="p-4 text-center min-w-[120px] text-sm font-semibold text-[var(--vibe-fg-base)]">
+                          {name}
+                        </th>
                       ))}
-                      <SumRow label="Oben (Summe)" players={scores} calc={calculateTopSum} />
-                      <SumRow label="Bonus (+25)" players={scores} calc={s => calculateTopSum(s) >= 63 ? 25 : 0} highlight />
-                      {BOTTOM_CATEGORIES.map((key) => (
-                        <tr key={key} className="hover:bg-zinc-50/50 dark:hover:bg-zinc-800/30">
-                          <td className="sticky left-0 z-10 bg-white dark:bg-zinc-900 p-4 font-bold border-r dark:border-zinc-700 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">{CAT_LABELS[key]}</td>
-                          {scores.map((pScore, pIdx) => (
-                            <td key={pIdx} className="p-2">
-                              <div className="flex justify-center items-center gap-1">
-                                {FIXED_PTS[key] ? (
-                                  <button
-                                    onClick={() => updateCell(pIdx, key, pScore[key].score ? null : FIXED_PTS[key]!, false)}
-                                    className={`flex-1 h-10 rounded-lg border-2 font-black transition-all ${pScore[key].score ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-zinc-100 dark:border-zinc-800 text-zinc-300'}`}
-                                  >
-                                    {pScore[key].score || FIXED_PTS[key]}
-                                  </button>
-                                ) : (
-                                  <input
-                                    type="number" inputMode="numeric"
-                                    value={pScore[key].score ?? ""}
-                                    disabled={pScore[key].crossed}
-                                    onChange={e => updateCell(pIdx, key, e.target.value === "" ? null : parseInt(e.target.value))}
-                                    className="w-14 h-10 bg-zinc-50 dark:bg-zinc-800 border-2 border-zinc-100 dark:border-zinc-800 rounded-lg text-center font-bold focus:border-amber-500 outline-none disabled:opacity-20 transition-all"
-                                  />
-                                )}
-                                <button
-                                  onClick={() => updateCell(pIdx, key, null, !pScore[key].crossed)}
-                                  className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center transition-all ${pScore[key].crossed ? 'bg-red-500 border-red-500 text-white' : 'border-zinc-100 dark:border-zinc-800 text-zinc-200 dark:text-zinc-700'}`}
-                                >
-                                  <X size={14} aria-hidden />
-                                </button>
-                              </div>
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                      <SumRow label="Gesamt" players={scores} calc={calculateTotal} highlight large />
-                    </tbody>
-                  </table>
-                </div>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--vibe-line)] text-sm">
+                    {/* Top section label */}
+                    <tr className="bg-[color-mix(in_srgb,var(--accent)_5%,transparent)]">
+                      <td colSpan={gamePlayerNames.length + 1} className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--accent)] opacity-70">
+                        Obere Sektion
+                      </td>
+                    </tr>
+                    {TOP_CATEGORIES.map((key) => (
+                      <ScoreRow
+                        key={key}
+                        catKey={key}
+                        scores={scores}
+                        onUpdate={updateCell}
+                      />
+                    ))}
+                    <SumRow label="Oben (Summe)" players={scores} calc={calculateTopSum} />
+                    <SumRow label="Bonus (+25)" players={scores} calc={s => calculateTopSum(s) >= 63 ? 25 : 0} highlight />
+                    {/* Bottom section label */}
+                    <tr className="bg-[color-mix(in_srgb,var(--accent)_5%,transparent)]">
+                      <td colSpan={gamePlayerNames.length + 1} className="px-4 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--accent)] opacity-70">
+                        Untere Sektion
+                      </td>
+                    </tr>
+                    {BOTTOM_CATEGORIES.map((key) => (
+                      <ScoreRow
+                        key={key}
+                        catKey={key}
+                        scores={scores}
+                        onUpdate={updateCell}
+                      />
+                    ))}
+                    <SumRow label="Gesamt" players={scores} calc={calculateTotal} highlight large />
+                  </tbody>
+                </table>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </main>
-    </div>
+    </ToolShell>
+  );
+}
+
+type ScoreRowProps = {
+  catKey: Category;
+  scores: PlayerScores[];
+  onUpdate: (pIdx: number, cat: Category, val: number | null, cross?: boolean) => void;
+};
+
+function ScoreRow({ catKey, scores, onUpdate }: ScoreRowProps) {
+  return (
+    <tr className="hover:bg-[var(--vibe-bg-sunken)]/50 transition-colors">
+      <td className="sticky left-0 z-10 bg-[var(--vibe-bg-elevated)] p-4 text-sm font-medium text-[var(--vibe-fg-base)] border-r border-[var(--vibe-line)]">
+        {CAT_LABELS[catKey]}
+      </td>
+      {scores.map((pScore, pIdx) => (
+        <td key={pIdx} className="p-2">
+          <div className="flex justify-center items-center gap-1.5">
+            {FIXED_PTS[catKey] ? (
+              <button
+                onClick={() => onUpdate(pIdx, catKey, pScore[catKey].score ? null : FIXED_PTS[catKey]!, false)}
+                className={cn(
+                  "flex-1 h-10 rounded-[var(--vibe-r-md)] border-2 font-bold text-sm transition-all",
+                  pScore[catKey].score
+                    ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-ink)]"
+                    : "border-[var(--vibe-line)] text-[var(--vibe-fg-faint)] hover:border-[var(--accent-line)]",
+                )}
+              >
+                {pScore[catKey].score ?? FIXED_PTS[catKey]}
+              </button>
+            ) : (
+              <input
+                type="number"
+                inputMode="numeric"
+                value={pScore[catKey].score ?? ""}
+                disabled={pScore[catKey].crossed}
+                onChange={e => onUpdate(pIdx, catKey, e.target.value === "" ? null : parseInt(e.target.value))}
+                className={cn(
+                  "w-14 h-10 rounded-[var(--vibe-r-md)] border-2 text-center font-mono font-semibold text-sm tabular-nums",
+                  "bg-[var(--vibe-bg-sunken)] border-[var(--vibe-line)]",
+                  "focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/25",
+                  "disabled:opacity-25 transition-all",
+                )}
+              />
+            )}
+            <button
+              onClick={() => onUpdate(pIdx, catKey, null, !pScore[catKey].crossed)}
+              className={cn(
+                "h-10 w-10 rounded-[var(--vibe-r-md)] border-2 flex items-center justify-center transition-all",
+                pScore[catKey].crossed
+                  ? "border-red-500 bg-red-500/15 text-red-500"
+                  : "border-[var(--vibe-line)] text-[var(--vibe-fg-faint)] hover:border-red-400/50 hover:text-red-400",
+              )}
+            >
+              <X size={13} aria-hidden />
+            </button>
+          </div>
+        </td>
+      ))}
+    </tr>
   );
 }

@@ -8,6 +8,7 @@ import { RoundNavigator } from "@/components/turnier/components/RoundNavigator";
 import { useTournamentActions, useTournamentSync } from "@/components/turnier/hooks";
 import { standingsForTournament } from "@/components/turnier/logic";
 import { actionBtn, dangerBtn, subtleBtn, turnierShell } from "@/components/turnier/styles";
+import { ToolShell } from "@/components/tool-shell/ToolShell";
 import type { TournamentDetail, TournamentStatus } from "@/components/turnier/types";
 import { DrawView } from "@/components/turnier/views/DrawView";
 import { PodiumView } from "@/components/turnier/views/PodiumView";
@@ -138,7 +139,7 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
     tournament.status === "paused" && (tab === "draw" || tab === "scores" || tab === "podium");
 
   return (
-    <div className={turnierShell}>
+    <ToolShell tool="turnier" className={turnierShell}>
       <div className="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-4 px-4 pt-4 pb-8 sm:px-6 sm:pt-5 sm:pb-10 lg:px-8 lg:pt-6">
         <header className="flex min-w-0 flex-col gap-3">
           <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
@@ -382,6 +383,6 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
           </div>
         ) : null}
       </div>
-    </div>
+    </ToolShell>
   );
 }

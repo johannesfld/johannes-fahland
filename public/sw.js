@@ -1,5 +1,5 @@
-const CACHE_NAME = "vibecode-v4";
-const OLD_CACHES = ["vibecode-v3", "vibecode-v2", "vibecode-v1"];
+const CACHE_NAME = "vibecode-v5";
+const OLD_CACHES = ["vibecode-v4", "vibecode-v3", "vibecode-v2", "vibecode-v1"];
 
 const PRECACHE_URLS = [
   "/manifest.json",

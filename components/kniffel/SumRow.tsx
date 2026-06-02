@@ -1,3 +1,4 @@
+import { cn } from "@/components/ui/styles";
 import type { PlayerScores } from "@/components/kniffel/constants";
 
 type SumRowProps = {
@@ -8,28 +9,28 @@ type SumRowProps = {
   large?: boolean;
 };
 
-export function SumRow({
-  label,
-  players,
-  calc,
-  highlight,
-  large,
-}: SumRowProps) {
+export function SumRow({ label, players, calc, highlight, large }: SumRowProps) {
   return (
     <tr
-      className={`${
-        highlight ? "bg-amber-50 dark:bg-amber-900/10" : "bg-zinc-50 dark:bg-zinc-800/30"
-      }`}
+      className={cn(
+        "border-y border-[var(--vibe-line-strong)]",
+        highlight
+          ? "bg-[color-mix(in_srgb,var(--accent)_8%,transparent)]"
+          : "bg-[var(--vibe-bg-sunken)]",
+      )}
     >
-      <td className="sticky left-0 z-10 bg-inherit p-4 font-black uppercase text-[10px] tracking-widest border-r dark:border-zinc-700">
+      <td className="sticky left-0 z-10 bg-inherit px-4 py-2.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--vibe-fg-faint)] border-r border-[var(--vibe-line)]">
         {label}
       </td>
       {players.map((s, i) => (
         <td
           key={i}
-          className={`p-4 text-center font-black ${
-            large ? "text-xl text-amber-500" : "text-zinc-600 dark:text-zinc-300"
-          }`}
+          className={cn(
+            "px-4 py-2.5 text-center font-mono font-bold tabular-nums",
+            large
+              ? "text-xl text-[var(--accent)]"
+              : "text-sm text-[var(--vibe-fg-muted)]",
+          )}
         >
           {calc(s)}
         </td>

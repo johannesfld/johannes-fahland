@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { fraunces, caveat } from "./fonts";
 import "./globals.css";
-import { AppShell } from "@/components/AppShell";
+import { AppShell } from "@/components/layout/AppShell";
 import { FullscreenProvider } from "@/components/FullscreenContext";
 import { PWAInstaller } from "@/components/PWAInstaller";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -25,8 +25,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#FAFAF7" },
-    { media: "(prefers-color-scheme: dark)", color: "#0B0B0E" },
+    { media: "(prefers-color-scheme: light)", color: "#FBFAF7" },
+    { media: "(prefers-color-scheme: dark)", color: "#0E0C12" },
   ],
   viewportFit: "cover",
   interactiveWidget: "resizes-content",

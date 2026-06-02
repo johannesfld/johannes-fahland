@@ -13,8 +13,8 @@ export default function OfflinePage() {
       >
         <defs>
           <linearGradient id="offline-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#fbbf24" />
-            <stop offset="100%" stopColor="#d97706" />
+            <stop offset="0%" stopColor="#9C7FE2" />
+            <stop offset="100%" stopColor="#4F3399" />
           </linearGradient>
         </defs>
         <rect width="512" height="512" rx="100" fill="url(#offline-grad)" />
@@ -43,12 +43,7 @@ export default function OfflinePage() {
 
       <button
         onClick={() => window.location.reload()}
-        className="px-6 py-3 rounded-xl font-semibold text-sm transition-all active:scale-[0.98]"
-        style={{
-          background: "var(--accent)",
-          color: "var(--accent-ink)",
-          minHeight: "44px",
-        }}
+        className="min-h-11 rounded-[var(--vibe-r-lg)] bg-[var(--plum-500)] px-6 py-3 text-sm font-semibold text-white transition-all hover:brightness-95 active:scale-[0.98]"
       >
         Erneut versuchen
       </button>
