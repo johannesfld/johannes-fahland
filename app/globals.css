@@ -157,6 +157,14 @@
   --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(176, 79, 192, 0.18) 0%, transparent 70%);
   --tool-surface: #F5E8FA;
 }
+[data-tool="wordle"] {
+  --accent:       #2B7FD4;
+  --accent-soft:  #C8DEFF;
+  --accent-ink:   #07274A;
+  --accent-line:  rgba(43, 127, 212, 0.20);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(43, 127, 212, 0.18) 0%, transparent 70%);
+  --tool-surface: #EAF2FD;
+}
 
 .dark {
   /* --- Legacy aliases --- */
@@ -278,6 +286,14 @@
   --accent-line:  rgba(214, 114, 232, 0.22);
   --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(214, 114, 232, 0.20) 0%, transparent 70%);
   --tool-surface: #220B2A;
+}
+.dark [data-tool="wordle"] {
+  --accent:       #5BA8F5;
+  --accent-soft:  #0F2D50;
+  --accent-ink:   #D0E8FF;
+  --accent-line:  rgba(91, 168, 245, 0.22);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(91, 168, 245, 0.20) 0%, transparent 70%);
+  --tool-surface: #071828;
 }
 
 @theme inline {

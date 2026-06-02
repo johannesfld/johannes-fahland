@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Sparkles, Dices, Ship, SquareStack, Trophy, Grid3x3, Zap, Brain } from "lucide-react";
+import { Sparkles, Dices, Ship, SquareStack, Trophy, Grid3x3, Zap, Brain, Type } from "lucide-react";
 import { FeatureTile } from "./FeatureTile";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -221,6 +221,39 @@ export function FeatureTiles() {
                 fill="var(--accent)"
                 opacity={i % 2 === 0 ? 0.08 : 0.05}
               />
+            ))}
+          </svg>
+        }
+      />
+
+      {/* Wordle */}
+      <FeatureTile
+        href="/wordle"
+        tool="wordle"
+        icon={Type}
+        meta="Tageswort · 6 Versuche"
+        reduced={reduced}
+        index={8}
+        wordmark={
+          <span className="font-sans text-4xl font-black uppercase tracking-tight leading-none">
+            WORDLE
+          </span>
+        }
+        pattern={
+          <svg className="absolute inset-0 h-full w-full" aria-hidden>
+            {["W","O","R","T"].map((letter, i) => (
+              <text
+                key={i}
+                x={`${12 + i * 24}%`}
+                y="65%"
+                fontSize="28"
+                fontWeight="900"
+                fill="var(--accent)"
+                opacity={0.06 + i * 0.025}
+                fontFamily="sans-serif"
+              >
+                {letter}
+              </text>
             ))}
           </svg>
         }
