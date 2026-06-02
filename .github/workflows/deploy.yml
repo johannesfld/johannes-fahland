@@ -52,6 +52,9 @@ jobs:
           fi
           (
             cd "$BS3_DIR"
+            # Try the runner's Node version first (artifacts also produced for it),
+            # then a generic arm64 fetch, then fall back to whatever the package
+            # ships as default prebuild target.
             npx --yes prebuild-install --platform=linux --arch=arm64 --runtime=node \
               || npx --yes prebuild-install --platform=linux --arch=arm64
           )
@@ -95,55 +98,47 @@ jobs:
           include-hidden-files: true
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build
     steps:
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.PI_SSH_KEY }}" > ~/.ssh/pi_key
-          chmod 600 ~/.ssh/pi_key
-          echo "${{ secrets.PI_SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
-
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: pi-release
           path: /tmp/pi-release
 
-      - name: Deploy via rsync over SSH
+      - name: Deploy via rsync
         run: |
-          rsync -az --delete \
+          rsync -a --delete \
             --exclude='.env' \
             --exclude='data/' \
-            -e "ssh -i ~/.ssh/pi_key -o StrictHostKeyChecking=yes" \
             /tmp/pi-release/ \
-            ${{ secrets.PI_SSH_USER }}@${{ secrets.PI_SSH_HOST }}:/home/johannes/apps/active-site/
+            /home/johannes/apps/active-site/
 
-      - name: Verify ARM64 binary, migrate, restart PM2
+      - name: Verify ARM64 binary on Pi
         run: |
-          ssh -i ~/.ssh/pi_key -o StrictHostKeyChecking=yes \
-            ${{ secrets.PI_SSH_USER }}@${{ secrets.PI_SSH_HOST }} << 'ENDSSH'
-          set -e
-
-          # Verify ARM64 binary
           file /home/johannes/apps/active-site/node_modules/better-sqlite3/build/Release/better_sqlite3.node
 
-          # Prisma migrations
+      - name: Run Prisma migrations
+        run: |
           mkdir -p /home/johannes/apps/data
           cd /home/johannes/apps/active-site
           set -a && source .env && set +a
           node scripts/migrate.mjs
 
-          # Restart PM2
+      - name: Restart PM2
+        run: |
           pm2 delete active-site 2>/dev/null || true
+          cd /home/johannes/apps/active-site
           PORT=3000 HOSTNAME=0.0.0.0 pm2 start server.js --name active-site
           pm2 save
 
-          # Smoke test
+      - name: Smoke test
+        run: |
           for i in 1 2 3 4 5; do
             sleep 2
             curl -sf http://localhost:3000/ >/dev/null || continue
+            # Route that hits prisma → catches native-binary mismatches
             body=$(curl -sf http://localhost:3000/tischtennis-turnier) || continue
             if echo "$body" | grep -q "page couldn"; then
               echo "Smoke test failed: /tischtennis-turnier rendered server error"
@@ -152,8 +147,7 @@ jobs:
             echo "OK" && exit 0
           done
           echo "Smoke test failed" && exit 1
-          ENDSSH
 
       - name: Cleanup
         if: always()
-        run: rm -rf /tmp/pi-release
+        run: rm -rf /tmp/pi-release /tmp/arm64-deps
