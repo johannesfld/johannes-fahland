@@ -1,4 +1,4 @@
-import { Home, Sparkles, Dices, Ship, SquareStack, Trophy, Grid3x3, Zap, type LucideIcon } from "lucide-react";
+import { Home, Sparkles, Dices, Ship, SquareStack, Trophy, Grid3x3, Zap, Brain, type LucideIcon } from "lucide-react";
 
 export type NavItem = {
   href: string;
@@ -16,6 +16,7 @@ export const TURNIER_HREF = "/tischtennis-turnier";
 export const ROMME_HREF = "/romme";
 export const G2048_HREF = "/2048";
 export const SNAKE_HREF = "/snake";
+export const MEMORY_HREF = "/memory";
 
 export const NAV: NavItem[] = [
   { href: "/",              label: "Home",            labelShort: "Home",    icon: Home,        tool: null,      bottomNav: true },
@@ -26,6 +27,7 @@ export const NAV: NavItem[] = [
   { href: TURNIER_HREF,     label: "Turniertool",     labelShort: "Turnier", icon: Trophy,      tool: "turnier", bottomNav: true },
   { href: G2048_HREF,       label: "2048",            labelShort: "2048",    icon: Grid3x3,     tool: "g2048",   bottomNav: false },
   { href: SNAKE_HREF,       label: "Snake",           labelShort: "Snake",   icon: Zap,         tool: "snake",   bottomNav: false },
+  { href: MEMORY_HREF,      label: "Memory",          labelShort: "Memory",  icon: Brain,       tool: "memory",  bottomNav: false },
 ];
 
 export function navIsActive(pathname: string | null, href: string) {

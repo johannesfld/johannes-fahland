@@ -1,6 +1,6 @@
 import { cn } from "@/components/ui/styles";
 
-type Tool = "wizard" | "kniffel" | "schiffe" | "romme" | "turnier" | "g2048" | "snake";
+type Tool = "wizard" | "kniffel" | "schiffe" | "romme" | "turnier" | "g2048" | "snake" | "memory";
 
 type ToolShellProps = {
   tool: Tool;

@@ -149,6 +149,14 @@
   --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(59, 158, 74, 0.18) 0%, transparent 70%);
   --tool-surface: #E4F4E6;
 }
+[data-tool="memory"] {
+  --accent:       #B04FC0;
+  --accent-soft:  #EDD5F2;
+  --accent-ink:   #430A4F;
+  --accent-line:  rgba(176, 79, 192, 0.20);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(176, 79, 192, 0.18) 0%, transparent 70%);
+  --tool-surface: #F5E8FA;
+}
 
 .dark {
   /* --- Legacy aliases --- */
@@ -262,6 +270,14 @@
   --accent-line:  rgba(93, 201, 108, 0.22);
   --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(93, 201, 108, 0.20) 0%, transparent 70%);
   --tool-surface: #0D2410;
+}
+.dark [data-tool="memory"] {
+  --accent:       #D672E8;
+  --accent-soft:  #4A1556;
+  --accent-ink:   #F5D6FA;
+  --accent-line:  rgba(214, 114, 232, 0.22);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(214, 114, 232, 0.20) 0%, transparent 70%);
+  --tool-surface: #220B2A;
 }
 
 @theme inline {
