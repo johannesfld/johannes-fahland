@@ -19,7 +19,7 @@ export function BottomNav({ pathname }: BottomNavProps) {
         "pb-[env(safe-area-inset-bottom,0px)]",
       )}
     >
-      {NAV.map((item) => {
+      {NAV.filter((item) => item.bottomNav !== false).map((item) => {
         const active = navIsActive(pathname, item.href);
         return (
           <Link

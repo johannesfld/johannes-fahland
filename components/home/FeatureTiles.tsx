@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Sparkles, Dices, Ship, SquareStack, Trophy } from "lucide-react";
+import { Sparkles, Dices, Ship, SquareStack, Trophy, Grid3x3 } from "lucide-react";
 import { FeatureTile } from "./FeatureTile";
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -132,6 +132,37 @@ export function FeatureTiles() {
         pattern={
           <svg className="absolute inset-0 h-full w-full" aria-hidden>
             <line x1="50%" y1="0" x2="50%" y2="100%" stroke="var(--accent)" strokeWidth="1.2" opacity="0.06" />
+          </svg>
+        }
+      />
+
+      {/* 2048 */}
+      <FeatureTile
+        href="/2048"
+        tool="g2048"
+        icon={Grid3x3}
+        meta="Solo · Highscore"
+        reduced={reduced}
+        index={5}
+        wordmark={
+          <span className="font-sans text-5xl font-black tabular-nums tracking-tight leading-none">
+            2048
+          </span>
+        }
+        pattern={
+          <svg className="absolute inset-0 h-full w-full" aria-hidden>
+            {[[20,25],[55,25],[20,60],[55,60],[82,25],[82,60]].map(([cx, cy], i) => (
+              <rect
+                key={i}
+                x={`${cx}%`}
+                y={`${cy}%`}
+                width="14%"
+                height="22%"
+                rx="3"
+                fill="var(--accent)"
+                opacity={0.05 + i * 0.012}
+              />
+            ))}
           </svg>
         }
       />
