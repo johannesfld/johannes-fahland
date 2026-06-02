@@ -144,8 +144,7 @@ export default function WizardScoreMaster() {
     if (state.currentActualIndex === 0) {
       setState((prev) => ({
         ...prev,
-        gamePhase: "bids",
-        currentBidderIndex: biddingPlayerOrder.length - 1,
+        gamePhase: "bid-summary",
       }));
     } else {
       setState((prev) => ({
@@ -193,7 +192,7 @@ export default function WizardScoreMaster() {
       }
       setState((prev) => ({
         ...prev,
-        gamePhase: "actuals",
+        gamePhase: "bid-summary",
         currentActualIndex: 0,
       }));
     } else {
@@ -632,6 +631,66 @@ export default function WizardScoreMaster() {
                       {state.currentBidderIndex === biddingPlayerOrder.length - 1
                         ? "Bestätigen und weiter"
                         : "Bestätigen"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {state.gamePhase === "bid-summary" && (
+              <div className={stageCenterWrap}>
+                <CloseGameButton onClick={resetGame} />
+                <div className="w-full max-w-md space-y-3 text-center sm:space-y-6 app-page-enter">
+                  <div className="space-y-1">
+                    <p className={labelMuted}>Runde {state.roundNumber} – Ansagen</p>
+                    <h2 className="font-serif text-xl font-bold text-amber-800 sm:text-2xl dark:text-amber-200">
+                      Übersicht
+                    </h2>
+                  </div>
+
+                  <div className="overflow-hidden rounded-2xl border border-amber-200/50 bg-white/50 dark:border-slate-800/60 dark:bg-slate-900/35">
+                    {biddingPlayerOrder.map((pi) => (
+                      <div
+                        key={pi}
+                        className="flex items-center justify-between border-b border-amber-100/80 px-4 py-3 last:border-0 dark:border-slate-800/50"
+                      >
+                        <span className="font-bold text-amber-950 dark:text-amber-50">
+                          {state.players[pi]?.name}
+                        </span>
+                        <span className="font-serif text-lg font-bold text-amber-700 dark:text-amber-400">
+                          {state.pendingBids[pi]}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setState((prev) => ({
+                          ...prev,
+                          gamePhase: "bids",
+                          currentBidderIndex: biddingPlayerOrder.length - 1,
+                        }))
+                      }
+                      className="flex-none rounded-2xl border-2 border-amber-300/60 bg-white/60 px-4 py-4 text-sm font-black text-amber-700 transition-colors hover:bg-amber-50 dark:border-slate-600 dark:bg-slate-800/60 dark:text-amber-300 dark:hover:bg-slate-800 touch-manipulation"
+                      aria-label="Zurück"
+                    >
+                      ←
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setState((prev) => ({
+                          ...prev,
+                          gamePhase: "actuals",
+                          currentActualIndex: 0,
+                        }))
+                      }
+                      className={`${primaryBtn} flex-1`}
+                    >
+                      Spiel starten
                     </button>
                   </div>
                 </div>

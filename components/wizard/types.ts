@@ -17,6 +17,7 @@ export type GamePhase =
   | "rules"
   | "mixer-announcement"
   | "bids"
+  | "bid-summary"
   | "actuals"
   | "scoreboard";
 
