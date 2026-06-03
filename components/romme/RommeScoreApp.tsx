@@ -303,7 +303,7 @@ export default function RommeScoreApp() {
                           "transition-colors",
                         )}
                       />
-                      {playerNames.length > 2 && (
+                      {playerNames.length > 1 && (
                         <button
                           type="button"
                           onClick={() => setPlayerNames(playerNames.filter((_, idx) => idx !== i))}

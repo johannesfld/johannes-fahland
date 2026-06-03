@@ -131,13 +131,18 @@ export default function WordleGame({ words }: { words: string[] }) {
     <ToolShell tool="wordle">
       <div className="flex min-h-0 flex-1 flex-col items-center gap-3 overflow-y-auto px-3 py-4 sm:py-5">
         {/* Header */}
-        <div className="flex w-full max-w-sm items-center justify-between">
+        <div className="flex w-full max-w-sm items-center justify-between pr-12 sm:pr-0">
           <div className="flex flex-col leading-none">
             <span className="font-sans text-3xl font-black uppercase tracking-tight" style={{ color: "var(--accent)" }}>
               WORDLE
             </span>
-            <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--vibe-fg-faint)]">
-              Tageswort · {new Date().toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" })}
+            <span
+              className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--vibe-fg-faint)]"
+              suppressHydrationWarning
+            >
+              {hydrated
+                ? `Tageswort · ${new Date().toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" })}`
+                : "Tageswort"}
             </span>
           </div>
           <div className="flex flex-col items-end gap-0.5">
@@ -210,7 +215,7 @@ export default function WordleGame({ words }: { words: string[] }) {
         {/* Keyboard */}
         <div className="flex w-full max-w-sm flex-col gap-1.5 pt-1">
           {KEYBOARD_ROWS.map((row, ri) => (
-            <div key={ri} className="flex justify-center gap-1">
+            <div key={ri} className="flex w-full justify-center gap-[3px] sm:gap-1">
               {row.map((key) => {
                 const ks = keyboardState[key];
                 const kc = ks ? colors[ks] : null;
@@ -219,16 +224,14 @@ export default function WordleGame({ words }: { words: string[] }) {
                   <button
                     key={key}
                     onClick={() => handleKey(key)}
-                    className="flex items-center justify-center rounded-lg text-xs font-bold uppercase transition-transform active:scale-95"
+                    className="flex min-w-0 items-center justify-center rounded-lg font-bold uppercase transition-transform active:scale-95"
                     style={{
                       height: "3rem",
-                      minWidth: isWide ? "3.75rem" : "2.1rem",
-                      flex: isWide ? "0 0 3.75rem" : "1 1 0",
-                      maxWidth: isWide ? "3.75rem" : "2.6rem",
+                      flex: isWide ? "1.5 1 0" : "1 1 0",
                       background: kc ? kc.bg : "var(--vibe-bg-sunken)",
                       color: kc ? kc.fg : "var(--vibe-fg-base)",
                       border: kc ? `1.5px solid ${kc.border}` : "1.5px solid var(--vibe-line)",
-                      fontSize: isWide ? "0.65rem" : "0.8rem",
+                      fontSize: isWide ? "0.6rem" : "0.8rem",
                     }}
                   >
                     {key}

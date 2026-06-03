@@ -88,9 +88,9 @@ export function FeatureTiles() {
           </div>
         }
         pattern={
-          <svg className="absolute inset-0 h-full w-full" aria-hidden>
-            <path d="M 0 60% Q 25% 55%, 50% 62% T 100% 58%" stroke="var(--accent)" strokeWidth="1.5" fill="none" opacity="0.08" />
-            <path d="M 0 70% Q 25% 65%, 50% 72% T 100% 68%" stroke="var(--accent)" strokeWidth="1" fill="none" opacity="0.06" />
+          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
+            <path d="M 0 60 Q 25 55, 50 62 T 100 58" stroke="var(--accent)" strokeWidth="0.4" fill="none" opacity="0.08" vectorEffect="non-scaling-stroke" />
+            <path d="M 0 70 Q 25 65, 50 72 T 100 68" stroke="var(--accent)" strokeWidth="0.3" fill="none" opacity="0.06" vectorEffect="non-scaling-stroke" />
           </svg>
         }
       />
@@ -181,15 +181,16 @@ export function FeatureTiles() {
           </span>
         }
         pattern={
-          <svg className="absolute inset-0 h-full w-full" aria-hidden>
+          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
             <polyline
-              points="20%,70% 20%,40% 50%,40% 50%,65% 75%,65% 75%,30%"
+              points="20,70 20,40 50,40 50,65 75,65 75,30"
               stroke="var(--accent)"
-              strokeWidth="4"
+              strokeWidth="1.2"
               strokeLinecap="round"
               strokeLinejoin="round"
               fill="none"
               opacity="0.12"
+              vectorEffect="non-scaling-stroke"
             />
           </svg>
         }

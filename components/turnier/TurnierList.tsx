@@ -11,6 +11,7 @@ import {
   subtleBtn,
   turnierCard,
 } from "@/components/turnier/styles";
+import { ToolShell } from "@/components/tool-shell/ToolShell";
 import type { BestOf, TournamentFormat, TournamentListItem } from "@/components/turnier/types";
 
 function tournamentListStatusLabel(item: TournamentListItem): string {
@@ -41,6 +42,7 @@ export function TurnierList({ initialItems }: TurnierListProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   return (
+    <ToolShell tool="turnier">
     <div className="mx-auto flex min-h-0 w-full max-w-7xl min-w-0 flex-1 flex-col gap-4 overflow-y-auto overflow-x-hidden px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6">
       <section className={`${turnierCard} flex flex-col gap-3`}>
         <h1 className="text-2xl font-black tracking-tighter">Tischtennis Turniere</h1>
@@ -189,5 +191,6 @@ export function TurnierList({ initialItems }: TurnierListProps) {
         ))}
       </section>
     </div>
+    </ToolShell>
   );
 }

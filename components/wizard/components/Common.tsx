@@ -1,7 +1,8 @@
 "use client";
 
+import { LogOut } from "lucide-react";
 import { useFullscreen } from "@/components/FullscreenContext";
-import { IconAlert, IconClose } from "@/components/ui/icons";
+import { IconAlert } from "@/components/ui/icons";
 
 export function BigNumber({ value }: { value: number }) {
   return (
@@ -49,7 +50,7 @@ export function CloseGameButton({ onClick }: { onClick: () => void }) {
       }
       aria-label="Spiel beenden"
     >
-      <IconClose className="h-5 w-5" />
+      <LogOut className="h-5 w-5" />
     </button>
   );
 }

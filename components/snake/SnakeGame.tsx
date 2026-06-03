@@ -155,7 +155,7 @@ export default function SnakeGame() {
     <ToolShell tool="snake" fullBleed>
       <div className="flex h-full w-full flex-col items-center justify-start gap-4 px-4 py-4 sm:py-6">
         {/* Header */}
-        <div className="flex w-full max-w-[28rem] items-center justify-between gap-3">
+        <div className="flex w-full max-w-[28rem] items-center justify-between gap-3 pr-12 sm:pr-0">
           <div className="flex flex-col leading-none">
             <span
               className="font-sans text-4xl font-black uppercase tracking-tight"
