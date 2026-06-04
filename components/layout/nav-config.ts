@@ -6,8 +6,9 @@ export type NavItem = {
   labelShort: string;
   icon: LucideIcon;
   tool: string | null;
-  /** Show in mobile bottom-nav. Skip for less-frequent tools to avoid overflow. */
+  /** Show in mobile bottom-nav */
   bottomNav?: boolean;
+  group?: "main" | "games" | "tools";
 };
 
 export const WIZARD_HREF = "/wizzard-punkterechner";
@@ -19,17 +20,27 @@ export const SNAKE_HREF = "/snake";
 export const MEMORY_HREF = "/memory";
 export const WORDLE_HREF = "/wordle";
 
+/** Sidebar order: tools first, then games */
 export const NAV: NavItem[] = [
-  { href: "/",              label: "Home",            labelShort: "Home",    icon: Home,        tool: null,      bottomNav: true },
-  { href: WIZARD_HREF,      label: "Wizard",          labelShort: "Wizard",  icon: Sparkles,    tool: "wizard",  bottomNav: true },
-  { href: "/kniffel-rechner", label: "Kniffel",       labelShort: "Kniffel", icon: Dices,       tool: "kniffel", bottomNav: true },
-  { href: SCHIFFE_HREF,     label: "Schiffe versenken", labelShort: "Schiffe", icon: Ship,      tool: "schiffe", bottomNav: true },
-  { href: ROMME_HREF,       label: "Rommé",           labelShort: "Rommé",   icon: SquareStack, tool: "romme",   bottomNav: true },
-  { href: TURNIER_HREF,     label: "Turniertool",     labelShort: "Turnier", icon: Trophy,      tool: "turnier", bottomNav: true },
-  { href: G2048_HREF,       label: "2048",            labelShort: "2048",    icon: Grid3x3,     tool: "g2048",   bottomNav: false },
-  { href: SNAKE_HREF,       label: "Snake",           labelShort: "Snake",   icon: Zap,         tool: "snake",   bottomNav: false },
-  { href: MEMORY_HREF,      label: "Memory",          labelShort: "Memory",  icon: Brain,       tool: "memory",  bottomNav: false },
-  { href: WORDLE_HREF,      label: "Wordle",          labelShort: "Wordle",  icon: Type,        tool: "wordle",  bottomNav: false },
+  { href: "/",               label: "Home",              labelShort: "Home",    icon: Home,        tool: null,      group: "main"  },
+  { href: WIZARD_HREF,       label: "Wizard",            labelShort: "Wizard",  icon: Sparkles,    tool: "wizard",  group: "tools" },
+  { href: "/kniffel-rechner",label: "Kniffel",           labelShort: "Kniffel", icon: Dices,       tool: "kniffel", group: "tools" },
+  { href: SCHIFFE_HREF,      label: "Schiffe versenken", labelShort: "Schiffe", icon: Ship,        tool: "schiffe", group: "tools" },
+  { href: ROMME_HREF,        label: "Rommé",             labelShort: "Rommé",   icon: SquareStack, tool: "romme",   group: "tools" },
+  { href: TURNIER_HREF,      label: "Turniertool",       labelShort: "Turnier", icon: Trophy,      tool: "turnier", group: "tools" },
+  { href: G2048_HREF,        label: "2048",              labelShort: "2048",    icon: Grid3x3,     tool: "g2048",   group: "games" },
+  { href: SNAKE_HREF,        label: "Snake",             labelShort: "Snake",   icon: Zap,         tool: "snake",   group: "games" },
+  { href: MEMORY_HREF,       label: "Memory",            labelShort: "Memory",  icon: Brain,       tool: "memory",  group: "games" },
+  { href: WORDLE_HREF,       label: "Wordle",            labelShort: "Wordle",  icon: Type,        tool: "wordle",  group: "games" },
+];
+
+/** Bottom-nav order: Home + all 4 games */
+export const BOTTOM_NAV: NavItem[] = [
+  NAV.find((i) => i.href === "/")!,
+  NAV.find((i) => i.href === G2048_HREF)!,
+  NAV.find((i) => i.href === SNAKE_HREF)!,
+  NAV.find((i) => i.href === MEMORY_HREF)!,
+  NAV.find((i) => i.href === WORDLE_HREF)!,
 ];
 
 export function navIsActive(pathname: string | null, href: string) {
