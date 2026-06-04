@@ -170,7 +170,7 @@ export default function WordleGame({ words, accepted }: { words: string[]; accep
     <ToolShell tool="wordle">
       <div className="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-2 py-3 sm:px-3 sm:py-4">
         {/* Header */}
-        <div className="flex w-full max-w-sm items-center justify-between pr-12 sm:pr-0 mb-1">
+        <div className="flex w-full max-w-sm items-center justify-between mb-1">
           <div className="flex flex-col leading-none">
             <span className="font-sans text-2xl font-black uppercase tracking-tight sm:text-3xl" style={{ color: "var(--accent)" }}>
               WORDLE

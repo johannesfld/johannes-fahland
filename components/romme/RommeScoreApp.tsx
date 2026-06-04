@@ -227,19 +227,20 @@ export default function RommeScoreApp() {
       : undefined;
 
   return (
-    <ToolShell tool="romme" className={`${rommeDisplay.variable} px-4 py-4 sm:px-6 sm:py-5`}>
-      {/* Header */}
-      <header className="mx-auto mb-5 flex w-full max-w-5xl shrink-0 items-end justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-[var(--vibe-r-md)] bg-[color-mix(in_srgb,var(--accent)_12%,transparent)]">
-            <SquareStack size={20} className="text-[var(--accent)]" aria-hidden />
+    <ToolShell tool="romme" fullBleed className={`${rommeDisplay.variable}`}>
+      <div className="flex h-full min-h-0 w-full flex-col px-3 pt-3 sm:px-6 sm:pt-5">
+      {/* Header — kompakter und shrink-0 */}
+      <header className="mx-auto mb-3 flex w-full max-w-5xl shrink-0 items-center justify-between sm:mb-4">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-[var(--vibe-r-md)] bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] sm:h-10 sm:w-10">
+            <SquareStack size={18} className="text-[var(--accent)] sm:h-5 sm:w-5" aria-hidden />
           </div>
           <div>
             <h1
               className={cn(
                 rommeDisplay.className,
                 "font-bold uppercase tracking-tight leading-none text-[var(--accent)]",
-                "text-3xl sm:text-4xl",
+                "text-2xl sm:text-4xl",
               )}
             >
               Rommé
@@ -267,10 +268,8 @@ export default function RommeScoreApp() {
 
       <main
         className={cn(
-          "mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-y-auto",
-          isStarted
-            ? "pb-[calc(9rem+64px+env(safe-area-inset-bottom,0px))] sm:pb-44"
-            : "pb-4",
+          "mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col",
+          isStarted ? "overflow-hidden" : "overflow-y-auto pb-4",
         )}
       >
         <AnimatePresence mode="wait">
@@ -348,7 +347,7 @@ export default function RommeScoreApp() {
               transition={{ duration: 0.28, ease }}
               className="flex min-h-0 flex-1 flex-col"
             >
-              <div className="overflow-x-auto rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] shadow-[var(--vibe-shadow-soft)]">
+              <div className="min-h-0 flex-1 overflow-auto rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] shadow-[var(--vibe-shadow-soft)]">
                 <table
                   style={narrowTableMinWidth ? { minWidth: narrowTableMinWidth } : undefined}
                   className={cn(
@@ -372,11 +371,11 @@ export default function RommeScoreApp() {
                       />
                     ))}
                   </colgroup>
-                  <thead>
-                    <tr className="border-b border-[var(--vibe-line)] bg-[color-mix(in_srgb,var(--accent)_6%,transparent)]">
+                  <thead className="sticky top-0 z-30">
+                    <tr className="border-b border-[var(--vibe-line)] bg-[color-mix(in_srgb,var(--accent)_6%,transparent)] backdrop-blur-sm">
                       <th
                         scope="col"
-                        className="sticky left-0 z-20 bg-[var(--vibe-bg-sunken)] border-r border-[var(--vibe-line)] px-1 py-3 text-center text-[9px] font-bold uppercase leading-tight tracking-wide text-[var(--vibe-fg-faint)] sm:px-2 sm:text-[10px]"
+                        className="sticky left-0 top-0 z-40 bg-[var(--vibe-bg-sunken)] border-r border-[var(--vibe-line)] px-1 py-3 text-center text-[9px] font-bold uppercase leading-tight tracking-wide text-[var(--vibe-fg-faint)] sm:px-2 sm:text-[10px]"
                       >
                         #
                       </th>
@@ -384,7 +383,7 @@ export default function RommeScoreApp() {
                         <th
                           key={i}
                           scope="col"
-                          className="min-w-0 px-1 py-3 text-center align-middle text-[10px] font-semibold uppercase leading-tight tracking-wide text-[var(--vibe-fg-base)] sm:px-2 sm:text-xs"
+                          className="min-w-0 bg-[color-mix(in_srgb,var(--accent)_6%,var(--vibe-bg-elevated))] px-1 py-3 text-center align-middle text-[10px] font-semibold uppercase leading-tight tracking-wide text-[var(--vibe-fg-base)] sm:px-2 sm:text-xs"
                         >
                           <span className="relative inline-flex items-center justify-center gap-0">
                             <span className="line-clamp-2 max-w-[min(100%,7rem)] break-words text-center sm:max-w-[10rem]">
@@ -508,8 +507,8 @@ export default function RommeScoreApp() {
       </main>
 
       {isStarted && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 border-t border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/95 px-4 pt-2 pb-[calc(max(0.75rem,env(safe-area-inset-bottom,0px))+64px)] backdrop-blur-md md:pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
-          <div className="pointer-events-auto mx-auto w-full max-w-5xl sm:px-2">
+        <div className="shrink-0 border-t border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/95 px-3 pt-2 pb-[calc(max(0.5rem,env(safe-area-inset-bottom,0px))+64px)] backdrop-blur-md sm:px-4 md:pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
+          <div className="mx-auto w-full max-w-5xl sm:px-2">
             {totals.length > 0 && (
               <div className="mb-2 overflow-x-auto rounded-[var(--vibe-r-lg)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]">
                 <table
@@ -574,6 +573,7 @@ export default function RommeScoreApp() {
           </div>
         </div>
       )}
+      </div>
     </ToolShell>
   );
 }

@@ -153,17 +153,17 @@ export default function SnakeGame() {
 
   return (
     <ToolShell tool="snake" fullBleed>
-      <div className="flex h-full w-full flex-col items-center justify-start gap-4 px-4 py-4 sm:py-6">
+      <div className="flex h-full w-full flex-col items-center justify-start gap-2 px-3 pt-[max(0.5rem,env(safe-area-inset-top,0px))] pb-[calc(0.5rem+64px+env(safe-area-inset-bottom,0px))] sm:gap-4 sm:px-4 sm:py-6 sm:pb-6">
         {/* Header */}
-        <div className="flex w-full max-w-[28rem] items-center justify-between gap-3 pr-12 sm:pr-0">
+        <div className="flex w-full max-w-[28rem] shrink-0 items-center justify-between gap-3">
           <div className="flex flex-col leading-none">
             <span
-              className="font-sans text-4xl font-black uppercase tracking-tight"
+              className="font-sans text-3xl font-black uppercase tracking-tight sm:text-4xl"
               style={{ color: "var(--accent)" }}
             >
               SNAKE
             </span>
-            <span className="mt-1 text-xs text-[var(--vibe-fg-muted)]">
+            <span className="mt-0.5 hidden text-xs text-[var(--vibe-fg-muted)] sm:block">
               {state.status === "idle"
                 ? "Tippen zum Starten"
                 : state.status === "over"
@@ -180,11 +180,12 @@ export default function SnakeGame() {
         </div>
 
         {/* Board */}
-        <div className="relative w-full max-w-[28rem]">
+        <div className="relative flex w-full max-w-[28rem] flex-1 items-center justify-center" style={{ minHeight: 0 }}>
           <div
-            className="relative w-full overflow-hidden rounded-2xl"
+            className="relative aspect-square w-full overflow-hidden rounded-2xl"
             style={{
-              aspectRatio: "1 / 1",
+              maxHeight: "100%",
+              maxWidth: "calc(min(100vh,100%) - 0px)",
               background: "var(--tool-surface)",
               boxShadow: "var(--vibe-shadow-lifted), inset 0 0 0 1px var(--accent-line)",
               touchAction: "none",
@@ -299,9 +300,9 @@ export default function SnakeGame() {
         </div>
 
         {/* Controls bar */}
-        <div className="flex w-full max-w-[28rem] flex-col gap-3">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-xs text-[var(--vibe-fg-muted)]">
+        <div className="flex w-full max-w-[28rem] shrink-0 flex-col gap-2">
+          <div className="flex items-center justify-end gap-2 sm:justify-between">
+            <p className="hidden text-xs text-[var(--vibe-fg-muted)] sm:block">
               Friss die&nbsp;
               <span className="font-bold" style={{ color: "var(--accent)" }}>●</span>
               &nbsp;ohne dich selbst zu treffen.
@@ -337,7 +338,7 @@ export default function SnakeGame() {
           </div>
 
           {/* D-Pad (mobile) */}
-          <div className="grid grid-cols-3 gap-2 sm:hidden">
+          <div className="grid grid-cols-3 gap-1.5 sm:hidden">
             <div />
             <DPadButton onClick={() => changeDir("up")} label="hoch" rotate={0} />
             <div />
@@ -376,8 +377,9 @@ function DPadButton({ onClick, label, rotate }: { onClick: () => void; label: st
     <button
       onClick={onClick}
       aria-label={label}
-      className="flex aspect-square items-center justify-center rounded-xl"
+      className="flex items-center justify-center rounded-xl"
       style={{
+        height: "clamp(2.5rem, 11vw, 3.25rem)",
         background: "var(--accent-soft)",
         color: "var(--accent-ink)",
         boxShadow: "var(--vibe-shadow-soft)",

@@ -39,7 +39,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <main className="flex min-h-dvh flex-col bg-[var(--vibe-bg-base)]">
         <div className="relative mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-8 sm:py-10">
           <div className="mb-6 flex justify-end">
-            <ThemeToggle />
+            <ThemeToggle iconOnly />
           </div>
           {children}
         </div>
@@ -49,14 +49,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-dvh min-h-0 w-full min-w-0 flex-row overflow-hidden bg-[var(--vibe-bg-base)] text-[var(--vibe-fg-base)]">
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar — nur auf md+ wenn nicht fullscreen */}
       {!fullscreen && <Sidebar pathname={pathname} open={sidebarOpen} />}
 
       {/* Main area */}
       <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
-        {/* Fullscreen exit button (absolute overlay) */}
+        {/* Desktop fullscreen exit button — md+ only */}
         {fullscreen && (
-          <div className="pointer-events-none absolute right-[max(1rem,env(safe-area-inset-right))] top-[max(0.5rem,env(safe-area-inset-top))] z-40">
+          <div className="pointer-events-none absolute right-[max(1rem,env(safe-area-inset-right))] top-[max(0.5rem,env(safe-area-inset-top))] z-40 hidden md:block">
             <button
               type="button"
               onClick={() => setFullscreen(false)}
@@ -76,14 +76,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         )}
 
-        {/* Topbar */}
+        {/* Topbar — auf mobile immer versteckt (Vollbild); auf desktop nur ohne fullscreen */}
         {!fullscreen && (
-          <Topbar
-            sidebarOpen={sidebarOpen}
-            onToggleSidebar={handleToggleSidebar}
-            fullscreen={fullscreen}
-            onToggleFullscreen={handleToggleFullscreen}
-          />
+          <div className="hidden md:block">
+            <Topbar
+              sidebarOpen={sidebarOpen}
+              onToggleSidebar={handleToggleSidebar}
+              fullscreen={fullscreen}
+              onToggleFullscreen={handleToggleFullscreen}
+            />
+          </div>
         )}
 
         {/* Content */}
@@ -100,8 +102,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </main>
 
-        {/* Mobile Bottom Nav */}
-        {!fullscreen && <BottomNav pathname={pathname} />}
+        {/* Mobile Bottom Nav (md:hidden in der Komponente) */}
+        <BottomNav pathname={pathname} />
       </div>
     </div>
   );

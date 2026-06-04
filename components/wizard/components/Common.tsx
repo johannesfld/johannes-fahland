@@ -37,6 +37,8 @@ export function ErrorBanner({ message }: { message: string }) {
 
 export function CloseGameButton({ onClick }: { onClick: () => void }) {
   const { fullscreen } = useFullscreen();
+  // Auf desktop im fullscreen: links oben (rechts ist X-Button).
+  // Sonst: rechts oben.
   const position = fullscreen
     ? "absolute left-3 top-3 z-10 md:left-4 md:top-4"
     : "absolute right-3 top-3 z-10 md:right-4 md:top-4";

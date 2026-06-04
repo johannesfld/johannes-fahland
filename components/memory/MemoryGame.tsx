@@ -58,7 +58,7 @@ export default function MemoryGame() {
     <ToolShell tool="memory">
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 py-4 sm:py-6">
         {/* Header */}
-        <div className="flex items-center justify-between gap-3 pr-12 sm:pr-0">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex flex-col leading-none">
             <span
               className="font-sans text-4xl font-black uppercase tracking-tight"

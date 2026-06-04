@@ -80,7 +80,7 @@ export function Sidebar({ pathname, open }: SidebarProps) {
           <p className="text-[11px] text-[var(--vibe-fg-faint)]">
             von <span className="font-medium text-[var(--vibe-fg-muted)]">Johannes Fahland</span>
           </p>
-          <ThemeToggle />
+          <ThemeToggle iconOnly />
         </div>
       </div>
     </aside>
