@@ -8,7 +8,11 @@ export const metadata = {
 };
 
 export default async function WordlePage() {
-  const file = await readFile(path.join(process.cwd(), "public", "wordle-words.json"), "utf-8");
-  const words: string[] = JSON.parse(file);
-  return <WordleGame words={words} />;
+  const [wordsRaw, acceptedRaw] = await Promise.all([
+    readFile(path.join(process.cwd(), "public", "wordle-words.json"), "utf-8"),
+    readFile(path.join(process.cwd(), "public", "wordle-accepted.json"), "utf-8"),
+  ]);
+  const words: string[] = JSON.parse(wordsRaw);
+  const accepted: string[] = JSON.parse(acceptedRaw);
+  return <WordleGame words={words} accepted={accepted} />;
 }

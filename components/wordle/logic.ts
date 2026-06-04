@@ -81,7 +81,7 @@ export function deleteLetter(state: GameState): GameState {
   return { ...state, currentInput: state.currentInput.slice(0, -1), message: "", shake: false };
 }
 
-export function submitGuess(state: GameState, words: string[]): GameState {
+export function submitGuess(state: GameState, accepted: Set<string>): GameState {
   if (state.status !== "playing") return state;
   if (state.currentInput.length < WORD_LENGTH) {
     return { ...state, shake: true, message: "Zu kurz!" };
@@ -89,7 +89,7 @@ export function submitGuess(state: GameState, words: string[]): GameState {
 
   const guess = state.currentInput.toUpperCase();
 
-  if (!words.includes(guess)) {
+  if (!accepted.has(guess)) {
     return { ...state, shake: true, message: "Unbekanntes Wort" };
   }
 

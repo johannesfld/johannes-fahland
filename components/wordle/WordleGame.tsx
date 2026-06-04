@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { RotateCcw } from "lucide-react";
 import { ToolShell } from "@/components/tool-shell/ToolShell";
@@ -47,7 +47,8 @@ function getRandomWord(words: string[], exclude?: string): string {
   return word!;
 }
 
-export default function WordleGame({ words }: { words: string[] }) {
+export default function WordleGame({ words, accepted }: { words: string[]; accepted: string[] }) {
+  const acceptedSet = useMemo(() => new Set(accepted), [accepted]);
   const dailyWord = getDailyWord(words);
   const [state, setState] = useState<GameState>(() => createInitialState(dailyWord));
   const [hydrated, setHydrated] = useState(false);
@@ -103,13 +104,13 @@ export default function WordleGame({ words }: { words: string[] }) {
 
   const handleKey = useCallback((key: string) => {
     if (key === "ENTER") {
-      setState((s) => submitGuess(s, words));
+      setState((s) => submitGuess(s, acceptedSet));
     } else if (key === "⌫" || key === "BACKSPACE") {
       setState((s) => deleteLetter(s));
     } else if (/^[A-Za-z]$/.test(key)) {
       setState((s) => addLetter(s, key.toUpperCase()));
     }
-  }, [words]);
+  }, [acceptedSet]);
 
   // Keyboard input
   useEffect(() => {
@@ -215,26 +216,6 @@ export default function WordleGame({ words }: { words: string[] }) {
           </button>
         )}
 
-        {/* Message */}
-        <AnimatePresence mode="wait">
-          {state.message && (
-            <motion.div
-              key={state.message}
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="mb-1 rounded-lg px-4 py-1.5 text-sm font-bold"
-              style={{
-                background: state.status === "won" ? "var(--accent)" : "var(--vibe-bg-elevated)",
-                color: state.status === "won" ? "#fff" : "var(--vibe-fg-base)",
-                boxShadow: "var(--vibe-shadow-soft)",
-              }}
-            >
-              {state.message}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {/* Board */}
         <motion.div
           className="grid w-full max-w-[17rem] gap-1 sm:max-w-[20rem] sm:gap-1.5"
@@ -304,6 +285,28 @@ export default function WordleGame({ words }: { words: string[] }) {
               })}
             </div>
           ))}
+        </div>
+
+        {/* Message slot — fixed height so the board doesn't shift */}
+        <div className="mt-2 flex h-8 w-full max-w-sm items-center justify-center px-2">
+          <AnimatePresence mode="wait">
+            {state.message && (
+              <motion.div
+                key={state.message}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="rounded-lg px-4 py-1 text-sm font-bold"
+                style={{
+                  background: state.status === "won" ? "var(--accent)" : "var(--vibe-bg-elevated)",
+                  color: state.status === "won" ? "#fff" : "var(--vibe-fg-base)",
+                  boxShadow: "var(--vibe-shadow-soft)",
+                }}
+              >
+                {state.message}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </ToolShell>
