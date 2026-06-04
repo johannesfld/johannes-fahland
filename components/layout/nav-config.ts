@@ -34,13 +34,20 @@ export const NAV: NavItem[] = [
   { href: WORDLE_HREF,       label: "Wordle",            labelShort: "Wordle",  icon: Type,        tool: "wordle",  group: "games" },
 ];
 
-/** Bottom-nav order: Home + all 4 games */
+/** Bottom-nav: Home + alle Spiele + alle Tools (horizontal scrollbar mit Snap) */
 export const BOTTOM_NAV: NavItem[] = [
   NAV.find((i) => i.href === "/")!,
+  // Spiele zuerst (häufiger genutzt auf Mobile)
   NAV.find((i) => i.href === G2048_HREF)!,
   NAV.find((i) => i.href === SNAKE_HREF)!,
   NAV.find((i) => i.href === MEMORY_HREF)!,
   NAV.find((i) => i.href === WORDLE_HREF)!,
+  // Tools danach
+  NAV.find((i) => i.href === WIZARD_HREF)!,
+  NAV.find((i) => i.href === "/kniffel-rechner")!,
+  NAV.find((i) => i.href === SCHIFFE_HREF)!,
+  NAV.find((i) => i.href === ROMME_HREF)!,
+  NAV.find((i) => i.href === TURNIER_HREF)!,
 ];
 
 export function navIsActive(pathname: string | null, href: string) {
