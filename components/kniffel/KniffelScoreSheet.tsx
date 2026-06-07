@@ -178,15 +178,15 @@ export default function KniffelApp() {
               transition={{ duration: 0.28, ease }}
               className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] shadow-[var(--vibe-shadow-soft)]"
             >
-              <div className="overflow-x-auto overflow-y-auto min-h-0 flex-1">
+              <div className="overflow-auto min-h-0 flex-1">
                 <table className="w-full border-collapse">
-                  <thead>
+                  <thead className="sticky top-0 z-20">
                     <tr className="border-b border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)]">
-                      <th className="sticky left-0 z-20 bg-[var(--vibe-bg-sunken)] p-4 text-left text-[10px] font-semibold uppercase tracking-widest text-[var(--vibe-fg-faint)] border-r border-[var(--vibe-line)]">
+                      <th className="sticky left-0 z-30 bg-[var(--vibe-bg-sunken)] p-4 text-left text-[10px] font-semibold uppercase tracking-widest text-[var(--vibe-fg-faint)] border-r border-[var(--vibe-line)]">
                         Feld
                       </th>
                       {gamePlayerNames.map((name, i) => (
-                        <th key={i} className="p-4 text-center min-w-[120px] text-sm font-semibold text-[var(--vibe-fg-base)]">
+                        <th key={i} className="bg-[var(--vibe-bg-sunken)] p-4 text-center min-w-[120px] text-sm font-semibold text-[var(--vibe-fg-base)]">
                           {name}
                         </th>
                       ))}

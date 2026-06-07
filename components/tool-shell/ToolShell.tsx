@@ -1,9 +1,8 @@
 import { cn } from "@/components/ui/styles";
-
-type Tool = "wizard" | "kniffel" | "schiffe" | "romme" | "turnier" | "g2048" | "snake" | "memory" | "wordle";
+import type { ToolSlug } from "@/components/layout/nav-config";
 
 type ToolShellProps = {
-  tool: Tool;
+  tool: ToolSlug;
   fullBleed?: boolean;
   className?: string;
   style?: React.CSSProperties;

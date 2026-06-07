@@ -12,7 +12,8 @@ import {
 import { clearState, loadBest, loadState, saveBest, saveState } from "./storage";
 import { BOARD_SIZE, type Direction, type GameState, type Tile } from "./types";
 
-const SWIPE_THRESHOLD = 32;
+const SWIPE_THRESHOLD = 24;
+const SWIPE_IGNORE_SELECTOR = "button, a, input, textarea, select, [data-no-swipe]";
 
 function tileColors(value: number): { bg: string; fg: string; shadow: string } {
   // Vibe-coded palette stepping from soft to vivid via Plum→Amber accents.
@@ -180,28 +181,39 @@ export default function Game2048() {
     return () => window.removeEventListener("keydown", onKey);
   }, [doMove]);
 
-  // Touch / swipe controls
-  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    const t = e.touches[0];
-    touchStartRef.current = { x: t.clientX, y: t.clientY };
-  }, []);
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (touchStartRef.current) e.preventDefault();
-  }, []);
-  const onTouchEnd = useCallback((e: React.TouchEvent) => {
-    const start = touchStartRef.current;
-    touchStartRef.current = null;
-    if (!start) return;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - start.x;
-    const dy = t.clientY - start.y;
-    if (Math.abs(dx) < SWIPE_THRESHOLD && Math.abs(dy) < SWIPE_THRESHOLD) return;
-    if (Math.abs(dx) > Math.abs(dy)) {
-      doMove(dx > 0 ? "right" : "left");
-    } else {
-      doMove(dy > 0 ? "down" : "up");
+  // Touch / swipe controls — window-wide, ignore interactive targets
+  useEffect(() => {
+    let start: { x: number; y: number } | null = null;
+
+    function onTouchStart(e: TouchEvent) {
+      const target = e.target as Element | null;
+      if (target?.closest(SWIPE_IGNORE_SELECTOR)) {
+        start = null;
+        return;
+      }
+      const t = e.touches[0];
+      start = { x: t.clientX, y: t.clientY };
     }
+    function onTouchEnd(e: TouchEvent) {
+      const s = start;
+      start = null;
+      if (!s) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - s.x;
+      const dy = t.clientY - s.y;
+      if (Math.abs(dx) < SWIPE_THRESHOLD && Math.abs(dy) < SWIPE_THRESHOLD) return;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        doMove(dx > 0 ? "right" : "left");
+      } else {
+        doMove(dy > 0 ? "down" : "up");
+      }
+    }
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend", onTouchEnd);
+    };
   }, [doMove]);
 
   const cellPercent = 100 / BOARD_SIZE;
@@ -249,9 +261,6 @@ export default function Game2048() {
               boxShadow: "var(--vibe-shadow-lifted), inset 0 0 0 1px var(--accent-line)",
               touchAction: "none",
             }}
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
           >
             {/* Inner playfield */}
             <div className="relative h-full w-full">

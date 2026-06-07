@@ -1,11 +1,29 @@
 import { Home, Sparkles, Dices, Ship, SquareStack, Trophy, Grid3x3, Zap, Brain, Type, type LucideIcon } from "lucide-react";
 
+/**
+ * Liste aller Tool-Slugs — Quelle für `ToolShell.tool` und `[data-tool=...]` in globals.css.
+ * Neues Spiel hinzufügen: hier den Slug + entsprechendes NAV-Item ergänzen.
+ */
+export const TOOL_SLUGS = [
+  "wizard",
+  "kniffel",
+  "schiffe",
+  "romme",
+  "turnier",
+  "g2048",
+  "snake",
+  "memory",
+  "wordle",
+] as const;
+
+export type ToolSlug = (typeof TOOL_SLUGS)[number];
+
 export type NavItem = {
   href: string;
   label: string;
   labelShort: string;
   icon: LucideIcon;
-  tool: string | null;
+  tool: ToolSlug | null;
   /** Show in mobile bottom-nav */
   bottomNav?: boolean;
   group?: "main" | "games" | "tools";

@@ -7,7 +7,8 @@ import { applyDir, createInitialState, tick } from "./logic";
 import { loadBest, saveBest } from "./storage";
 import { GRID, TICK_MS, type Dir, type GameState } from "./types";
 
-const SWIPE_THRESHOLD = 28;
+const SWIPE_THRESHOLD = 24;
+const SWIPE_IGNORE_SELECTOR = "button, a, input, textarea, select, [data-no-swipe]";
 
 const OPPOSITE: Record<Dir, Dir> = {
   up: "down", down: "up", left: "right", right: "left",
@@ -85,11 +86,17 @@ export default function SnakeGame() {
   useEffect(() => () => stopTick(), [stopTick]);
 
   const changeDir = useCallback((dir: Dir) => {
+    let didTurn = false;
     setState((s) => {
       if (s.status !== "running") return s;
-      return { ...s, nextDir: applyDir(s.dir, dir) };
+      const newNext = applyDir(s.dir, dir);
+      if (newNext === s.dir) return { ...s, nextDir: newNext };
+      // Real direction change → step immediately so the snake feels responsive.
+      didTurn = true;
+      return tick({ ...s, nextDir: newNext });
     });
-  }, []);
+    if (didTurn) startTick();
+  }, [startTick]);
 
   // Keyboard
   useEffect(() => {
@@ -122,31 +129,42 @@ export default function SnakeGame() {
     return () => window.removeEventListener("keydown", onKey);
   }, [startGame, changeDir, togglePause]);
 
-  // Touch / swipe
-  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    const t = e.touches[0];
-    touchStartRef.current = { x: t.clientX, y: t.clientY };
-  }, []);
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (touchStartRef.current) e.preventDefault();
-  }, []);
-  const onTouchEnd = useCallback((e: React.TouchEvent) => {
-    const start = touchStartRef.current;
-    touchStartRef.current = null;
-    if (!start) return;
-    const t = e.changedTouches[0];
-    const dx = t.clientX - start.x;
-    const dy = t.clientY - start.y;
-    if (Math.abs(dx) < SWIPE_THRESHOLD && Math.abs(dy) < SWIPE_THRESHOLD) return;
-    const dir: Dir = Math.abs(dx) > Math.abs(dy)
-      ? dx > 0 ? "right" : "left"
-      : dy > 0 ? "down" : "up";
-    if (stateRef.current.status === "idle" || stateRef.current.status === "over") {
-      startGame();
-    } else {
-      changeDir(dir);
+  // Touch / swipe — window-wide, ignore interactive targets
+  useEffect(() => {
+    let start: { x: number; y: number } | null = null;
+
+    function onTouchStart(e: TouchEvent) {
+      const target = e.target as Element | null;
+      if (target?.closest(SWIPE_IGNORE_SELECTOR)) {
+        start = null;
+        return;
+      }
+      const t = e.touches[0];
+      start = { x: t.clientX, y: t.clientY };
     }
+    function onTouchEnd(e: TouchEvent) {
+      const s = start;
+      start = null;
+      if (!s) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - s.x;
+      const dy = t.clientY - s.y;
+      if (Math.abs(dx) < SWIPE_THRESHOLD && Math.abs(dy) < SWIPE_THRESHOLD) return;
+      const dir: Dir = Math.abs(dx) > Math.abs(dy)
+        ? dx > 0 ? "right" : "left"
+        : dy > 0 ? "down" : "up";
+      if (stateRef.current.status === "idle" || stateRef.current.status === "over") {
+        startGame();
+      } else {
+        changeDir(dir);
+      }
+    }
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    return () => {
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend", onTouchEnd);
+    };
   }, [startGame, changeDir]);
 
   const cellSize = 100 / GRID;
@@ -190,9 +208,6 @@ export default function SnakeGame() {
               boxShadow: "var(--vibe-shadow-lifted), inset 0 0 0 1px var(--accent-line)",
               touchAction: "none",
             }}
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
             onClick={() => {
               if (state.status === "idle" || state.status === "over") startGame();
             }}
