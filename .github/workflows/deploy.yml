@@ -4,96 +4,55 @@ on:
   push:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        app: [hub, turnier]
     steps:
       - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: pnpm
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: npx prisma generate
+        run: pnpm --filter @spielbrett/db generate
 
-      - name: Build
-        run: npm run build
+      - name: Build ${{ matrix.app }}
+        run: pnpm --filter ${{ matrix.app }} build
         env:
           NODE_OPTIONS: --max-old-space-size=4096
           DATABASE_URL: file:/tmp/dummy.db
 
       - name: Assemble standalone bundle
-        run: |
-          cp -r public .next/standalone/public
-          cp -r .next/static .next/standalone/.next/static
-          cp -r prisma .next/standalone/prisma
-          cp -r scripts .next/standalone/scripts
+        run: bash scripts/deploy-assemble.sh ${{ matrix.app }}
 
       - name: Install ARM64 native binaries
-        run: |
-          mkdir -p /tmp/arm64-deps
-          cd /tmp/arm64-deps
-          cp $GITHUB_WORKSPACE/package.json .
-          npm install --cpu=arm64 --os=linux --libc=glibc --ignore-scripts 2>/dev/null || true
-
-          STANDALONE_NM=$GITHUB_WORKSPACE/.next/standalone/node_modules
-
-          # better-sqlite3 arm64 prebuild — REQUIRED. Build runs on x64,
-          # Pi is arm64. Without this, every Prisma call crashes at runtime.
-          BS3_DIR="$STANDALONE_NM/better-sqlite3"
-          if [ ! -d "$BS3_DIR" ]; then
-            echo "ERROR: better-sqlite3 missing from standalone bundle"
-            exit 1
-          fi
-          (
-            cd "$BS3_DIR"
-            # Try the runner's Node version first (artifacts also produced for it),
-            # then a generic arm64 fetch, then fall back to whatever the package
-            # ships as default prebuild target.
-            npx --yes prebuild-install --platform=linux --arch=arm64 --runtime=node \
-              || npx --yes prebuild-install --platform=linux --arch=arm64
-          )
-          BIN="$BS3_DIR/build/Release/better_sqlite3.node"
-          file "$BIN"
-          if ! file "$BIN" | grep -qE 'ARM aarch64|aarch64'; then
-            echo "ERROR: better-sqlite3 binary is not ARM64 after prebuild-install"
-            exit 1
-          fi
-
-          # sharp arm64
-          for pkg in @img/sharp-linux-arm64 @img/sharp-libvips-linux-arm64; do
-            if [ -d "/tmp/arm64-deps/node_modules/$pkg" ]; then
-              mkdir -p "$STANDALONE_NM/$pkg"
-              cp -r /tmp/arm64-deps/node_modules/$pkg/. "$STANDALONE_NM/$pkg/"
-            fi
-          done
-
-          # next/swc arm64
-          for pkg in @next/swc-linux-arm64-gnu @next/swc-linux-arm64-musl; do
-            if [ -d "/tmp/arm64-deps/node_modules/$pkg" ]; then
-              mkdir -p "$STANDALONE_NM/$pkg"
-              cp -r /tmp/arm64-deps/node_modules/$pkg/. "$STANDALONE_NM/$pkg/"
-            fi
-          done
-
-          # Strip x64 binaries to reduce artifact size
-          find "$STANDALONE_NM" -name '*linux-x64*' -type d | xargs rm -rf || true
+        run: bash scripts/install-arm64-natives.sh ${{ matrix.app }}
 
       - name: Write deploy meta
         run: |
-          echo "{\"sha\":\"$GITHUB_SHA\",\"ref\":\"$GITHUB_REF\",\"built\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" \
-            > .next/standalone/.deploy-meta.json
+          echo "{\"sha\":\"$GITHUB_SHA\",\"ref\":\"$GITHUB_REF\",\"app\":\"${{ matrix.app }}\",\"built\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" \
+            > apps/${{ matrix.app }}/.next/standalone/.deploy-meta.json
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: pi-release
-          path: .next/standalone/
+          name: pi-release-${{ matrix.app }}
+          path: apps/${{ matrix.app }}/.next/standalone/
           retention-days: 1
           include-hidden-files: true
 
@@ -101,53 +60,72 @@ jobs:
     runs-on: self-hosted
     needs: build
     steps:
-      - name: Download artifact
+      - name: Download hub artifact
         uses: actions/download-artifact@v4
         with:
-          name: pi-release
-          path: /tmp/pi-release
+          name: pi-release-hub
+          path: /tmp/pi-release-hub
 
-      - name: Deploy via rsync
+      - name: Download turnier artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pi-release-turnier
+          path: /tmp/pi-release-turnier
+
+      - name: Rsync hub
         run: |
+          mkdir -p /home/johannes/apps/active-site/hub
           rsync -a --delete \
             --exclude='.env' \
             --exclude='data/' \
-            /tmp/pi-release/ \
-            /home/johannes/apps/active-site/
+            /tmp/pi-release-hub/ \
+            /home/johannes/apps/active-site/hub/
 
-      - name: Verify ARM64 binary on Pi
+      - name: Rsync turnier
         run: |
-          file /home/johannes/apps/active-site/node_modules/better-sqlite3/build/Release/better_sqlite3.node
+          mkdir -p /home/johannes/apps/active-site/turnier
+          rsync -a --delete \
+            --exclude='.env' \
+            --exclude='data/' \
+            /tmp/pi-release-turnier/ \
+            /home/johannes/apps/active-site/turnier/
 
-      - name: Run Prisma migrations
+      - name: Verify ARM64 binaries
+        run: |
+          HUB_BS3=$(find /home/johannes/apps/active-site/hub -name 'better_sqlite3.node' -path '*build/Release*' | head -1)
+          TURN_BS3=$(find /home/johannes/apps/active-site/turnier -name 'better_sqlite3.node' -path '*build/Release*' | head -1)
+          for B in "$HUB_BS3" "$TURN_BS3"; do
+            [ -n "$B" ] || { echo "ERROR: better_sqlite3.node missing"; exit 1; }
+            file "$B"
+            file "$B" | grep -qE 'ARM aarch64|aarch64' || { echo "ERROR: $B is not arm64"; exit 1; }
+          done
+
+      - name: Run Prisma migrations (shared DB)
         run: |
           mkdir -p /home/johannes/apps/data
-          cd /home/johannes/apps/active-site
-          set -a && source .env && set +a
-          node scripts/migrate.mjs
+          set -a && source /home/johannes/apps/active-site/hub/.env && set +a
+          node /home/johannes/apps/active-site/hub/packages/db/scripts/migrate.mjs
 
-      - name: Restart PM2
+      - name: Reload PM2 (both apps)
         run: |
-          pm2 delete active-site 2>/dev/null || true
-          cd /home/johannes/apps/active-site
-          PORT=3000 HOSTNAME=0.0.0.0 pm2 start server.js --name active-site
+          pm2 startOrReload /home/johannes/apps/ecosystem.config.cjs --update-env
           pm2 save
 
       - name: Smoke test
         run: |
-          for i in 1 2 3 4 5; do
+          for i in 1 2 3 4 5 6 7 8; do
             sleep 2
-            curl -sf http://localhost:3000/ >/dev/null || continue
-            # Route that hits prisma → catches native-binary mismatches
-            body=$(curl -sf http://localhost:3000/tischtennis-turnier) || continue
-            if echo "$body" | grep -q "page couldn"; then
-              echo "Smoke test failed: /tischtennis-turnier rendered server error"
-              exit 1
+            HUB_OK=$(curl -sf -o /dev/null -w "%{http_code}" http://localhost:3000/) || HUB_OK=0
+            TURN_OK=$(curl -sf -o /dev/null -w "%{http_code}" http://localhost:3001/) || TURN_OK=0
+            if [ "$HUB_OK" = "200" ] && [ "$TURN_OK" = "200" ]; then
+              echo "Smoke OK (hub=$HUB_OK, turnier=$TURN_OK)"
+              exit 0
             fi
-            echo "OK" && exit 0
+            echo "attempt $i: hub=$HUB_OK turnier=$TURN_OK"
           done
-          echo "Smoke test failed" && exit 1
+          echo "Smoke test failed"
+          exit 1
 
       - name: Cleanup
         if: always()
-        run: rm -rf /tmp/pi-release /tmp/arm64-deps
+        run: rm -rf /tmp/pi-release-hub /tmp/pi-release-turnier

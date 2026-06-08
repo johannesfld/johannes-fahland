@@ -1,0 +1,25 @@
+* text=auto
+
+# Shell scripts must use LF (executed by bash on the Ubuntu CI runner + Pi).
+*.sh text eol=lf
+
+# Source files: LF everywhere (avoid CRLF noise in diffs between Win/Linux).
+*.ts text eol=lf
+*.tsx text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.css text eol=lf
+*.prisma text eol=lf
+
+# Binary
+*.png binary
+*.jpg binary
+*.ico binary
+*.webp binary
+*.psd binary
+*.db binary

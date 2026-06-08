@@ -1,0 +1,295 @@
+/* @spielbrett/ui — Design-Tokens für Hub und Turnier-Subdomain.
+   Editorial-Skeuomorph-Sprache: warmes Bütten/Tinte + gebranntes Orange als Brand-Akzent.
+   9 Tool-Akzente per [data-tool="x"]. Per-Tool-Surfaces für skeuomorphe Spielflächen. */
+
+/* Desk-Variante: nur Geräte ab 1024px UND mit echtem Pointer (Maus, Trackpad).
+   iPad Portrait/Landscape ohne Maus fällt darunter raus → bekommt BottomNav statt Sidebar.
+   Tailwind-v4-Syntax: nutzbar als `desk:flex`, `desk:hidden`, etc. */
+@custom-variant desk (@media (min-width: 1024px) and (hover: hover) and (pointer: fine));
+
+:root {
+  /* --- Legacy aliases (App-Code referenziert teilweise noch direkt) --- */
+  --background: #F4F1EA;
+  --foreground: #1A1714;
+  --surface: #FFFFFF;
+  --surface-muted: #EAE5DB;
+  --border: rgba(26, 23, 20, 0.10);
+  --ring-focus: rgba(194, 65, 12, 0.32);
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: light;
+
+  /* --- Surfaces (Bütten-Stack) --- */
+  --vibe-bg-base:     #F4F1EA;  /* Bütten */
+  --vibe-bg-elevated: #FBF8F1;  /* Papier hell */
+  --vibe-bg-sunken:   #EAE5DB;  /* Bütten gedrückt */
+  --vibe-bg-tinted:   #F0E4D6;  /* Brand-Anklang */
+
+  /* --- Foreground (Tinte) --- */
+  --vibe-fg-base:  #1A1714;     /* Tinte */
+  --vibe-fg-muted: #5F564D;     /* Tinte verdünnt */
+  --vibe-fg-faint: #968B7E;     /* Bleistift */
+
+  /* --- Linien --- */
+  --vibe-line:        rgba(26, 23, 20, 0.10);
+  --vibe-line-strong: rgba(26, 23, 20, 0.20);
+  --vibe-ring:        rgba(194, 65, 12, 0.32);
+
+  /* --- Motion --- */
+  --vibe-ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --vibe-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --vibe-dur-1: 120ms;
+  --vibe-dur-2: 220ms;
+  --vibe-dur-3: 280ms;
+  --vibe-dur-4: 600ms;
+
+  /* --- Radii --- */
+  --vibe-r-xs:      0.25rem;
+  --vibe-r-sm:      0.5rem;
+  --vibe-r-md:      0.75rem;
+  --vibe-r-lg:      1.125rem;
+  --vibe-r-xl:      1.5rem;
+  --vibe-r-2xl:     2rem;
+  --vibe-r-tight:   0.5rem;
+  --vibe-r-base:    0.75rem;
+  --vibe-r-soft:    1.125rem;
+  --vibe-r-pillow:  1.5rem;
+  --vibe-r-balloon: 2rem;
+
+  /* --- Shadows (warm shadow tinted toward ink) --- */
+  --vibe-shadow-flat:   0 1px 2px rgba(26, 23, 20, 0.04);
+  --vibe-shadow-soft:   0 2px 8px -2px rgba(26, 23, 20, 0.08), 0 8px 24px -8px rgba(26, 23, 20, 0.10);
+  --vibe-shadow-lifted: 0 8px 24px -6px rgba(26, 23, 20, 0.14), 0 24px 48px -16px rgba(26, 23, 20, 0.12);
+  --vibe-shadow-glow:   0 0 0 1px var(--vibe-ring) inset, 0 8px 30px -10px var(--vibe-ring);
+  --vibe-shadow-1: var(--vibe-shadow-flat);
+  --vibe-shadow-2: var(--vibe-shadow-soft);
+  --vibe-shadow-3: var(--vibe-shadow-lifted);
+
+  /* --- Spacing --- */
+  --vibe-gap-1: 0.25rem;
+  --vibe-gap-2: 0.5rem;
+  --vibe-gap-3: 0.75rem;
+  --vibe-gap-4: 1rem;
+  --vibe-gap-5: 1.5rem;
+  --vibe-pad-page: 1rem;
+  --vibe-pad-card: 1.25rem;
+
+  /* --- Brand: Spielbrett (gebranntes Orange) --- */
+  --brand-50:  #FDF2EA;
+  --brand-100: #FAE1CB;
+  --brand-200: #F4C195;
+  --brand-300: #ED9D5E;
+  --brand-400: #DC7530;
+  --brand-500: #C2410C;   /* Brand-Akzent */
+  --brand-600: #9A3209;
+  --brand-700: #762605;
+  --brand-800: #581C04;
+  --brand-900: #3A1202;
+  --brand-950: #220A01;
+
+  /* Brand-Alias als Default-Akzent (Hub-Home, Footer, Impressum) */
+  --accent:       var(--brand-500);
+  --accent-soft:  var(--brand-100);
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(194, 65, 12, 0.20);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(194, 65, 12, 0.18) 0%, transparent 70%);
+  --tool-surface: var(--brand-50);
+}
+
+/* --- Per-Tool Akzent-Map (9er-Palette: Olive, Zinnober, Lapis, Senf, Rost, Salbei, Pflaume, Kupfer, Anthrazit) --- */
+[data-tool="wizard"] {
+  /* Pflaume — magisch, kartenspielig */
+  --accent:       #6B3D7A;
+  --accent-soft:  #E4D5EB;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(107, 61, 122, 0.20);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(107, 61, 122, 0.18) 0%, transparent 70%);
+  --tool-surface: #EFE6F2;
+}
+[data-tool="kniffel"] {
+  /* Senf — Würfel, Schreibwarenton */
+  --accent:       #B8860B;
+  --accent-soft:  #F4E1A6;
+  --accent-ink:   #4A350A;
+  --accent-line:  rgba(184, 134, 11, 0.22);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(184, 134, 11, 0.18) 0%, transparent 70%);
+  --tool-surface: #FBEFC4;
+}
+[data-tool="schiffe"] {
+  /* Lapis — Millimeterpapier, Meer */
+  --accent:       #1E5F8B;
+  --accent-soft:  #C5DDEB;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(30, 95, 139, 0.22);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(30, 95, 139, 0.18) 0%, transparent 70%);
+  --tool-surface: #DCEAF2;
+}
+[data-tool="romme"] {
+  /* Zinnober — Filz, Kartenfläche */
+  --accent:       #B23A2C;
+  --accent-soft:  #ECC5BE;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(178, 58, 44, 0.20);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(178, 58, 44, 0.18) 0%, transparent 70%);
+  --tool-surface: #F2DAD5;
+}
+[data-tool="turnier"] {
+  /* Salbei — Sportplatz, Trophäe gedämpft */
+  --accent:       #4A7C59;
+  --accent-soft:  #C7DCC9;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(74, 124, 89, 0.22);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(74, 124, 89, 0.18) 0%, transparent 70%);
+  --tool-surface: #E1ECDF;
+}
+[data-tool="g2048"] {
+  /* Rost — Plättchen geprägt */
+  --accent:       #B85C16;
+  --accent-soft:  #F2D5B7;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(184, 92, 22, 0.22);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(184, 92, 22, 0.18) 0%, transparent 70%);
+  --tool-surface: #F8E7D3;
+}
+[data-tool="snake"] {
+  /* Olive — Spielwiese */
+  --accent:       #687B2E;
+  --accent-soft:  #D3DBA5;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(104, 123, 46, 0.22);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(104, 123, 46, 0.18) 0%, transparent 70%);
+  --tool-surface: #E5EAC8;
+}
+[data-tool="memory"] {
+  /* Kupfer — Kartendeck patiniert */
+  --accent:       #A1542C;
+  --accent-soft:  #E8C8B0;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(161, 84, 44, 0.20);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(161, 84, 44, 0.18) 0%, transparent 70%);
+  --tool-surface: #F2DDC9;
+}
+[data-tool="wordle"] {
+  /* Anthrazit — Schreibmaschine, klar */
+  --accent:       #3A3A40;
+  --accent-soft:  #C8C8CE;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(58, 58, 64, 0.20);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(58, 58, 64, 0.16) 0%, transparent 70%);
+  --tool-surface: #DEDEE3;
+}
+
+/* --- Dark Mode --- */
+.dark {
+  --background: #18130E;
+  --foreground: #EFEAE2;
+  --surface: #221C16;
+  --surface-muted: #14100B;
+  --border: rgba(255, 250, 240, 0.08);
+  --ring-focus: rgba(237, 157, 94, 0.32);
+  color-scheme: dark;
+
+  --vibe-bg-base:     #18130E;
+  --vibe-bg-elevated: #221C16;
+  --vibe-bg-sunken:   #0E0B07;
+  --vibe-bg-tinted:   #2A1F14;
+
+  --vibe-fg-base:  #EFEAE2;
+  --vibe-fg-muted: #A89E92;
+  --vibe-fg-faint: #6F665C;
+
+  --vibe-line:        rgba(255, 250, 240, 0.08);
+  --vibe-line-strong: rgba(255, 250, 240, 0.16);
+  --vibe-ring:        rgba(237, 157, 94, 0.32);
+
+  --vibe-shadow-flat:   0 1px 2px rgba(0, 0, 0, 0.30);
+  --vibe-shadow-soft:   0 2px 8px -2px rgba(0, 0, 0, 0.40), 0 8px 24px -8px rgba(0, 0, 0, 0.50);
+  --vibe-shadow-lifted: 0 8px 24px -6px rgba(0, 0, 0, 0.55), 0 24px 48px -16px rgba(0, 0, 0, 0.45);
+  --vibe-shadow-glow:   0 0 0 1px var(--vibe-ring) inset, 0 8px 30px -10px var(--vibe-ring);
+  --vibe-shadow-1: var(--vibe-shadow-flat);
+  --vibe-shadow-2: var(--vibe-shadow-soft);
+  --vibe-shadow-3: var(--vibe-shadow-lifted);
+
+  /* Brand-Dark */
+  --brand-50:  #220A01;
+  --brand-100: #3A1202;
+  --brand-200: #581C04;
+  --brand-300: #762605;
+  --brand-400: #9A3209;
+  --brand-500: #C2410C;
+  --brand-600: #DC7530;
+  --brand-700: #ED9D5E;
+  --brand-800: #F4C195;
+  --brand-900: #FAE1CB;
+  --brand-950: #FDF2EA;
+
+  --accent:       #ED9D5E;   /* gedämpft heller im Dark-Mode */
+  --accent-soft:  #3A1202;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(237, 157, 94, 0.22);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(237, 157, 94, 0.18) 0%, transparent 70%);
+  --tool-surface: #2A1F14;
+}
+
+.dark [data-tool="wizard"] {
+  --accent:       #B89BC5;
+  --accent-soft:  #4A2E54;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(184, 155, 197, 0.22);
+  --tool-surface: #2A1830;
+}
+.dark [data-tool="kniffel"] {
+  --accent:       #E5B947;
+  --accent-soft:  #5A3D08;
+  --accent-ink:   #1A1305;
+  --accent-line:  rgba(229, 185, 71, 0.22);
+  --tool-surface: #3A2A0D;
+}
+.dark [data-tool="schiffe"] {
+  --accent:       #6FA8C9;
+  --accent-soft:  #143348;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(111, 168, 201, 0.22);
+  --tool-surface: #122838;
+}
+.dark [data-tool="romme"] {
+  --accent:       #DE8A7C;
+  --accent-soft:  #4D1A12;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(222, 138, 124, 0.20);
+  --tool-surface: #2E1410;
+}
+.dark [data-tool="turnier"] {
+  --accent:       #8FB89C;
+  --accent-soft:  #1F4028;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(143, 184, 156, 0.22);
+  --tool-surface: #15291B;
+}
+.dark [data-tool="g2048"] {
+  --accent:       #E89456;
+  --accent-soft:  #5A2A0A;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(232, 148, 86, 0.22);
+  --tool-surface: #3A1F0A;
+}
+.dark [data-tool="snake"] {
+  --accent:       #B5C46E;
+  --accent-soft:  #2F3D14;
+  --accent-ink:   #1A1F08;
+  --accent-line:  rgba(181, 196, 110, 0.22);
+  --tool-surface: #1F2A10;
+}
+.dark [data-tool="memory"] {
+  --accent:       #D49170;
+  --accent-soft:  #4A2010;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(212, 145, 112, 0.20);
+  --tool-surface: #2D1A10;
+}
+.dark [data-tool="wordle"] {
+  --accent:       #C8C8CE;
+  --accent-soft:  #2A2A2F;
+  --accent-ink:   #1A1A1F;
+  --accent-line:  rgba(200, 200, 206, 0.22);
+  --tool-surface: #1F1F22;
+}

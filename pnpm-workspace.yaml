@@ -1,0 +1,11 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# Trusted native-build scripts (pnpm 11+ requires explicit approval).
+allowBuilds:
+  '@prisma/engines': true
+  better-sqlite3: true
+  prisma: true
+  sharp: true
+  unrs-resolver: true

@@ -1,0 +1,45 @@
+// PM2-Ecosystem für Spielbrett auf dem Raspberry Pi.
+//
+// Liegt am Pi unter /home/johannes/apps/ecosystem.config.cjs (NICHT im Repo).
+// Der Workflow ruft `pm2 startOrReload /home/johannes/apps/ecosystem.config.cjs --update-env`.
+//
+// Mit `outputFileTracingRoot = repo-root` ist die Bundle-Struktur:
+//   ~/apps/active-site/hub/        ← rsync-Target
+//     apps/hub/server.js           ← Next-Server-Entrypoint
+//     apps/hub/.next/static/...
+//     apps/hub/public/...
+//     node_modules/...
+//     packages/db/...
+//
+// `cwd` zeigt auf das rsync-Target, `script` ist relativ dazu.
+
+module.exports = {
+  apps: [
+    {
+      name: "hub",
+      script: "apps/hub/server.js",
+      cwd: "/home/johannes/apps/active-site/hub",
+      env: {
+        NODE_ENV: "production",
+        PORT: 3000,
+        HOSTNAME: "0.0.0.0",
+        DATABASE_URL: "file:/home/johannes/apps/data/spielbrett.db",
+      },
+      max_memory_restart: "350M",
+      time: true,
+    },
+    {
+      name: "turnier",
+      script: "apps/turnier/server.js",
+      cwd: "/home/johannes/apps/active-site/turnier",
+      env: {
+        NODE_ENV: "production",
+        PORT: 3001,
+        HOSTNAME: "0.0.0.0",
+        DATABASE_URL: "file:/home/johannes/apps/data/spielbrett.db",
+      },
+      max_memory_restart: "350M",
+      time: true,
+    },
+  ],
+};
