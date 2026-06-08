@@ -5,7 +5,7 @@
 # Usage: bash scripts/install-arm64-natives.sh <app>
 #   <app>  →  "hub" or "turnier"
 
-set -euo pipefail
+set -euxo pipefail
 
 APP="${1:?usage: install-arm64-natives.sh <app>}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
