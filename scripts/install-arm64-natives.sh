@@ -17,7 +17,11 @@ if [ ! -d "$NM_ROOT" ]; then
   exit 1
 fi
 
-# Stage 1: pull arm64 prebuilds into a tmp area via npm with cpu/os flags
+# Stage 1: pull arm64 prebuilds into a tmp area via npm with cpu/os flags.
+# This also gives us an INTACT prebuild-install CLI — the copy inside the
+# Next standalone bundle is incomplete (output-file-tracing drops bin.js,
+# since it's never require()d at runtime), so running it from there throws
+# MODULE_NOT_FOUND. We always invoke the tmp copy instead.
 TMP_DIR="$(mktemp -d)"
 trap "rm -rf $TMP_DIR" EXIT
 
@@ -25,6 +29,14 @@ cd "$TMP_DIR"
 cp "$ROOT/packages/db/package.json" .
 # bring in the workspace lockfile context so npm doesn't try to resolve workspaces
 npm install --cpu=arm64 --os=linux --libc=glibc --ignore-scripts 2>/dev/null || true
+# Guarantee a usable prebuild-install regardless of the line above
+npm install --no-save --ignore-scripts prebuild-install@^7 2>/dev/null || true
+
+PREBUILD_BIN="$TMP_DIR/node_modules/prebuild-install/bin.js"
+if [ ! -f "$PREBUILD_BIN" ]; then
+  echo "ERROR: prebuild-install CLI not found at $PREBUILD_BIN"
+  exit 1
+fi
 
 # Stage 2: replace every better-sqlite3 binary in the bundle with the arm64 prebuild.
 # pnpm with node-linker=hoisted still scatters multiple copies through the
@@ -40,10 +52,13 @@ fi
 for PKG_JSON in "${BS3_PKGS[@]}"; do
   BS3_DIR="$(dirname "$PKG_JSON")"
   echo "→ prebuild-install arm64 into: $BS3_DIR"
+  # Run the INTACT tmp CLI with CWD=BS3_DIR: prebuild-install reads the target
+  # package.json from $PWD and writes build/Release/ there, but its own code is
+  # loaded from the complete tmp copy (not the stripped bundle copy).
   (
     cd "$BS3_DIR"
-    npx --yes prebuild-install --platform=linux --arch=arm64 --runtime=node \
-      || npx --yes prebuild-install --platform=linux --arch=arm64
+    node "$PREBUILD_BIN" --platform=linux --arch=arm64 --runtime=node \
+      || node "$PREBUILD_BIN" --platform=linux --arch=arm64
   )
   BIN="$BS3_DIR/build/Release/better_sqlite3.node"
   if [ -f "$BIN" ] && file "$BIN" | grep -qE 'ARM aarch64|aarch64'; then
