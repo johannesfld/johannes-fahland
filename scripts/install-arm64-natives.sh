@@ -87,9 +87,50 @@ for pkg in @img/sharp-linux-arm64 @img/sharp-libvips-linux-arm64 \
   fi
 done
 
-# Stage 4: strip x64-specific binaries to shrink artifact size
-find "$NM_ROOT" -type d -name '*linux-x64*' -prune -exec rm -rf {} + 2>/dev/null || true
-find "$NM_ROOT" -type d -name '*win32*'     -prune -exec rm -rf {} + 2>/dev/null || true
-find "$NM_ROOT" -type d -name '*darwin*'    -prune -exec rm -rf {} + 2>/dev/null || true
+# Stage 4: slim the bundle so the self-hosted Pi runner can actually pull it.
+# The raw standalone is ~330 MB (mostly foreign-platform prebuilds, build
+# intermediates and source maps), which times out the artifact download over a
+# home connection. None of the removals below are needed at runtime or by
+# migrate.mjs (which talks to the DB through the arm64 better_sqlite3.node).
+SIZE_BEFORE="$(du -sh "$STANDALONE" 2>/dev/null | cut -f1)"
+
+# 4a. Foreign-platform native dirs (keep only linux-arm64).
+for pat in '*linux-x64*' '*linux-x64-gnu*' '*linux-x64-musl*' '*win32*' '*darwin*' \
+           '*linux-arm-*' '*android*' '*freebsd*' '*linuxmusl-x64*'; do
+  find "$NM_ROOT" -type d -name "$pat" -prune -exec rm -rf {} + 2>/dev/null || true
+done
+# Leftover @img / @next / @esbuild / @rollup platform packages that are not arm64.
+find "$NM_ROOT" -type d -regextype posix-extended \
+     -regex '.*/(@img|@next|@esbuild|@rollup)/[^/]*(linux-x64|darwin|win32|wasm32|android|freebsd|linux-arm[^6]).*' \
+     -prune -exec rm -rf {} + 2>/dev/null || true
+
+# 4b. better-sqlite3 build intermediates — keep build/Release/*.node, drop the rest.
+while IFS= read -r bs3; do
+  rm -rf "$bs3/deps" "$bs3/src" "$bs3/build/Release/obj" "$bs3/build/Release/obj.target" \
+         "$bs3/build/deps" "$bs3/build/Makefile" "$bs3/build/binding.Makefile" \
+         "$bs3/build/config.gypi" "$bs3/build/gyp-mac-tool" 2>/dev/null || true
+  find "$bs3/build" -name '*.o' -delete 2>/dev/null || true
+done < <(find "$NM_ROOT" -type d -path '*/better-sqlite3' 2>/dev/null)
+
+# 4c. Prisma: the app uses the better-sqlite3 driver adapter, so the engine
+# binaries / CLI download caches are dead weight. Keep @prisma/client + .prisma.
+rm -rf "$NM_ROOT/@prisma/engines" "$NM_ROOT/prisma" \
+       "$NM_ROOT/.pnpm"/prisma@*/node_modules/prisma 2>/dev/null || true
+find "$NM_ROOT" -type d -path '*/@prisma/engines*' -prune -exec rm -rf {} + 2>/dev/null || true
+find "$NM_ROOT" -type f \( -name 'libquery_engine*' -o -name 'query-engine*' \
+     -o -name 'schema-engine*' -o -name 'migration-engine*' \) -delete 2>/dev/null || true
+
+# 4d. Universal dead weight: source maps, build-time docs, test fixtures, caches.
+find "$NM_ROOT" -type f -name '*.map' -delete 2>/dev/null || true
+find "$STANDALONE" -type d -name 'cache' -path '*/.next/*' -prune -exec rm -rf {} + 2>/dev/null || true
+find "$NM_ROOT" -type f \( -name '*.md' -o -name '*.markdown' -o -name 'LICENSE*' \
+     -o -name 'CHANGELOG*' -o -name '*.ts' ! -name '*.d.ts' \) -delete 2>/dev/null || true
+find "$NM_ROOT" -type d \( -name 'test' -o -name 'tests' -o -name '__tests__' \
+     -o -name 'docs' -o -name 'example' -o -name 'examples' \) -prune -exec rm -rf {} + 2>/dev/null || true
+
+SIZE_AFTER="$(du -sh "$STANDALONE" 2>/dev/null | cut -f1)"
+echo "── bundle slimmed: $SIZE_BEFORE → $SIZE_AFTER ($APP)"
+echo "── top 20 remaining dirs in bundle:"
+du -h "$STANDALONE" 2>/dev/null | sort -rh | head -20 || true
 
 echo "arm64 native binaries installed for $APP"
