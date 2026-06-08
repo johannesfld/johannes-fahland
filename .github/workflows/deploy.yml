@@ -39,7 +39,17 @@ jobs:
         run: bash scripts/deploy-assemble.sh ${{ matrix.app }}
 
       - name: Install ARM64 native binaries
-        run: bash scripts/install-arm64-natives.sh ${{ matrix.app }}
+        run: |
+          set -o pipefail
+          bash scripts/install-arm64-natives.sh ${{ matrix.app }} 2>&1 | tee /tmp/arm64.log
+          rc=${PIPESTATUS[0]}
+          if [ "$rc" -ne 0 ]; then
+            echo "::group::arm64-natives last 200 lines"
+            tail -200 /tmp/arm64.log
+            echo "::endgroup::"
+            while IFS= read -r line; do echo "::error::$line"; done < <(tail -40 /tmp/arm64.log)
+            exit $rc
+          fi
 
       - name: Write deploy meta
         run: |
