@@ -1,4 +1,4 @@
-name: Deploy to Pi
+name: Deploy to Pi (native build)
 
 on:
   push:
@@ -6,124 +6,255 @@ on:
       - master
   workflow_dispatch:
 
+concurrency:
+  group: pi-deploy
+  cancel-in-progress: false
+
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
-      matrix:
-        app: [hub, turnier]
+  deploy:
+    # Pin to self-hosted + ARM64. The ARM64 label is assigned AUTOMATICALLY by the
+    # runner agent on any arm64 host (no manual setup needed), so this is guaranteed
+    # to match the Pi while still refusing to land on an accidentally-registered x64
+    # self-hosted runner (which could not run the arm64 native binaries anyway).
+    # (We intentionally do NOT require a custom 'pi-server' label, because it is not
+    #  guaranteed to be configured — requiring it would leave the job queued forever.)
+    runs-on: [self-hosted, ARM64]
+    timeout-minutes: 60
+    env:
+      # Build-time dummy DB target. Pre-created in Diagnostics so the eager better-sqlite3
+      # adapter in @spielbrett/db (instantiated at module top-level) can always open it
+      # if a Server Component / generateStaticParams is statically evaluated during build.
+      BUILD_DATABASE_URL: file:/tmp/spielbrett-build-dummy.db
+      ACTIVE_SITE: /home/johannes/apps/active-site
+      SHARED_DB_DIR: /home/johannes/apps/data
+      SHARED_DB_FILE: /home/johannes/apps/data/spielbrett.db
+      ECOSYSTEM: /home/johannes/apps/ecosystem.config.cjs
+      HUB_ENV: /home/johannes/apps/active-site/hub/.env
+      # Minimum free space (1K-blocks) required on the FS backing /home before we build.
+      # ~6 GB: build artifacts (hub .next ~770 MB + turnier .next ~1.6 GB coexist),
+      # node_modules (~773 MB, larger on arm64), existing active-site standalones,
+      # and rsync's transient ~2x footprint (new files written before --delete frees old).
+      MIN_FREE_HOME_KB: "6000000"
+      MIN_FREE_TMP_KB: "1000000"
     steps:
-      - uses: actions/checkout@v4
+      - name: Diagnostics + preflight (fail fast, loud, actionable)
+        run: |
+          set -u
+          echo "===== HOST ====="; uname -a || true
+          echo "===== CPUs ====="; nproc || true
+          echo "===== MEMORY ====="; free -h || true
+          echo "===== NODE ====="; node --version || echo "node: NOT FOUND"
+          echo "===== PNPM / COREPACK ====="; pnpm --version || echo "pnpm: NOT FOUND"; corepack --version || echo "corepack: NOT FOUND"
+          echo "===== DISK ====="; df -h /home || df -h || true; df -h /tmp || true
+          echo "SHA: ${GITHUB_SHA:-unknown}  WS: ${GITHUB_WORKSPACE:-unknown}"
 
-      - uses: pnpm/action-setup@v4
+          # --- Required runtime tools on the NON-login PATH (run: uses a non-login shell;
+          # nvm/n PATH from ~/.bashrc may be absent). Report ALL missing before failing. ---
+          echo "===== TOOL PROBE ====="
+          MISSING=""
+          for t in node pnpm pm2 rsync curl file find awk; do
+            if command -v "$t" >/dev/null 2>&1; then
+              echo "ok: $t -> $(command -v "$t")"
+            else
+              echo "MISSING: $t"; MISSING="$MISSING $t"
+            fi
+          done
 
-      - uses: actions/setup-node@v4
+          # --- C toolchain probe: better-sqlite3 first tries a prebuild matching the Pi's
+          # Node ABI; if none matches it compiles via node-gyp (needs python3+make+g++).
+          # WARN (not fatal) — a matching prebuild may still cover us. ---
+          echo "===== TOOLCHAIN PROBE (needed only if no matching better-sqlite3 prebuild) ====="
+          for t in python3 make g++ node-gyp; do
+            command -v "$t" >/dev/null 2>&1 && echo "ok: $t" || echo "WARN: $t missing"
+          done
+
+          # --- Disk preflight: hard-fail BEFORE building so ENOSPC can't truncate a bundle. ---
+          echo "===== DISK PREFLIGHT ====="
+          AVAIL_HOME=$(df -P /home 2>/dev/null | awk 'NR==2{print $4}')
+          AVAIL_TMP=$(df -P /tmp 2>/dev/null | awk 'NR==2{print $4}')
+          echo "free /home: ${AVAIL_HOME:-?} KB (need >= ${MIN_FREE_HOME_KB})"
+          echo "free /tmp:  ${AVAIL_TMP:-?} KB (need >= ${MIN_FREE_TMP_KB})"
+
+          # --- Pre-create the build dummy DB + its dir (deterministic eager-adapter open). ---
+          mkdir -p /tmp
+          : > /tmp/spielbrett-build-dummy.db
+          echo "build dummy DB ready: /tmp/spielbrett-build-dummy.db"
+
+          # --- Fail now with one consolidated, actionable message. ---
+          FATAL=""
+          [ -n "$MISSING" ] && FATAL="${FATAL}\nFATAL: required tools missing on runner PATH:${MISSING}\n  -> install them or export their dir into the runner service PATH."
+          if [ -z "${AVAIL_HOME:-}" ] || [ "${AVAIL_HOME:-0}" -lt "$MIN_FREE_HOME_KB" ]; then
+            FATAL="${FATAL}\nFATAL: <$(($MIN_FREE_HOME_KB/1000000))GB free on /home (have ${AVAIL_HOME:-0} KB).\n  -> free disk space on the Pi before deploying."
+          fi
+          if [ -z "${AVAIL_TMP:-}" ] || [ "${AVAIL_TMP:-0}" -lt "$MIN_FREE_TMP_KB" ]; then
+            FATAL="${FATAL}\nFATAL: <1GB free on /tmp (have ${AVAIL_TMP:-0} KB)."
+          fi
+          if [ -n "$FATAL" ]; then printf '%b\n' "$FATAL"; exit 1; fi
+          echo "Preflight OK."
+
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          node-version: 22
-          cache: pnpm
+          fetch-depth: 1
+          # Keep node_modules warm across runs (cold install raises peak RAM and time on the Pi).
+          # We drop stale build OUTPUT explicitly in the next step instead of git-cleaning everything.
+          clean: false
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Clean stale build output (determinism on reused runner workspace)
+        run: |
+          set -euo pipefail
+          # .gitignore ignores .next/, and the self-hosted _work dir is REUSED and not always
+          # wiped, so a prior run's apps/*/.next (standalone/static) can persist and be silently
+          # merged by the cp -r assemble step. Remove it so each deploy reflects ONLY this commit.
+          rm -rf apps/*/.next
+          echo "Removed stale apps/*/.next"
+
+      - name: Enable pnpm via corepack
+        id: corepack
+        continue-on-error: true
+        run: |
+          set -e
+          corepack enable
+          corepack prepare pnpm@11.1.2 --activate
+          # Persist the corepack shim dir onto PATH for subsequent steps (each step is a fresh shell).
+          COREPACK_BIN="$(dirname "$(command -v corepack)")"
+          echo "$COREPACK_BIN" >> "$GITHUB_PATH"
+          # Make this step's SUCCESS contingent on pnpm@11.1.2 actually resolving — otherwise
+          # outcome=success can mask a non-invocable pnpm and the fallback below never fires.
+          VER="$(pnpm --version)"
+          echo "pnpm resolved: $VER"
+          [ "$VER" = "11.1.2" ] || { echo "ERROR: pnpm not 11.1.2 after corepack (got '$VER')"; exit 1; }
+
+      - name: Fallback pnpm via action-setup
+        if: steps.corepack.outcome == 'failure'
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.1.2
+          run_install: false
+
+      - name: Verify pnpm is invocable
+        run: |
+          set -e
+          command -v pnpm >/dev/null || { echo "FATAL: pnpm not on PATH after setup"; exit 1; }
+          echo "pnpm: $(pnpm --version)  ($(command -v pnpm))"
+
+      - name: Install
+        run: pnpm install --frozen-lockfile --prod=false
+
+      - name: Verify better-sqlite3 arm64
+        run: |
+          set -e
+          BS3="$(find node_modules -path '*better-sqlite3*build/Release/better_sqlite3.node' 2>/dev/null | head -1)"
+          [ -n "$BS3" ] || { echo "ERROR: better_sqlite3.node not built — install/allowBuilds did not compile it. Check python3/make/g++ on the Pi."; exit 1; }
+          echo "found: $BS3"
+          file "$BS3"
+          file "$BS3" | grep -qE 'aarch64|ARM aarch64' || { echo "ERROR: better_sqlite3.node is NOT arm64"; file "$BS3"; exit 1; }
+          echo "better-sqlite3 arm64 OK"
 
       - name: Generate Prisma client
         run: pnpm --filter @spielbrett/db generate
 
-      - name: Build ${{ matrix.app }}
-        run: pnpm --filter ${{ matrix.app }} build
+      # ── Builds use the LEGACY WEBPACK compiler (`next build --webpack`), NOT the Next 16
+      #    Turbopack default. Turbopack does its heavy work in native Rust (RSS) which the V8
+      #    --max-old-space-size flag CANNOT bound; on this unknown-RAM Pi, building BOTH apps
+      #    sequentially WHILE the live PM2 hub+turnier serve risks a kernel OOM-kill that could
+      #    reap a live worker (site down), not just abort the build. Webpack's peak RSS is
+      #    materially lower and is the safer default here. The V8 heap cap is raised to 4096
+      #    and SCOPED to each build step only (migrate/pm2/curl steps must not inherit it).
+      - name: Build hub (webpack, lower peak memory)
         env:
+          DATABASE_URL: ${{ env.BUILD_DATABASE_URL }}
           NODE_OPTIONS: --max-old-space-size=4096
-          DATABASE_URL: file:/tmp/dummy.db
+        run: pnpm --filter hub exec next build --webpack
 
-      - name: Assemble standalone bundle
-        run: bash scripts/deploy-assemble.sh ${{ matrix.app }}
+      - name: Build turnier (webpack, lower peak memory)
+        env:
+          DATABASE_URL: ${{ env.BUILD_DATABASE_URL }}
+          NODE_OPTIONS: --max-old-space-size=4096
+        run: pnpm --filter turnier exec next build --webpack
 
-      - name: Install ARM64 native binaries
-        run: bash scripts/install-arm64-natives.sh ${{ matrix.app }}
-
-      - name: Write deploy meta
+      - name: Assemble standalone bundles
         run: |
-          echo "{\"sha\":\"$GITHUB_SHA\",\"ref\":\"$GITHUB_REF\",\"app\":\"${{ matrix.app }}\",\"built\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" \
-            > apps/${{ matrix.app }}/.next/standalone/.deploy-meta.json
+          set -euo pipefail
+          assemble() {
+            APP="$1"; STANDALONE="apps/$APP/.next/standalone"
+            [ -d "$STANDALONE" ] || { echo "ERROR: $STANDALONE missing (build produced no standalone output)"; exit 1; }
+            mkdir -p "$STANDALONE/apps/$APP/.next/static"
+            cp -r "apps/$APP/.next/static/." "$STANDALONE/apps/$APP/.next/static/"
+            [ -d "apps/$APP/public" ] && { mkdir -p "$STANDALONE/apps/$APP/public"; cp -r "apps/$APP/public/." "$STANDALONE/apps/$APP/public/"; }
+            mkdir -p "$STANDALONE/packages/db/prisma" "$STANDALONE/packages/db/scripts"
+            cp -r "packages/db/prisma/." "$STANDALONE/packages/db/prisma/"
+            cp "packages/db/scripts/migrate.mjs" "$STANDALONE/packages/db/scripts/migrate.mjs"
+            [ -f "$STANDALONE/apps/$APP/server.js" ] || { echo "ERROR: $STANDALONE/apps/$APP/server.js missing"; exit 1; }
+          }
+          assemble hub
+          assemble turnier
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: pi-release-${{ matrix.app }}
-          path: apps/${{ matrix.app }}/.next/standalone/
-          retention-days: 1
-          include-hidden-files: true
-
-  deploy:
-    runs-on: self-hosted
-    needs: build
-    steps:
-      - name: Download hub artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: pi-release-hub
-          path: /tmp/pi-release-hub
-
-      - name: Download turnier artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: pi-release-turnier
-          path: /tmp/pi-release-turnier
-
-      - name: Rsync hub
+      - name: Disk check after assemble (abort before rsync if low)
         run: |
-          mkdir -p /home/johannes/apps/active-site/hub
-          rsync -a --delete \
-            --exclude='.env' \
-            --exclude='data/' \
-            /tmp/pi-release-hub/ \
-            /home/johannes/apps/active-site/hub/
+          set -euo pipefail
+          du -sh apps/hub/.next/standalone apps/turnier/.next/standalone 2>/dev/null || true
+          AVAIL_HOME=$(df -P /home 2>/dev/null | awk 'NR==2{print $4}')
+          echo "free /home after assemble: ${AVAIL_HOME:-?} KB (need >= ${MIN_FREE_HOME_KB})"
+          [ -n "${AVAIL_HOME:-}" ] && [ "$AVAIL_HOME" -ge "$MIN_FREE_HOME_KB" ] || {
+            echo "FATAL: insufficient free space on /home to rsync bundles safely — aborting BEFORE touching active-site."; exit 1; }
 
-      - name: Rsync turnier
+      - name: Deploy bundles (rsync, preserving .env)
         run: |
-          mkdir -p /home/johannes/apps/active-site/turnier
-          rsync -a --delete \
-            --exclude='.env' \
-            --exclude='data/' \
-            /tmp/pi-release-turnier/ \
-            /home/johannes/apps/active-site/turnier/
+          set -euo pipefail
+          # Guard: the shared DB must NOT live under active-site, or rsync --delete would nuke it.
+          case "$SHARED_DB_DIR" in "$ACTIVE_SITE"/*) echo "FATAL: SHARED_DB_DIR is under ACTIVE_SITE — rsync --delete would destroy the DB"; exit 1;; esac
+          deploy() {
+            APP="$1"
+            # --exclude protects an EXISTING active-site/<app>/.env from BOTH transfer and --delete.
+            rsync -a --delete --exclude='.env' --exclude='.env.*' \
+              "apps/$APP/.next/standalone/" "$ACTIVE_SITE/$APP/"
+          }
+          deploy hub
+          deploy turnier
 
-      - name: Verify ARM64 binaries
+      - name: Run Prisma migrations (shared DB — absolute target, never the app's dev .env)
         run: |
-          HUB_BS3=$(find /home/johannes/apps/active-site/hub -name 'better_sqlite3.node' -path '*build/Release*' | head -1)
-          TURN_BS3=$(find /home/johannes/apps/active-site/turnier -name 'better_sqlite3.node' -path '*build/Release*' | head -1)
-          for B in "$HUB_BS3" "$TURN_BS3"; do
-            [ -n "$B" ] || { echo "ERROR: better_sqlite3.node missing"; exit 1; }
-            file "$B"
-            file "$B" | grep -qE 'ARM aarch64|aarch64' || { echo "ERROR: $B is not arm64"; exit 1; }
-          done
+          set -euo pipefail
+          mkdir -p "$SHARED_DB_DIR"
+          # Do NOT source the app's .env for the migration target: apps/<app>/.env ships a
+          # RELATIVE dev path (file:../../packages/db/dev.db) which migrate.mjs would resolve
+          # against packages/db -> a throwaway DB, silently diverging from the PM2 runtime DB.
+          # Pass the known absolute prod path directly so migrate target == PM2 runtime target.
+          export DATABASE_URL="file:${SHARED_DB_FILE}"
+          case "$DATABASE_URL" in
+            file:/*) ;;
+            *) echo "FATAL: DATABASE_URL not an absolute file: path: $DATABASE_URL"; exit 1;;
+          esac
+          # Defense in depth: the migration DB must live under the shared data dir (sibling of
+          # active-site), never inside active-site (where rsync --delete could later destroy it).
+          case "$DATABASE_URL" in
+            "file:${SHARED_DB_DIR}/"*) ;;
+            *) echo "FATAL: migration DB path is not under SHARED_DB_DIR ($SHARED_DB_DIR): $DATABASE_URL"; exit 1;;
+          esac
+          echo "Migrating: $DATABASE_URL"
+          node "$ACTIVE_SITE/hub/packages/db/scripts/migrate.mjs"
 
-      - name: Run Prisma migrations (shared DB)
+      - name: PM2 startOrReload
         run: |
-          mkdir -p /home/johannes/apps/data
-          set -a && source /home/johannes/apps/active-site/hub/.env && set +a
-          node /home/johannes/apps/active-site/hub/packages/db/scripts/migrate.mjs
-
-      - name: Reload PM2 (both apps)
-        run: |
-          pm2 startOrReload /home/johannes/apps/ecosystem.config.cjs --update-env
+          set -euo pipefail
+          [ -f "$ECOSYSTEM" ] || { echo "FATAL: $ECOSYSTEM missing — one-time bootstrap required (place ecosystem.config.cjs on the Pi)."; exit 1; }
+          pm2 startOrReload "$ECOSYSTEM" --update-env
           pm2 save
 
       - name: Smoke test
         run: |
-          for i in 1 2 3 4 5 6 7 8; do
-            sleep 2
-            HUB_OK=$(curl -sf -o /dev/null -w "%{http_code}" http://localhost:3000/) || HUB_OK=0
-            TURN_OK=$(curl -sf -o /dev/null -w "%{http_code}" http://localhost:3001/) || TURN_OK=0
-            if [ "$HUB_OK" = "200" ] && [ "$TURN_OK" = "200" ]; then
-              echo "Smoke OK (hub=$HUB_OK, turnier=$TURN_OK)"
-              exit 0
-            fi
-            echo "attempt $i: hub=$HUB_OK turnier=$TURN_OK"
+          set -u
+          # Accept 2xx/3xx and common auth gates so an auth-redirected root route does not
+          # false-fail AFTER pm2 has already reloaded a healthy site.
+          ok() { case "$1" in 200|301|302|303|307|308|401|403) return 0;; *) return 1;; esac; }
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            sleep 3
+            HUB=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/ || echo 000)
+            TURN=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:3001/ || echo 000)
+            echo "attempt $i: hub=$HUB turnier=$TURN"
+            if ok "$HUB" && ok "$TURN"; then echo "Smoke OK (hub=$HUB turnier=$TURN)"; exit 0; fi
           done
-          echo "Smoke test failed"
+          echo "Smoke FAILED"
+          pm2 logs --lines 40 --nostream || true
           exit 1
-
-      - name: Cleanup
-        if: always()
-        run: rm -rf /tmp/pi-release-hub /tmp/pi-release-turnier

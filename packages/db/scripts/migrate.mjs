@@ -20,6 +20,11 @@ const resolvedDbPath = dbPath.startsWith('/') ? dbPath : join(appRoot, dbPath);
 console.log(`DB: ${resolvedDbPath}`);
 
 const db = new Database(resolvedDbPath);
+// Wait up to 5s for a write lock instead of throwing SQLITE_BUSY immediately.
+// Migrations run against the LIVE shared DB while PM2 hub+turnier are serving;
+// without this, a single in-flight web request write would hard-fail the deploy
+// AFTER rsync has already swapped the on-disk code (worst point to fail).
+db.pragma('busy_timeout = 5000');
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
@@ -50,11 +55,25 @@ for (const name of migrations) {
   if (applied.has(name)) continue;
   const sql = readFileSync(join(migrationsDir, name, 'migration.sql'), 'utf8');
   console.log(`Applying: ${name}`);
-  db.exec(sql);
-  db.prepare(
-    `INSERT INTO _prisma_migrations (id, checksum, finished_at, migration_name, applied_steps_count)
-     VALUES (lower(hex(randomblob(16))), '', datetime('now'), ?, 1)`
-  ).run(name);
+  // Wrap each migration file + its bookkeeping row in ONE transaction so a failure
+  // mid-file (e.g. a transient SQLITE_BUSY between statements, or a bad statement)
+  // rolls the whole file back atomically. Without this, a partially-applied multi-
+  // statement migration would NOT be recorded as applied, and the next deploy would
+  // re-run it -> "table already exists" and a permanently stuck migration state on
+  // the shared production DB. foreign_keys stays ON across the transaction.
+  db.exec('BEGIN');
+  try {
+    db.exec(sql);
+    db.prepare(
+      `INSERT INTO _prisma_migrations (id, checksum, finished_at, migration_name, applied_steps_count)
+       VALUES (lower(hex(randomblob(16))), '', datetime('now'), ?, 1)`
+    ).run(name);
+    db.exec('COMMIT');
+  } catch (err) {
+    try { db.exec('ROLLBACK'); } catch { /* rollback best-effort */ }
+    console.error(`FAILED applying ${name} — rolled back. No partial schema written.`);
+    throw err;
+  }
   count++;
 }
 
