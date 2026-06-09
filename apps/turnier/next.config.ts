@@ -17,19 +17,21 @@ const nextConfig: NextConfig = {
       "../../packages/db/package.json",
     ],
   },
-  // KEEP THESE — they are architecture-independent CORRECTNESS guards, not x64 size hacks.
-  // The file tracer follows the pnpm workspace symlinks node_modules/.pnpm/node_modules/{hub,turnier}
-  // and recursively pulls the OTHER app's entire .next/standalone into this one
-  // (standalone-in-standalone). Measured on the native build: even WITH these excludes
-  // hub=751 MB / turnier=1.6 GB; removing them balloons both bundles further and risks
-  // ENOSPC mid-rsync on the constrained Pi -> half-written, non-bootable bundle = broken site.
-  // The @next/swc-* entries drop the ~100 MB build-time compiler that the standalone server never loads.
+  // Cross-app recursion guards: the tracer follows the pnpm workspace symlinks
+  // node_modules/.pnpm/node_modules/{hub,turnier} and would otherwise pull the OTHER
+  // app's entire build into this one (standalone-in-standalone). The @next/swc-* entries
+  // drop the build-time compiler the standalone server never loads.
+  //
+  // NB: we deliberately do NOT exclude "../../apps/<app>/.next/**" here. That glob also
+  // matches THIS app's own server runtime (e.g. .next/server/webpack-runtime.js, which
+  // every page.js requires via ../webpack-runtime.js). On Linux the exclude stripped it
+  // from the standalone -> the deployed app crashed at first request with
+  // "Cannot find module '../webpack-runtime.js'" (MODULE_NOT_FOUND). The bundle is only
+  // ~60 MB now, so there is no size reason to exclude it anyway.
   outputFileTracingExcludes: {
     "/*": [
       "../../node_modules/.pnpm/node_modules/hub/**/*",
       "../../node_modules/.pnpm/node_modules/turnier/**/*",
-      "../../apps/hub/.next/**/*",
-      "../../apps/turnier/.next/**/*",
       "../../node_modules/@next/swc-*/**/*",
       "../../node_modules/.pnpm/@next+swc-*/**/*",
     ],

@@ -49,10 +49,29 @@ if [ -d "apps/$APP/public" ]; then
   mkdir -p "$STANDALONE/apps/$APP/public"
   cp -r "apps/$APP/public/." "$STANDALONE/apps/$APP/public/"
 fi
+
+# 3b) Self-heal the server runtime. Next's file tracer decides per-file what lands in the
+#     standalone; an over-broad outputFileTracingExcludes once stripped .next/server/
+#     webpack-runtime.js, which every page.js requires via ../webpack-runtime.js, crashing
+#     the deployed app with MODULE_NOT_FOUND at first request. Mirror the freshly-built
+#     .next/server (minus the dropped cache) into the standalone so the runtime is ALWAYS
+#     complete, independent of tracer quirks. rsync-like overlay via cp -rn keeps the
+#     tracer's copies and only fills in anything missing.
+if [ -d "apps/$APP/.next/server" ]; then
+  mkdir -p "$STANDALONE/apps/$APP/.next/server"
+  cp -r "apps/$APP/.next/server/." "$STANDALONE/apps/$APP/.next/server/"
+fi
+
 mkdir -p "$STANDALONE/packages/db/prisma" "$STANDALONE/packages/db/scripts"
 cp -r "packages/db/prisma/." "$STANDALONE/packages/db/prisma/"
 cp "packages/db/scripts/migrate.mjs" "$STANDALONE/packages/db/scripts/migrate.mjs"
+
+# 3c) Hard verification BEFORE deploy: the entrypoint and the webpack runtime that every
+#     route requires must be present, or the app would boot and then crash on first hit.
+#     Fail here (build tree still intact, active-site untouched) instead of in the smoke test.
 [ -f "$STANDALONE/apps/$APP/server.js" ] || { echo "FATAL: $STANDALONE/apps/$APP/server.js missing after assemble"; exit 1; }
+[ -f "$STANDALONE/apps/$APP/.next/server/webpack-runtime.js" ] \
+  || { echo "FATAL: webpack-runtime.js missing from standalone server runtime — deployed app would crash with MODULE_NOT_FOUND"; exit 1; }
 
 du -sh "$STANDALONE" 2>/dev/null || true
 
