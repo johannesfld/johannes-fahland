@@ -27,14 +27,15 @@ jobs:
       SHARED_DB_DIR: /home/johannes/apps/data
       SHARED_DB_FILE: /home/johannes/apps/data/spielbrett.db
       ECOSYSTEM: /home/johannes/apps/ecosystem.config.cjs
-      # Disk floors tuned to the REAL Pi (measured run #59): 6.8 GB SD card, ~1.5 GB free,
-      # 905 MB RAM + 3.9 GB swap, 4 cores. Measured working set on a CLEAN build:
-      # node_modules ~773 MB (persists across runs) + the LARGEST single app .next ~310 MB
-      # (incl. ~250 MB webpack cache we delete right after each build) ≈ 1.1 GB peak.
-      # The deployed standalone bundles are only ~60 MB each. We build+deploy ONE app at a
-      # time and delete its .next before the next, so two .next trees never coexist.
-      # 900 MB /home floor leaves headroom above node_modules for one app's build output.
-      MIN_FREE_HOME_KB: "900000"
+      # Disk floors tuned to the REAL Pi (6.8 GB SD, 905 MB RAM + swap, 4 cores). node_modules
+      # (~773 MB) PERSISTS across runs (clean:false) and is reused, so it does NOT count toward
+      # the per-run requirement. The ONLY new disk a run needs is the build output: measured
+      # peak is ONE app's full .next = ~311 MB (of which ~229 MB is the webpack cache we delete
+      # immediately after each build); the deployed standalone is just ~66 MB. We build+deploy
+      # one app at a time and delete its .next before the next, so two .next trees never coexist.
+      # Floor = ~311 MB peak + ~240 MB safety margin = 550 MB. (Was 900 MB, which assumed a cold
+      # install; with a warm node_modules that was unreachable on this card and never necessary.)
+      MIN_FREE_HOME_KB: "550000"
       MIN_FREE_TMP_KB: "150000"
     steps:
       # Reclaim disk FIRST, before the preflight floor check. On a 6.8 GB SD card a single
