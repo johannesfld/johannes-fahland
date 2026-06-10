@@ -41,13 +41,17 @@ jobs:
       # Reclaim disk FIRST, before the preflight floor check. On a 6.8 GB SD card a single
       # native build (node_modules compile + webpack cache) eats ~1 GB, so without ongoing
       # hygiene the card creeps toward full and the preflight (correctly) refuses to build.
-      # This runs with the runner's own rights only (no sudo); the apt/journal sweep that
-      # needs root is a one-time manual step documented in docs/DEPLOYMENT.md.
+      # Runner-owned caches are swept unconditionally; the apt/journal sweep needs root and
+      # runs only when passwordless sudo is available (Raspberry Pi OS grants the primary
+      # user NOPASSWD by default) — 2026-06-11 the manual sweep documented in
+      # docs/DEPLOYMENT.md had to be repeated, so it is automated here.
       - name: Reclaim disk (runner-owned caches & stale work dirs)
         run: |
           set -u
           echo "----- disk before cleanup -----"; df -h /home || df -h / || true
           echo "----- top dirs in \$HOME before -----"; du -h --max-depth=1 "$HOME" 2>/dev/null | sort -rh | head -12 || true
+          echo "----- ~/apps breakdown -----"; du -h --max-depth=2 "$HOME/apps" 2>/dev/null | sort -rh | head -15 || true
+          echo "----- ~/actions-runner breakdown -----"; du -h --max-depth=2 "$HOME/actions-runner" 2>/dev/null | sort -rh | head -15 || true
 
           # BIGGEST WIN (measured 2026-06: 769 MB): the pnpm/action-setup@v4 download dir.
           # The action re-creates it on demand, and we prefer corepack anyway, so this is
@@ -70,8 +74,36 @@ jobs:
           # by the determinism step). These are the biggest recurring hog after setup-pnpm.
           find "$HOME/actions-runner/_work" -type d -name '.next' -prune -exec rm -rf {} + 2>/dev/null || true
 
+          # Workspaces of renamed/removed repos: a repo rename leaves the old _work/<name>
+          # behind with a full node_modules (~770 MB). Keep only the current repo's dir
+          # plus the runner-internal dirs (which are cleaned content-wise above).
+          CURRENT_REPO="${GITHUB_REPOSITORY##*/}"
+          for d in "$HOME/actions-runner/_work"/*/; do
+            [ -d "$d" ] || continue
+            base="$(basename "$d")"
+            case "$base" in
+              "$CURRENT_REPO"|_temp|_tool|_actions|_PipelineMapping) ;;
+              *) echo "removing stale workspace: $d"; rm -rf "$d" 2>/dev/null || true ;;
+            esac
+          done
+
           # PM2 logs (the live apps keep running; only the on-disk logs are flushed).
           pm2 flush 2>/dev/null || true
+
+          # Root-owned system hygiene — apt cache and journald live OUTSIDE /home and are
+          # the big consumers the runner account cannot otherwise touch. Only attempted
+          # with passwordless sudo (sudo -n); on a box without it this is a silent no-op.
+          if sudo -n true 2>/dev/null; then
+            echo "----- system sweep (passwordless sudo available) -----"
+            sudo -n journalctl --disk-usage 2>/dev/null || true
+            sudo -n du -sh /var/cache/apt /var/log /var/tmp /var/swap 2>/dev/null || true
+            sudo -n apt-get clean 2>/dev/null || true
+            sudo -n journalctl --vacuum-size=20M 2>/dev/null || true
+            sudo -n find /var/log -type f \( -name '*.gz' -o -name '*.1' -o -name '*.old' \) -delete 2>/dev/null || true
+            sudo -n rm -rf /var/tmp/* 2>/dev/null || true
+          else
+            echo "info: no passwordless sudo — apt/journal sweep skipped (see docs/DEPLOYMENT.md for the manual variant)"
+          fi
 
           echo "----- disk after cleanup -----"; df -h /home || df -h / || true
 

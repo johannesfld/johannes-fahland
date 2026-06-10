@@ -151,8 +151,10 @@ Bundle und verifiziert `webpack-runtime.js` hart vor dem Deploy.
 ## Wartung — SD-Karte freihalten (wichtig!)
 
 Die 6.8-GB-Karte läuft voll, wenn man nichts tut. Die Pipeline räumt bei **jedem** Run automatisch
-runner-eigene Caches auf (pnpm store, npm/node-gyp cache, alte `_work/.next`, PM2-Logs). Was **root**
-braucht, muss **einmalig/gelegentlich manuell** per SSH passieren:
+runner-eigene Caches auf (pnpm store, npm/node-gyp cache, alte `_work/.next`, verwaiste Workspaces,
+PM2-Logs) **und** — sofern passwortloses sudo verfügbar ist (Raspberry-Pi-OS-Default) — auch den
+apt-Cache und das systemd-Journal (`--vacuum-size=20M`). Nur wenn der Run meldet
+`info: no passwordless sudo`, muss der Root-Sweep manuell per SSH passieren:
 
 ```bash
 ssh johannes@pi-server
@@ -165,7 +167,7 @@ du -sh ~/actions-runner/_work/* 2>/dev/null | sort -rh | head   # größte Works
 df -h /                              # Ziel: >= ~1.5 GB frei
 ```
 
-Der Preflight bricht **bewusst** ab, wenn < 900 MB auf `/home` frei sind — das schützt vor einem
+Der Preflight bricht **bewusst** ab, wenn < 550 MB auf `/home` frei sind — das schützt vor einem
 ENOSPC mitten im Build (halb geschriebenes, nicht-bootfähiges Bundle = kaputte Seite).
 
 ## Bekannte Spezialitäten
