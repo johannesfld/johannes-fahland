@@ -55,23 +55,87 @@ fi
 #     webpack-runtime.js, which every page.js requires via ../webpack-runtime.js, crashing
 #     the deployed app with MODULE_NOT_FOUND at first request. Mirror the freshly-built
 #     .next/server (minus the dropped cache) into the standalone so the runtime is ALWAYS
-#     complete, independent of tracer quirks. rsync-like overlay via cp -rn keeps the
-#     tracer's copies and only fills in anything missing.
+#     complete, independent of tracer quirks.
 if [ -d "apps/$APP/.next/server" ]; then
   mkdir -p "$STANDALONE/apps/$APP/.next/server"
   cp -r "apps/$APP/.next/server/." "$STANDALONE/apps/$APP/.next/server/"
+fi
+
+# 3b-2) Self-heal the NATIVE runtime deps. Next's tracer does not reliably follow the pnpm
+#       symlink layout for packages it can't statically analyse: better-sqlite3 (native .node
+#       loaded via a dynamic require) and the Prisma client/adapter were MISSING from the
+#       standalone node_modules entirely. Statically-rendered hub survived (its root never
+#       touches the DB at runtime), but dynamically-rendered turnier crashed with
+#       "Could not locate the bindings file ... better_sqlite3.node" / could not resolve
+#       @prisma/client. Copy the real pnpm package dirs into the standalone and recreate the
+#       top-level node_modules symlinks Node needs to resolve `require('better-sqlite3')` etc.
+SA_NM="$STANDALONE/node_modules"
+mkdir -p "$SA_NM/.pnpm"
+# (a) copy each needed package's .pnpm/<pkg@ver> dir verbatim (carries build/Release/*.node etc.)
+for srcpnpm in \
+  node_modules/.pnpm/better-sqlite3@* \
+  node_modules/.pnpm/bindings@* \
+  node_modules/.pnpm/file-uri-to-path@* \
+  node_modules/.pnpm/@prisma+client@* \
+  node_modules/.pnpm/@prisma+adapter-better-sqlite3@* \
+  node_modules/.pnpm/@prisma+driver-adapter-utils@* \
+  node_modules/.pnpm/@prisma+client-runtime-utils@* \
+  node_modules/.pnpm/@prisma+debug@*; do
+  [ -d "$srcpnpm" ] || continue
+  base="$(basename "$srcpnpm")"
+  [ -d "$SA_NM/.pnpm/$base" ] || cp -r "$srcpnpm" "$SA_NM/.pnpm/$base"
+done
+# (b) recreate the top-level resolution entries Node walks for a bare `require('<pkg>')`.
+#     Copy the real (symlink-resolved) package dir so the bundle is self-contained — no
+#     dangling symlinks after rsync to the Pi.
+link_pkg() {
+  pkg="$1"; real="$2"
+  [ -d "$real" ] || { echo "WARN: native dep source missing: $real"; return 0; }
+  dest="$SA_NM/$pkg"
+  [ -e "$dest" ] && return 0
+  mkdir -p "$(dirname "$dest")"
+  cp -rL "$real" "$dest" 2>/dev/null || cp -r "$real" "$dest"
+}
+link_pkg better-sqlite3 "$(ls -d node_modules/.pnpm/better-sqlite3@*/node_modules/better-sqlite3 2>/dev/null | head -1)"
+link_pkg @prisma/client "$(ls -d node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/client 2>/dev/null | head -1)"
+link_pkg @prisma/adapter-better-sqlite3 "$(ls -d node_modules/.pnpm/@prisma+adapter-better-sqlite3@*/node_modules/@prisma/adapter-better-sqlite3 2>/dev/null | head -1)"
+# .prisma/client (generated client) lives at node_modules/.prisma — copy if present.
+if [ -d node_modules/.prisma ]; then
+  [ -e "$SA_NM/.prisma" ] || cp -rL node_modules/.prisma "$SA_NM/.prisma" 2>/dev/null || cp -r node_modules/.prisma "$SA_NM/.prisma"
+fi
+
+# 3b-3) Place the native binary where `bindings` ACTUALLY looks. Webpack bundles
+#       better-sqlite3's `bindings('better_sqlite3.node')` call into the server chunk, and
+#       `bindings` resolves relative to the CALLING module's dir — i.e. the bundle's
+#       apps/<app>/.next, NOT node_modules. So at runtime it searches
+#       apps/<app>/.next/build/Release/better_sqlite3.node (and ../build/, etc.) and a copy
+#       sitting only under node_modules is never found -> "Could not locate the bindings
+#       file" -> 500 on every DB-backed (dynamically rendered) route. Drop the arm64 .node
+#       into the exact build/Release path the search list checks first.
+BS3_SRC="$(find node_modules/.pnpm -name 'better_sqlite3.node' -path '*build/Release*' 2>/dev/null | head -1)"
+if [ -n "$BS3_SRC" ]; then
+  mkdir -p "$STANDALONE/apps/$APP/.next/build/Release"
+  cp "$BS3_SRC" "$STANDALONE/apps/$APP/.next/build/Release/better_sqlite3.node"
 fi
 
 mkdir -p "$STANDALONE/packages/db/prisma" "$STANDALONE/packages/db/scripts"
 cp -r "packages/db/prisma/." "$STANDALONE/packages/db/prisma/"
 cp "packages/db/scripts/migrate.mjs" "$STANDALONE/packages/db/scripts/migrate.mjs"
 
-# 3c) Hard verification BEFORE deploy: the entrypoint and the webpack runtime that every
-#     route requires must be present, or the app would boot and then crash on first hit.
-#     Fail here (build tree still intact, active-site untouched) instead of in the smoke test.
+# 3c) Hard verification BEFORE deploy: the entrypoint, the webpack runtime that every route
+#     requires, AND the native better-sqlite3 binary must be present, or the app would boot
+#     and then crash on first request. Fail here (build tree intact, active-site untouched)
+#     instead of in the smoke test after PM2 already reloaded.
 [ -f "$STANDALONE/apps/$APP/server.js" ] || { echo "FATAL: $STANDALONE/apps/$APP/server.js missing after assemble"; exit 1; }
 [ -f "$STANDALONE/apps/$APP/.next/server/webpack-runtime.js" ] \
-  || { echo "FATAL: webpack-runtime.js missing from standalone server runtime — deployed app would crash with MODULE_NOT_FOUND"; exit 1; }
+  || { echo "FATAL: webpack-runtime.js missing from standalone — app would crash with MODULE_NOT_FOUND"; exit 1; }
+# The binary MUST exist at the path `bindings` searches (.next/build/Release), not just
+# somewhere under node_modules — that is the whole point of step 3b-3.
+BS3_NODE="$STANDALONE/apps/$APP/.next/build/Release/better_sqlite3.node"
+[ -f "$BS3_NODE" ] || { echo "FATAL: better_sqlite3.node missing at $BS3_NODE — DB-backed routes would 500 ('Could not locate the bindings file')"; exit 1; }
+file "$BS3_NODE" | grep -qE 'aarch64|ARM aarch64' \
+  || { echo "FATAL: bundled better_sqlite3.node is not arm64: $(file "$BS3_NODE")"; exit 1; }
+echo "[$APP] native runtime OK: $BS3_NODE"
 
 du -sh "$STANDALONE" 2>/dev/null || true
 
