@@ -129,6 +129,45 @@ pnpm db:studio
 Pro App gibt es eine `.env` mit `DATABASE_URL`. Lokal teilen sich Hub und Turnier
 die `packages/db/dev.db` (WAL-Mode erlaubt N Reader + 1 Writer).
 
+## Native Build am Pi — Architektur (seit 2026-06)
+
+Der Deploy baut **nativ auf dem Pi** (kein Cross-Arch-Artefakt-Download mehr — der 288-MB-Download
+über die Heimleitung war die Ursache aller Fehlschläge nach dem Rebrand). Ein einziger
+self-hosted Job: `pnpm install` (kompiliert better-sqlite3 nativ für arm64) → pro App seriell
+`build-deploy-app.sh` (webpack-Build → `.next/cache` löschen → assemble → rsync ~60 MB Standalone
+nach `active-site` → `.next` löschen, damit nie zwei Build-Bäume gleichzeitig auf der Karte liegen)
+→ Migration → PM2-Reload → Smoke-Test.
+
+**Pi-Eckdaten (real, Stand 2026-06):** Raspberry Pi, aarch64, 4 Cores, **905 MB RAM + ~2–4 GB Swap**,
+**6.8-GB-SD-Karte** (eng!). Deshalb: `next build --webpack` (nicht der Next-16-Turbopack-Default —
+Turbopacks nativer Rust-Heap würde auf 905 MB thrashen), Heap-Cap 1536, serielles build+deploy.
+
+**Webpack-Standalone-Falle:** `outputFileTracingExcludes` darf **niemals** `apps/<app>/.next/**`
+enthalten — dieser Glob schließt unter Linux die eigene Server-Runtime (`.next/server/webpack-runtime.js`,
+von jedem `page.js` via `require("../webpack-runtime.js")` geladen) mit aus → Laufzeit-Crash
+`MODULE_NOT_FOUND`. `build-deploy-app.sh` spiegelt `.next/server` zusätzlich selbstheilend ins
+Bundle und verifiziert `webpack-runtime.js` hart vor dem Deploy.
+
+## Wartung — SD-Karte freihalten (wichtig!)
+
+Die 6.8-GB-Karte läuft voll, wenn man nichts tut. Die Pipeline räumt bei **jedem** Run automatisch
+runner-eigene Caches auf (pnpm store, npm/node-gyp cache, alte `_work/.next`, PM2-Logs). Was **root**
+braucht, muss **einmalig/gelegentlich manuell** per SSH passieren:
+
+```bash
+ssh johannes@pi-server
+df -h /                              # Kontrolle: wie voll?
+sudo apt-get clean                   # apt-Paket-Cache (oft mehrere 100 MB)
+sudo journalctl --vacuum-time=3d     # systemd-Journal auf 3 Tage kürzen
+du -sh ~/actions-runner/_work/* 2>/dev/null | sort -rh | head   # größte Workspaces finden
+# ggf. ältesten Runner-Workspace komplett löschen (wird beim nächsten Run neu geklont):
+# rm -rf ~/actions-runner/_work/johannes-fahland/johannes-fahland   # NUR wenn nötig
+df -h /                              # Ziel: >= ~1.5 GB frei
+```
+
+Der Preflight bricht **bewusst** ab, wenn < 900 MB auf `/home` frei sind — das schützt vor einem
+ENOSPC mitten im Build (halb geschriebenes, nicht-bootfähiges Bundle = kaputte Seite).
+
 ## Bekannte Spezialitäten
 
 - **Node 24 + Corp-Proxy lokal:** `prebuild-install` und `prisma generate` brauchen

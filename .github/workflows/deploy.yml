@@ -37,6 +37,29 @@ jobs:
       MIN_FREE_HOME_KB: "900000"
       MIN_FREE_TMP_KB: "150000"
     steps:
+      # Reclaim disk FIRST, before the preflight floor check. On a 6.8 GB SD card a single
+      # native build (node_modules compile + webpack cache) eats ~1 GB, so without ongoing
+      # hygiene the card creeps toward full and the preflight (correctly) refuses to build.
+      # This runs with the runner's own rights only (no sudo); the apt/journal sweep that
+      # needs root is a one-time manual step documented in docs/DEPLOYMENT.md.
+      - name: Reclaim disk (runner-owned caches & stale work dirs)
+        run: |
+          set -u
+          echo "----- disk before cleanup -----"; df -h /home || df -h / || true
+          # pnpm content-addressed store: prune unreferenced packages (safe; refetched on demand).
+          pnpm store prune 2>/dev/null || corepack pnpm store prune 2>/dev/null || true
+          # npm + node-gyp caches (build leftovers, never needed at runtime).
+          rm -rf "$HOME/.npm/_cacache" "$HOME/.cache/node-gyp" 2>/dev/null || true
+          # Actions runner temp + diagnostics from past runs.
+          rm -rf "${RUNNER_TEMP:-/nonexistent}"/* 2>/dev/null || true
+          find "$HOME/actions-runner/_diag" -type f -name '*.log' -mtime +2 -delete 2>/dev/null || true
+          # Stale .next build trees left in ANY past runner workspace (not the current one,
+          # which the determinism step handles). These are the biggest recurring hog.
+          find "$HOME/actions-runner/_work" -type d -name '.next' -prune -exec rm -rf {} + 2>/dev/null || true
+          # PM2 logs (the live apps keep running; only the on-disk logs are flushed).
+          pm2 flush 2>/dev/null || true
+          echo "----- disk after cleanup -----"; df -h /home || df -h / || true
+
       - name: Diagnostics + preflight (fail fast, loud, actionable)
         run: |
           set -u
