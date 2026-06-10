@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { fraunces, inter, jetbrainsMono } from "./fonts";
+import { inter, jetbrainsMono } from "./fonts";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -54,7 +54,7 @@ export default function RootLayout({
       lang="de"
       suppressHydrationWarning
       data-tool="turnier"
-      className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />

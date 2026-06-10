@@ -1,7 +1,7 @@
 import { cn } from "./styles";
 
 type HeadingVariant = "display" | "h1" | "h2" | "h3";
-type HeadingFont = "sans" | "mono" | "display" | "hand";
+type HeadingFont = "sans" | "mono" | "display";
 
 const variantClasses: Record<HeadingVariant, string> = {
   display: "text-[2rem] leading-tight font-bold tracking-[-0.02em]",
@@ -14,7 +14,6 @@ const fontClasses: Record<HeadingFont, string> = {
   sans:    "font-sans",
   mono:    "font-mono",
   display: "font-display",
-  hand:    "font-hand",
 };
 
 type HeadingProps = {

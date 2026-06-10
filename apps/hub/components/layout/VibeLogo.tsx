@@ -61,9 +61,8 @@ type SpielbrettWordmarkProps = {
 export function VibeWordmark({ className }: SpielbrettWordmarkProps) {
   return (
     <span
-      style={{ fontFamily: "var(--font-fraunces), serif" }}
       className={cn(
-        "text-base font-semibold tracking-[-0.01em] text-[var(--vibe-fg-base)]",
+        "font-display text-base font-semibold tracking-[-0.01em] text-[var(--vibe-fg-base)]",
         className,
       )}
     >

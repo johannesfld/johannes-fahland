@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { fraunces, inter, jetbrainsMono } from "./fonts";
+import { inter, jetbrainsMono } from "./fonts";
 import "./globals.css";
 import { AppShell } from "@/components/layout/AppShell";
 import { FullscreenProvider } from "@/components/FullscreenContext";
@@ -66,7 +66,7 @@ export default function RootLayout({
     <html
       lang="de"
       suppressHydrationWarning
-      className={`${inter.variable} ${jetbrainsMono.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />

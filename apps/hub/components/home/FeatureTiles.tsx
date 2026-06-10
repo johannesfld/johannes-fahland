@@ -1,15 +1,16 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Sparkles, Dices, Ship, SquareStack, Trophy, Grid3x3, Zap, Brain, Type } from "lucide-react";
+import { Sparkles, Dices, Ship, SquareStack, Grid3x3, Zap, Brain, Type } from "lucide-react";
 import { FeatureTile } from "./FeatureTile";
-
-const ease = [0.22, 1, 0.36, 1] as const;
 
 const containerVariants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.06 } },
 };
+
+/** Einheitlicher Wordmark-Stil für alle Tiles: gleiche Schriftgröße, -gewicht und -form. */
+const WORDMARK_CLASS = "font-display text-4xl font-black uppercase tracking-tight leading-none";
 
 export function FeatureTiles() {
   const reduced = useReducedMotion();
@@ -21,120 +22,7 @@ export function FeatureTiles() {
       initial="hidden"
       animate="show"
     >
-      {/* Wizard — groß, nimmt 2 Spalten auf lg */}
-      <FeatureTile
-        href="/wizzard-punkterechner"
-        tool="wizard"
-        icon={Sparkles}
-        meta="Kartenspiel · bis 6 Spieler"
-        reduced={reduced}
-        index={0}
-        className="lg:col-span-2 lg:row-span-1"
-        wordmark={
-          <span className="font-display text-5xl font-black italic tracking-tight leading-none">
-            WIZARD
-          </span>
-        }
-        pattern={
-          <svg className="absolute inset-0 h-full w-full" aria-hidden>
-            {[...Array(4)].map((_, i) => (
-              <circle
-                key={i}
-                cx={`${[15, 85, 20, 80][i]}%`}
-                cy={`${[15, 20, 80, 75][i]}%`}
-                r="2.5"
-                fill="var(--accent)"
-                opacity="0.08"
-              />
-            ))}
-          </svg>
-        }
-      />
-
-      {/* Kniffel */}
-      <FeatureTile
-        href="/kniffel-rechner"
-        tool="kniffel"
-        icon={Dices}
-        meta="Würfelspiel · Tabelle"
-        reduced={reduced}
-        index={1}
-        wordmark={
-          <span className="font-sans text-4xl font-black italic tracking-tight leading-none">
-            KNIFFEL
-          </span>
-        }
-        pattern={
-          <svg className="absolute inset-0 h-full w-full" aria-hidden>
-            {[[20,20],[80,20],[20,80],[80,80],[50,50]].map(([cx, cy], i) => (
-              <circle key={i} cx={`${cx}%`} cy={`${cy}%`} r="1.8" fill="var(--accent)" opacity="0.10" />
-            ))}
-          </svg>
-        }
-      />
-
-      {/* Schiffe */}
-      <FeatureTile
-        href="/schiffe-versenken"
-        tool="schiffe"
-        icon={Ship}
-        meta="1 – 2 Spieler"
-        reduced={reduced}
-        index={2}
-        wordmark={
-          <div className="flex flex-col leading-none">
-            <span className="font-sans text-3xl font-black uppercase tracking-widest leading-tight">SCHIFFE</span>
-            <span className="font-sans text-3xl font-black uppercase tracking-widest leading-tight">VERSENKEN</span>
-          </div>
-        }
-        pattern={
-          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
-            <path d="M 0 60 Q 25 55, 50 62 T 100 58" stroke="var(--accent)" strokeWidth="0.4" fill="none" opacity="0.08" vectorEffect="non-scaling-stroke" />
-            <path d="M 0 70 Q 25 65, 50 72 T 100 68" stroke="var(--accent)" strokeWidth="0.3" fill="none" opacity="0.06" vectorEffect="non-scaling-stroke" />
-          </svg>
-        }
-      />
-
-      {/* Rommé */}
-      <FeatureTile
-        href="/romme"
-        tool="romme"
-        icon={SquareStack}
-        meta="Kartenspiel · Tabelle"
-        reduced={reduced}
-        index={3}
-        wordmark={
-          <span className="font-sans text-4xl font-bold uppercase tracking-tight leading-none">
-            ROMMÉ
-          </span>
-        }
-        pattern={
-          <svg className="absolute inset-0 h-full w-full" aria-hidden>
-            <rect x="75%" y="15%" width="14%" height="20%" rx="3" stroke="var(--accent)" strokeWidth="1.2" fill="none" opacity="0.10" />
-            <rect x="78%" y="18%" width="14%" height="20%" rx="3" stroke="var(--accent)" strokeWidth="1.2" fill="none" opacity="0.07" />
-          </svg>
-        }
-      />
-
-      {/* Turnier — eigene App auf Subdomain */}
-      <FeatureTile
-        href={process.env.NEXT_PUBLIC_TURNIER_URL ?? "https://turnier.johannes-fahland.com"}
-        tool="turnier"
-        icon={Trophy}
-        meta="Einzel & Doppel"
-        reduced={reduced}
-        index={4}
-        wordmark={
-          <span className="font-mono text-[1.65rem] font-black uppercase tracking-[0.1em] leading-none">
-            TURNIER
-          </span>
-        }
-        pattern={
-          <svg className="absolute inset-0 h-full w-full" aria-hidden>
-            <line x1="50%" y1="0" x2="50%" y2="100%" stroke="var(--accent)" strokeWidth="1.2" opacity="0.06" />
-          </svg>
-        }
-      />
+      {/* --- Solo Games --- */}
 
       {/* 2048 */}
       <FeatureTile
@@ -143,11 +31,9 @@ export function FeatureTiles() {
         icon={Grid3x3}
         meta="Solo · Highscore"
         reduced={reduced}
-        index={5}
+        index={0}
         wordmark={
-          <span className="font-sans text-5xl font-black tabular-nums tracking-tight leading-none">
-            2048
-          </span>
+          <span className={`${WORDMARK_CLASS} tabular-nums`}>2048</span>
         }
         pattern={
           <svg className="absolute inset-0 h-full w-full" aria-hidden>
@@ -174,12 +60,8 @@ export function FeatureTiles() {
         icon={Zap}
         meta="Solo · Highscore"
         reduced={reduced}
-        index={6}
-        wordmark={
-          <span className="font-sans text-5xl font-black uppercase tracking-tight leading-none">
-            SNAKE
-          </span>
-        }
+        index={1}
+        wordmark={<span className={WORDMARK_CLASS}>SNAKE</span>}
         pattern={
           <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
             <polyline
@@ -196,6 +78,35 @@ export function FeatureTiles() {
         }
       />
 
+      {/* Wordle */}
+      <FeatureTile
+        href="/wordle"
+        tool="wordle"
+        icon={Type}
+        meta="Solo · Tageswort"
+        reduced={reduced}
+        index={2}
+        wordmark={<span className={WORDMARK_CLASS}>WORDLE</span>}
+        pattern={
+          <svg className="absolute inset-0 h-full w-full" aria-hidden>
+            {["W","O","R","T"].map((letter, i) => (
+              <text
+                key={i}
+                x={`${12 + i * 24}%`}
+                y="65%"
+                fontSize="28"
+                fontWeight="900"
+                fill="var(--accent)"
+                opacity={0.06 + i * 0.025}
+                fontFamily="sans-serif"
+              >
+                {letter}
+              </text>
+            ))}
+          </svg>
+        }
+      />
+
       {/* Memory */}
       <FeatureTile
         href="/memory"
@@ -203,12 +114,8 @@ export function FeatureTiles() {
         icon={Brain}
         meta="Solo · 2 Spieler"
         reduced={reduced}
-        index={7}
-        wordmark={
-          <span className="font-sans text-4xl font-black uppercase tracking-tight leading-none">
-            MEMORY
-          </span>
-        }
+        index={3}
+        wordmark={<span className={WORDMARK_CLASS}>MEMORY</span>}
         pattern={
           <svg className="absolute inset-0 h-full w-full" aria-hidden>
             {[[15,20],[38,20],[62,20],[85,20],[15,55],[38,55],[62,55],[85,55]].map(([cx, cy], i) => (
@@ -227,35 +134,86 @@ export function FeatureTiles() {
         }
       />
 
-      {/* Wordle */}
+      {/* --- Multiplayer Games --- */}
+
+      {/* Wizard — groß, nimmt 2 Spalten auf lg */}
       <FeatureTile
-        href="/wordle"
-        tool="wordle"
-        icon={Type}
-        meta="Tageswort · 6 Versuche"
+        href="/wizzard-punkterechner"
+        tool="wizard"
+        icon={Sparkles}
+        meta="Multiplayer · bis 6 Spieler"
         reduced={reduced}
-        index={8}
-        wordmark={
-          <span className="font-sans text-4xl font-black uppercase tracking-tight leading-none">
-            WORDLE
-          </span>
-        }
+        index={4}
+        wordmark={<span className={WORDMARK_CLASS}>WIZARD</span>}
         pattern={
           <svg className="absolute inset-0 h-full w-full" aria-hidden>
-            {["W","O","R","T"].map((letter, i) => (
-              <text
+            {[...Array(4)].map((_, i) => (
+              <circle
                 key={i}
-                x={`${12 + i * 24}%`}
-                y="65%"
-                fontSize="28"
-                fontWeight="900"
+                cx={`${[15, 85, 20, 80][i]}%`}
+                cy={`${[15, 20, 80, 75][i]}%`}
+                r="2.5"
                 fill="var(--accent)"
-                opacity={0.06 + i * 0.025}
-                fontFamily="sans-serif"
-              >
-                {letter}
-              </text>
+                opacity="0.08"
+              />
             ))}
+          </svg>
+        }
+      />
+
+      {/* Kniffel */}
+      <FeatureTile
+        href="/kniffel-rechner"
+        tool="kniffel"
+        icon={Dices}
+        meta="Multiplayer · Würfelspiel"
+        reduced={reduced}
+        index={5}
+        wordmark={<span className={WORDMARK_CLASS}>KNIFFEL</span>}
+        pattern={
+          <svg className="absolute inset-0 h-full w-full" aria-hidden>
+            {[[20,20],[80,20],[20,80],[80,80],[50,50]].map(([cx, cy], i) => (
+              <circle key={i} cx={`${cx}%`} cy={`${cy}%`} r="1.8" fill="var(--accent)" opacity="0.10" />
+            ))}
+          </svg>
+        }
+      />
+
+      {/* Schiffe */}
+      <FeatureTile
+        href="/schiffe-versenken"
+        tool="schiffe"
+        icon={Ship}
+        meta="Multiplayer · 1 – 2 Spieler"
+        reduced={reduced}
+        index={6}
+        wordmark={
+          <div className="flex flex-col leading-none gap-1">
+            <span className={WORDMARK_CLASS}>SCHIFFE</span>
+            <span className={WORDMARK_CLASS}>VERSENKEN</span>
+          </div>
+        }
+        pattern={
+          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
+            <path d="M 0 60 Q 25 55, 50 62 T 100 58" stroke="var(--accent)" strokeWidth="0.4" fill="none" opacity="0.08" vectorEffect="non-scaling-stroke" />
+            <path d="M 0 70 Q 25 65, 50 72 T 100 68" stroke="var(--accent)" strokeWidth="0.3" fill="none" opacity="0.06" vectorEffect="non-scaling-stroke" />
+          </svg>
+        }
+      />
+
+      {/* Rommé */}
+      <FeatureTile
+        href="/romme"
+        tool="romme"
+        icon={SquareStack}
+        meta="Multiplayer · Kartenspiel"
+        reduced={reduced}
+        index={7}
+        wordmark={<span className={WORDMARK_CLASS}>ROMMÉ</span>}
+        pattern={
+          <svg className="absolute inset-0 h-full w-full" aria-hidden>
+            <rect x="75%" y="15%" width="14%" height="20%" rx="3" stroke="var(--accent)" strokeWidth="1.2" fill="none" opacity="0.10" />
+            <rect x="78%" y="18%" width="14%" height="20%" rx="3" stroke="var(--accent)" strokeWidth="1.2" fill="none" opacity="0.07" />
           </svg>
         }
       />

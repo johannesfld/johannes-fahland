@@ -89,7 +89,7 @@
   /* Brand-Alias als Default-Akzent (Hub-Home, Footer, Impressum) */
   --accent:       var(--brand-500);
   --accent-soft:  var(--brand-100);
-  --accent-ink:   #FFFFFF;
+  --accent-ink:   var(--brand-700);
   --accent-line:  rgba(194, 65, 12, 0.20);
   --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(194, 65, 12, 0.18) 0%, transparent 70%);
   --tool-surface: var(--brand-50);
@@ -100,7 +100,7 @@
   /* Pflaume — magisch, kartenspielig */
   --accent:       #6B3D7A;
   --accent-soft:  #E4D5EB;
-  --accent-ink:   #FFFFFF;
+  --accent-ink:   #3D2246;
   --accent-line:  rgba(107, 61, 122, 0.20);
   --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(107, 61, 122, 0.18) 0%, transparent 70%);
   --tool-surface: #EFE6F2;
@@ -118,7 +118,7 @@
   /* Lapis — Millimeterpapier, Meer */
   --accent:       #1E5F8B;
   --accent-soft:  #C5DDEB;
-  --accent-ink:   #FFFFFF;
+  --accent-ink:   #133E5B;
   --accent-line:  rgba(30, 95, 139, 0.22);
   --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(30, 95, 139, 0.18) 0%, transparent 70%);
   --tool-surface: #DCEAF2;
@@ -127,7 +127,7 @@
   /* Zinnober — Filz, Kartenfläche */
   --accent:       #B23A2C;
   --accent-soft:  #ECC5BE;
-  --accent-ink:   #FFFFFF;
+  --accent-ink:   #6E2018;
   --accent-line:  rgba(178, 58, 44, 0.20);
   --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(178, 58, 44, 0.18) 0%, transparent 70%);
   --tool-surface: #F2DAD5;
@@ -136,7 +136,7 @@
   /* Salbei — Sportplatz, Trophäe gedämpft */
   --accent:       #4A7C59;
   --accent-soft:  #C7DCC9;
-  --accent-ink:   #FFFFFF;
+  --accent-ink:   #2C4A35;
   --accent-line:  rgba(74, 124, 89, 0.22);
   --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(74, 124, 89, 0.18) 0%, transparent 70%);
   --tool-surface: #E1ECDF;
@@ -145,7 +145,7 @@
   /* Rost — Plättchen geprägt */
   --accent:       #B85C16;
   --accent-soft:  #F2D5B7;
-  --accent-ink:   #FFFFFF;
+  --accent-ink:   #6E370D;
   --accent-line:  rgba(184, 92, 22, 0.22);
   --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(184, 92, 22, 0.18) 0%, transparent 70%);
   --tool-surface: #F8E7D3;
@@ -154,7 +154,7 @@
   /* Olive — Spielwiese */
   --accent:       #687B2E;
   --accent-soft:  #D3DBA5;
-  --accent-ink:   #FFFFFF;
+  --accent-ink:   #3D481B;
   --accent-line:  rgba(104, 123, 46, 0.22);
   --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(104, 123, 46, 0.18) 0%, transparent 70%);
   --tool-surface: #E5EAC8;
@@ -163,7 +163,7 @@
   /* Kupfer — Kartendeck patiniert */
   --accent:       #A1542C;
   --accent-soft:  #E8C8B0;
-  --accent-ink:   #FFFFFF;
+  --accent-ink:   #5F2F19;
   --accent-line:  rgba(161, 84, 44, 0.20);
   --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(161, 84, 44, 0.18) 0%, transparent 70%);
   --tool-surface: #F2DDC9;
@@ -172,7 +172,7 @@
   /* Anthrazit — Schreibmaschine, klar */
   --accent:       #3A3A40;
   --accent-soft:  #C8C8CE;
-  --accent-ink:   #FFFFFF;
+  --accent-ink:   #1F1F24;
   --accent-line:  rgba(58, 58, 64, 0.20);
   --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(58, 58, 64, 0.16) 0%, transparent 70%);
   --tool-surface: #DEDEE3;
@@ -240,7 +240,7 @@
 .dark [data-tool="kniffel"] {
   --accent:       #E5B947;
   --accent-soft:  #5A3D08;
-  --accent-ink:   #1A1305;
+  --accent-ink:   #E5B947;
   --accent-line:  rgba(229, 185, 71, 0.22);
   --tool-surface: #3A2A0D;
 }
@@ -275,7 +275,7 @@
 .dark [data-tool="snake"] {
   --accent:       #B5C46E;
   --accent-soft:  #2F3D14;
-  --accent-ink:   #1A1F08;
+  --accent-ink:   #B5C46E;
   --accent-line:  rgba(181, 196, 110, 0.22);
   --tool-surface: #1F2A10;
 }
@@ -289,7 +289,7 @@
 .dark [data-tool="wordle"] {
   --accent:       #C8C8CE;
   --accent-soft:  #2A2A2F;
-  --accent-ink:   #1A1A1F;
+  --accent-ink:   #C8C8CE;
   --accent-line:  rgba(200, 200, 206, 0.22);
   --tool-surface: #1F1F22;
 }

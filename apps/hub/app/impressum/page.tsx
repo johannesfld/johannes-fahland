@@ -12,10 +12,7 @@ export default function ImpressumPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--vibe-fg-faint)]">
           Anbieterkennzeichnung
         </p>
-        <h1
-          style={{ fontFamily: "var(--font-fraunces), serif" }}
-          className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl"
-        >
+        <h1 className="font-display mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
           Impressum
         </h1>
       </header>
@@ -60,9 +57,7 @@ export default function ImpressumPage() {
         <p>
           Spielbrett ist ein privates Hobbyprojekt. Inhalte und Tools werden mit Sorgfalt
           erstellt, eine Gewährleistung für Vollständigkeit, Aktualität oder Eignung für
-          einen bestimmten Zweck wird jedoch nicht übernommen. Für externe Links
-          (z.&nbsp;B. zur Subdomain <em>turnier.johannes-fahland.com</em>) gilt: zum
-          Zeitpunkt der Verlinkung waren keine rechtswidrigen Inhalte erkennbar.
+          einen bestimmten Zweck wird jedoch nicht übernommen.
         </p>
       </section>
 
