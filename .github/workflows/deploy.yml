@@ -46,18 +46,32 @@ jobs:
         run: |
           set -u
           echo "----- disk before cleanup -----"; df -h /home || df -h / || true
+          echo "----- top dirs in \$HOME before -----"; du -h --max-depth=1 "$HOME" 2>/dev/null | sort -rh | head -12 || true
+
+          # BIGGEST WIN (measured 2026-06: 769 MB): the pnpm/action-setup@v4 download dir.
+          # The action re-creates it on demand, and we prefer corepack anyway, so this is
+          # pure accumulated cache. Safe to delete wholesale.
+          rm -rf "$HOME/setup-pnpm" 2>/dev/null || true
+
           # pnpm content-addressed store: prune unreferenced packages (safe; refetched on demand).
           pnpm store prune 2>/dev/null || corepack pnpm store prune 2>/dev/null || true
-          # npm + node-gyp caches (build leftovers, never needed at runtime).
-          rm -rf "$HOME/.npm/_cacache" "$HOME/.cache/node-gyp" 2>/dev/null || true
-          # Actions runner temp + diagnostics from past runs.
+
+          # npm + node-gyp + generic user caches (build leftovers, never needed at runtime).
+          rm -rf "$HOME/.npm/_cacache" "$HOME/.cache/node-gyp" "$HOME/.cache"/* 2>/dev/null || true
+
+          # Actions runner temp, tool-cache and diagnostics from past runs (NOT the runner itself,
+          # NOT _work/<repo> which the determinism step manages, NOT ~/apps which holds the live site+DB).
           rm -rf "${RUNNER_TEMP:-/nonexistent}"/* 2>/dev/null || true
+          rm -rf "$HOME/actions-runner/_work/_temp"/* "$HOME/actions-runner/_work/_tool"/* 2>/dev/null || true
           find "$HOME/actions-runner/_diag" -type f -name '*.log' -mtime +2 -delete 2>/dev/null || true
-          # Stale .next build trees left in ANY past runner workspace (not the current one,
-          # which the determinism step handles). These are the biggest recurring hog.
+
+          # Stale .next build trees left in ANY past runner workspace (the current one is handled
+          # by the determinism step). These are the biggest recurring hog after setup-pnpm.
           find "$HOME/actions-runner/_work" -type d -name '.next' -prune -exec rm -rf {} + 2>/dev/null || true
+
           # PM2 logs (the live apps keep running; only the on-disk logs are flushed).
           pm2 flush 2>/dev/null || true
+
           echo "----- disk after cleanup -----"; df -h /home || df -h / || true
 
       - name: Diagnostics + preflight (fail fast, loud, actionable)
