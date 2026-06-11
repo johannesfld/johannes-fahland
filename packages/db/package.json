@@ -9,6 +9,7 @@
     "./auth": "./src/auth.ts"
   },
   "scripts": {
+    "build": "prisma generate",
     "generate": "prisma generate",
     "migrate": "prisma migrate deploy",
     "studio": "prisma studio"
