@@ -97,6 +97,13 @@ link_pkg() {
   cp -rL "$real" "$dest" 2>/dev/null || cp -r "$real" "$dest"
 }
 link_pkg better-sqlite3 "$(ls -d node_modules/.pnpm/better-sqlite3@*/node_modules/better-sqlite3 2>/dev/null | head -1)"
+# bindings (+ its dep file-uri-to-path) MUST also exist top-level: the REAL better-sqlite3
+# package (used unbundled by migrate.mjs) does require('bindings') at runtime, and the
+# top-level copy above is a real dir, so Node resolves from THIS node_modules upward.
+# Until 2026-06-11 this resolved by accident via the legacy root active-site/node_modules,
+# which the deploy cleanup now removes.
+link_pkg bindings "$(ls -d node_modules/.pnpm/bindings@*/node_modules/bindings 2>/dev/null | head -1)"
+link_pkg file-uri-to-path "$(ls -d node_modules/.pnpm/file-uri-to-path@*/node_modules/file-uri-to-path 2>/dev/null | head -1)"
 link_pkg @prisma/client "$(ls -d node_modules/.pnpm/@prisma+client@*/node_modules/@prisma/client 2>/dev/null | head -1)"
 link_pkg @prisma/adapter-better-sqlite3 "$(ls -d node_modules/.pnpm/@prisma+adapter-better-sqlite3@*/node_modules/@prisma/adapter-better-sqlite3 2>/dev/null | head -1)"
 # .prisma/client (generated client) lives at node_modules/.prisma — copy if present.
