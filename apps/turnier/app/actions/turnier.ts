@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getCurrentUser, prisma } from "@spielbrett/db";
+import { getCurrentUser, prisma, Prisma } from "@spielbrett/db";
 import { isCoverageCompletePrisma } from "@/lib/turnier/coverage";
 import { createRandomDoublesDraw, createRandomSinglesDraw } from "@/lib/turnier/draw";
 import { buildStandings } from "@/lib/turnier/standings";
@@ -67,30 +67,34 @@ async function assertTournamentWritable(tournamentId: string) {
   }
 }
 
-async function getTournamentRaw(tournamentId: string) {
-  return prisma.tournament.findUnique({
-    where: { id: tournamentId },
+const tournamentRawInclude = {
+  players: { orderBy: { createdAt: "asc" } },
+  rounds: {
+    orderBy: { roundNumber: "asc" },
     include: {
-      players: { orderBy: { createdAt: "asc" } },
-      rounds: {
-        orderBy: { roundNumber: "asc" },
+      matches: {
+        orderBy: { matchNumber: "asc" },
         include: {
-          matches: {
-            orderBy: { matchNumber: "asc" },
-            include: {
-              players: {
-                include: { player: true },
-              },
-              sets: { orderBy: { setNumber: "asc" } },
-            },
+          players: {
+            include: { player: true },
           },
+          sets: { orderBy: { setNumber: "asc" } },
         },
       },
     },
+  },
+} satisfies Prisma.TournamentInclude;
+
+type TournamentRaw = Prisma.TournamentGetPayload<{ include: typeof tournamentRawInclude }>;
+
+async function getTournamentRaw(tournamentId: string) {
+  return prisma.tournament.findUnique({
+    where: { id: tournamentId },
+    include: tournamentRawInclude,
   });
 }
 
-function mapTournamentDetail(raw: NonNullable<Awaited<ReturnType<typeof getTournamentRaw>>>): TournamentDetail {
+function mapTournamentDetail(raw: TournamentRaw): TournamentDetail {
   const rounds: RoundEntry[] = raw.rounds.map((round) => {
     const matches: MatchEntry[] = round.matches.map((match) => ({
       id: match.id,
