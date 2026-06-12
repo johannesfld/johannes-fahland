@@ -1,7 +1,7 @@
 import MemoryGame from "@/components/memory/MemoryGame";
 
 export const metadata = {
-  title: "Memory · vibecode",
+  title: "Memory · Pasch",
   description: "Finde alle Paare. Solo oder zu zweit.",
 };
 

@@ -138,7 +138,7 @@ export function FeatureTiles() {
 
       {/* Wizard — groß, nimmt 2 Spalten auf lg */}
       <FeatureTile
-        href="/wizzard-punkterechner"
+        href="/wizard"
         tool="wizard"
         icon={Sparkles}
         meta="Multiplayer · bis 6 Spieler"

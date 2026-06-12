@@ -25,7 +25,7 @@ export type NavItem = {
   group?: "main" | "solo" | "multiplayer";
 };
 
-export const WIZARD_HREF = "/wizzard-punkterechner";
+export const WIZARD_HREF = "/wizard";
 export const SCHIFFE_HREF = "/schiffe-versenken";
 export const ROMME_HREF = "/romme";
 export const G2048_HREF = "/2048";

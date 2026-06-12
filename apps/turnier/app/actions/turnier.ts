@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getCurrentUser, prisma, Prisma } from "@spielbrett/db";
+import { getCurrentUser, prisma, Prisma } from "@pasch/db";
 import { isCoverageCompletePrisma } from "@/lib/turnier/coverage";
 import { createRandomDoublesDraw, createRandomSinglesDraw } from "@/lib/turnier/draw";
 import { buildStandings } from "@/lib/turnier/standings";

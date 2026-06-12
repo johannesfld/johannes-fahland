@@ -1,7 +1,11 @@
+import { migrateKey } from "@/lib/migrate-storage";
 import type { GameState } from "./types";
 
-const STATE_KEY = "vibecode-2048-state-v1";
-const BEST_KEY = "vibecode-2048-best-v1";
+const STATE_KEY = "pasch-2048-state-v1";
+const BEST_KEY = "pasch-2048-best-v1";
+
+migrateKey("vibecode-2048-state-v1", STATE_KEY);
+migrateKey("vibecode-2048-best-v1", BEST_KEY);
 
 export function loadBest(): number {
   if (typeof window === "undefined") return 0;

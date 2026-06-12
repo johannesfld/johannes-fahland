@@ -1,15 +1,15 @@
 {
-  "name": "Spielbrett",
-  "short_name": "Spielbrett",
-  "description": "Spielbrett — digitales Familien-Spielbrett: Wizard, Kniffel, Schiffe, Rommé, Memory, Wordle und mehr.",
+  "name": "Pasch",
+  "short_name": "Pasch",
+  "description": "Pasch — der digitale Spieleabend: Wizard, Kniffel, Schiffe, Rommé, Memory, Wordle und mehr.",
   "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "standalone", "browser"],
   "orientation": "any",
-  "theme_color": "#F4F1EA",
-  "background_color": "#F4F1EA",
+  "theme_color": "#0B1F17",
+  "background_color": "#0B1F17",
   "lang": "de",
   "dir": "ltr",
   "categories": ["productivity", "games", "utilities"],
@@ -43,7 +43,7 @@
     {
       "name": "Wizard öffnen",
       "short_name": "Wizard",
-      "url": "/wizzard-punkterechner",
+      "url": "/wizard",
       "icons": [{ "src": "/brand/icon-192.png", "sizes": "192x192" }]
     }
   ],

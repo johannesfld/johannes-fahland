@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { FeatureTiles } from "@/components/home/FeatureTiles";
-import { getCurrentUser } from "@spielbrett/db";
+import { getCurrentUser } from "@pasch/db";
 
 export default async function Home() {
   const user = await getCurrentUser();

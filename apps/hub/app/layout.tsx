@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { inter, jetbrainsMono } from "./fonts";
+import { fraunces, hankenGrotesk, splineSansMono } from "./fonts";
 import "./globals.css";
 import { AppShell } from "@/components/layout/AppShell";
 import { FullscreenProvider } from "@/components/FullscreenContext";
@@ -12,23 +12,23 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F4F1EA" },
-    { media: "(prefers-color-scheme: dark)", color: "#18130E" },
+    { media: "(prefers-color-scheme: light)", color: "#F5F0E1" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B1F17" },
   ],
   viewportFit: "cover",
   interactiveWidget: "resizes-content",
 };
 
 export const metadata: Metadata = {
-  title: "Spielbrett",
-  description: "Spielbrett — digitales Familien-Spielbrett: Wizard, Kniffel, Schiffe, Rommé, Memory, Wordle und mehr.",
+  title: "Pasch",
+  description: "Pasch — der digitale Spieleabend: Wizard, Kniffel, Schiffe, Rommé, Memory, Wordle und mehr.",
   creator: "Johannes Fahland",
   authors: [{ name: "Johannes Fahland" }],
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Spielbrett",
+    title: "Pasch",
   },
   formatDetection: {
     telephone: false,
@@ -48,9 +48,8 @@ const themeInitScript = `
 (function(){
   try {
     var t = localStorage.getItem('theme');
-    var d = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    var dark = t === 'dark' || ((t === 'system' || !t) && d);
-    if (t === 'light') dark = false;
+    var sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var dark = t === 'light' ? false : t === 'system' ? sysDark : true;
     var r = document.documentElement;
     r.classList.toggle('dark', dark);
     r.style.colorScheme = dark ? 'dark' : 'light';
@@ -66,7 +65,7 @@ export default function RootLayout({
     <html
       lang="de"
       suppressHydrationWarning
-      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${hankenGrotesk.variable} ${splineSansMono.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />

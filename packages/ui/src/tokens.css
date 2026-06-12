@@ -1,6 +1,7 @@
-/* @spielbrett/ui — Design-Tokens für Hub und Turnier-Subdomain.
-   Editorial-Skeuomorph-Sprache: warmes Bütten/Tinte + gebranntes Orange als Brand-Akzent.
-   9 Tool-Akzente per [data-tool="x"]. Per-Tool-Surfaces für skeuomorphe Spielflächen. */
+/* @pasch/ui — Design-Tokens für Hub und Turnier-Subdomain.
+   "Spieltisch bei Nacht": Filzgrün + Messing + Elfenbein + Karmin. Nacht (.dark) ist Default,
+   Tag (:root) ist Sekundär-Theme. 9 Tool-Akzente ("Edelsteine bei Kerzenlicht") per [data-tool="x"].
+   Per-Tool-Surfaces für skeuomorphe Spielflächen. */
 
 /* Desk-Variante: nur Geräte ab 1024px UND mit echtem Pointer (Maus, Trackpad).
    iPad Portrait/Landscape ohne Maus fällt darunter raus → bekommt BottomNav statt Sidebar.
@@ -9,56 +10,70 @@
 
 :root {
   /* --- Legacy aliases (App-Code referenziert teilweise noch direkt) --- */
-  --background: #F4F1EA;
-  --foreground: #1A1714;
-  --surface: #FFFFFF;
-  --surface-muted: #EAE5DB;
-  --border: rgba(26, 23, 20, 0.10);
-  --ring-focus: rgba(194, 65, 12, 0.32);
+  --background: #F5F0E1;
+  --foreground: #14271E;
+  --surface: #FCF9EF;
+  --surface-muted: #EAE3CE;
+  --border: rgba(20, 39, 30, 0.12);
+  --ring-focus: rgba(135, 103, 27, 0.55);
   --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
   color-scheme: light;
 
-  /* --- Surfaces (Bütten-Stack) --- */
-  --vibe-bg-base:     #F4F1EA;  /* Bütten */
-  --vibe-bg-elevated: #FBF8F1;  /* Papier hell */
-  --vibe-bg-sunken:   #EAE5DB;  /* Bütten gedrückt */
-  --vibe-bg-tinted:   #F0E4D6;  /* Brand-Anklang */
+  /* --- Surfaces (Spieltisch bei Tag: Papier) --- */
+  --vibe-bg-base:     #F5F0E1;  /* Papier */
+  --vibe-bg-elevated: #FCF9EF;  /* Papier hell */
+  --vibe-bg-sunken:   #EAE3CE;  /* Papier gedrückt */
+  --vibe-bg-tinted:   #EFE7CF;  /* Messing-Anklang */
+  --vibe-bg-overlay:  #FFFDF6;
 
   /* --- Foreground (Tinte) --- */
-  --vibe-fg-base:  #1A1714;     /* Tinte */
-  --vibe-fg-muted: #5F564D;     /* Tinte verdünnt */
-  --vibe-fg-faint: #968B7E;     /* Bleistift */
+  --vibe-fg-base:  #14271E;     /* Tannentinte */
+  --vibe-fg-muted: #46584C;     /* Tinte verdünnt */
+  --vibe-fg-faint: #667261;     /* Bleistift */
 
   /* --- Linien --- */
-  --vibe-line:        rgba(26, 23, 20, 0.10);
-  --vibe-line-strong: rgba(26, 23, 20, 0.20);
-  --vibe-ring:        rgba(194, 65, 12, 0.32);
+  --vibe-line:        rgba(20, 39, 30, 0.12);
+  --vibe-line-strong: rgba(20, 39, 30, 0.22);
+  --vibe-line-brass:  rgba(135, 103, 27, 0.40);
+  --vibe-ring:        rgba(135, 103, 27, 0.55);
+  --vibe-edge:        inset 0 1px 0 rgba(255, 253, 246, 0.6);
+
+  /* --- Tischlicht (nur auf bg-base) --- */
+  --vibe-table-light: radial-gradient(120% 70% at 50% -10%, rgba(20, 39, 30, 0.04), transparent 60%);
+
+  /* --- Semantik --- */
+  --pasch-carmine:      #9E1B32;
+  --pasch-carmine-text: #9E1B32;
+  --pasch-carmine-soft: #F4D9DD;
+  --pasch-success:      #2E7D44;
+  --pasch-warn:         #92660F;
 
   /* --- Motion --- */
   --vibe-ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
-  --vibe-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --vibe-ease-spring: cubic-bezier(0.3, 1.36, 0.64, 1);
   --vibe-dur-1: 120ms;
   --vibe-dur-2: 220ms;
   --vibe-dur-3: 280ms;
   --vibe-dur-4: 600ms;
+  --vibe-dur-5: 900ms;
 
   /* --- Radii --- */
   --vibe-r-xs:      0.25rem;
   --vibe-r-sm:      0.5rem;
-  --vibe-r-md:      0.75rem;
-  --vibe-r-lg:      1.125rem;
-  --vibe-r-xl:      1.5rem;
-  --vibe-r-2xl:     2rem;
+  --vibe-r-md:      0.625rem;
+  --vibe-r-lg:      0.875rem;
+  --vibe-r-xl:      1.125rem;
+  --vibe-r-2xl:     1.5rem;
   --vibe-r-tight:   0.5rem;
-  --vibe-r-base:    0.75rem;
-  --vibe-r-soft:    1.125rem;
-  --vibe-r-pillow:  1.5rem;
-  --vibe-r-balloon: 2rem;
+  --vibe-r-base:    0.625rem;
+  --vibe-r-soft:    0.875rem;
+  --vibe-r-pillow:  1.125rem;
+  --vibe-r-balloon: 1.5rem;
 
   /* --- Shadows (warm shadow tinted toward ink) --- */
-  --vibe-shadow-flat:   0 1px 2px rgba(26, 23, 20, 0.04);
-  --vibe-shadow-soft:   0 2px 8px -2px rgba(26, 23, 20, 0.08), 0 8px 24px -8px rgba(26, 23, 20, 0.10);
-  --vibe-shadow-lifted: 0 8px 24px -6px rgba(26, 23, 20, 0.14), 0 24px 48px -16px rgba(26, 23, 20, 0.12);
+  --vibe-shadow-flat:   0 1px 2px rgba(20, 39, 30, 0.06);
+  --vibe-shadow-soft:   0 2px 8px -2px rgba(20, 39, 30, 0.08), 0 8px 24px -8px rgba(20, 39, 30, 0.12);
+  --vibe-shadow-lifted: 0 8px 24px -6px rgba(20, 39, 30, 0.16), 0 24px 48px -16px rgba(20, 39, 30, 0.14);
   --vibe-shadow-glow:   0 0 0 1px var(--vibe-ring) inset, 0 8px 30px -10px var(--vibe-ring);
   --vibe-shadow-1: var(--vibe-shadow-flat);
   --vibe-shadow-2: var(--vibe-shadow-soft);
@@ -73,223 +88,283 @@
   --vibe-pad-page: 1rem;
   --vibe-pad-card: 1.25rem;
 
-  /* --- Brand: Spielbrett (gebranntes Orange) --- */
-  --brand-50:  #FDF2EA;
-  --brand-100: #FAE1CB;
-  --brand-200: #F4C195;
-  --brand-300: #ED9D5E;
-  --brand-400: #DC7530;
-  --brand-500: #C2410C;   /* Brand-Akzent */
-  --brand-600: #9A3209;
-  --brand-700: #762605;
-  --brand-800: #581C04;
-  --brand-900: #3A1202;
-  --brand-950: #220A01;
+  /* --- Brand: Pasch (Messing) --- */
+  --brand-50:  #FCF8E8;
+  --brand-100: #F7EEC8;
+  --brand-200: #EFDF9C;
+  --brand-300: #E4CB6B;
+  --brand-400: #D7B643;
+  --brand-500: #C9A227;   /* Messing */
+  --brand-600: #A98420;
+  --brand-700: #87671B;
+  --brand-800: #654C16;
+  --brand-900: #44330F;
+  --brand-950: #2A1F08;
 
   /* Brand-Alias als Default-Akzent (Hub-Home, Footer, Impressum) */
   --accent:       var(--brand-500);
-  --accent-soft:  var(--brand-100);
-  --accent-ink:   var(--brand-700);
-  --accent-line:  rgba(194, 65, 12, 0.20);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(194, 65, 12, 0.18) 0%, transparent 70%);
-  --tool-surface: var(--brand-50);
+  --accent-soft:  #F2E8C4;
+  --accent-ink:   #87671B;   /* Messing-Text auf Papier (4.5:1+) */
+  --accent-line:  rgba(135, 103, 27, 0.26);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(201, 162, 39, 0.16) 0%, transparent 70%);
+  --tool-surface: #F1EAD5;
 }
 
-/* --- Per-Tool Akzent-Map (9er-Palette: Olive, Zinnober, Lapis, Senf, Rost, Salbei, Pflaume, Kupfer, Anthrazit) --- */
+/* --- Per-Tool Akzent-Map (Tag): "Edelsteine bei Kerzenlicht", gedämpft für Papier --- */
 [data-tool="wizard"] {
-  /* Pflaume — magisch, kartenspielig */
-  --accent:       #6B3D7A;
-  --accent-soft:  #E4D5EB;
-  --accent-ink:   #3D2246;
-  --accent-line:  rgba(107, 61, 122, 0.20);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(107, 61, 122, 0.18) 0%, transparent 70%);
-  --tool-surface: #EFE6F2;
+  /* Amethyst */
+  --accent:       #6A4393;
+  --accent-soft:  #E7DEEF;
+  --accent-ink:   #6A4393;
+  --accent-line:  rgba(106, 67, 147, 0.24);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(106, 67, 147, 0.16) 0%, transparent 70%);
+  --tool-surface: #EFE9F4;
 }
 [data-tool="kniffel"] {
-  /* Senf — Würfel, Schreibwarenton */
-  --accent:       #B8860B;
-  --accent-soft:  #F4E1A6;
-  --accent-ink:   #4A350A;
-  --accent-line:  rgba(184, 134, 11, 0.22);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(184, 134, 11, 0.18) 0%, transparent 70%);
-  --tool-surface: #FBEFC4;
+  /* Bernstein */
+  --accent:       #A05E14;
+  --accent-soft:  #F2E2C7;
+  --accent-ink:   #A05E14;
+  --accent-line:  rgba(160, 94, 20, 0.24);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(160, 94, 20, 0.16) 0%, transparent 70%);
+  --tool-surface: #F6E8D2;
 }
 [data-tool="schiffe"] {
-  /* Lapis — Millimeterpapier, Meer */
-  --accent:       #1E5F8B;
-  --accent-soft:  #C5DDEB;
-  --accent-ink:   #133E5B;
-  --accent-line:  rgba(30, 95, 139, 0.22);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(30, 95, 139, 0.18) 0%, transparent 70%);
-  --tool-surface: #DCEAF2;
+  /* Stahlblau */
+  --accent:       #2E6395;
+  --accent-soft:  #DAE6EF;
+  --accent-ink:   #2E6395;
+  --accent-line:  rgba(46, 99, 149, 0.24);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(46, 99, 149, 0.16) 0%, transparent 70%);
+  --tool-surface: #E2EBF2;
 }
 [data-tool="romme"] {
-  /* Zinnober — Filz, Kartenfläche */
-  --accent:       #B23A2C;
-  --accent-soft:  #ECC5BE;
-  --accent-ink:   #6E2018;
-  --accent-line:  rgba(178, 58, 44, 0.20);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(178, 58, 44, 0.18) 0%, transparent 70%);
-  --tool-surface: #F2DAD5;
+  /* Koralle */
+  --accent:       #A8404A;
+  --accent-soft:  #F2DBDD;
+  --accent-ink:   #A8404A;
+  --accent-line:  rgba(168, 64, 74, 0.22);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(168, 64, 74, 0.16) 0%, transparent 70%);
+  --tool-surface: #F5E1E2;
 }
 [data-tool="turnier"] {
-  /* Salbei — Sportplatz, Trophäe gedämpft */
-  --accent:       #4A7C59;
-  --accent-soft:  #C7DCC9;
-  --accent-ink:   #2C4A35;
-  --accent-line:  rgba(74, 124, 89, 0.22);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(74, 124, 89, 0.18) 0%, transparent 70%);
-  --tool-surface: #E1ECDF;
+  /* Jade */
+  --accent:       #1F7A66;
+  --accent-soft:  #D7EAE4;
+  --accent-ink:   #1F7A66;
+  --accent-line:  rgba(31, 122, 102, 0.24);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(31, 122, 102, 0.16) 0%, transparent 70%);
+  --tool-surface: #DEEEE8;
 }
 [data-tool="g2048"] {
-  /* Rost — Plättchen geprägt */
-  --accent:       #B85C16;
-  --accent-soft:  #F2D5B7;
-  --accent-ink:   #6E370D;
-  --accent-line:  rgba(184, 92, 22, 0.22);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(184, 92, 22, 0.18) 0%, transparent 70%);
-  --tool-surface: #F8E7D3;
+  /* Kupfer */
+  --accent:       #A14E22;
+  --accent-soft:  #F2DECE;
+  --accent-ink:   #A14E22;
+  --accent-line:  rgba(161, 78, 34, 0.24);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(161, 78, 34, 0.16) 0%, transparent 70%);
+  --tool-surface: #F6E6D8;
 }
 [data-tool="snake"] {
-  /* Olive — Spielwiese */
-  --accent:       #687B2E;
-  --accent-soft:  #D3DBA5;
-  --accent-ink:   #3D481B;
-  --accent-line:  rgba(104, 123, 46, 0.22);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(104, 123, 46, 0.18) 0%, transparent 70%);
-  --tool-surface: #E5EAC8;
+  /* Lindgrün */
+  --accent:       #5A7A1E;
+  --accent-soft:  #E1E8C9;
+  --accent-ink:   #5A7A1E;
+  --accent-line:  rgba(90, 122, 30, 0.24);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(90, 122, 30, 0.16) 0%, transparent 70%);
+  --tool-surface: #E9EFD2;
 }
 [data-tool="memory"] {
-  /* Kupfer — Kartendeck patiniert */
-  --accent:       #A1542C;
-  --accent-soft:  #E8C8B0;
-  --accent-ink:   #5F2F19;
-  --accent-line:  rgba(161, 84, 44, 0.20);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(161, 84, 44, 0.18) 0%, transparent 70%);
-  --tool-surface: #F2DDC9;
+  /* Rosé */
+  --accent:       #A4476E;
+  --accent-soft:  #F2DEE7;
+  --accent-ink:   #A4476E;
+  --accent-line:  rgba(164, 71, 110, 0.22);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(164, 71, 110, 0.16) 0%, transparent 70%);
+  --tool-surface: #F6E4ED;
 }
 [data-tool="wordle"] {
-  /* Anthrazit — Schreibmaschine, klar */
-  --accent:       #3A3A40;
-  --accent-soft:  #C8C8CE;
-  --accent-ink:   #1F1F24;
-  --accent-line:  rgba(58, 58, 64, 0.20);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(58, 58, 64, 0.16) 0%, transparent 70%);
-  --tool-surface: #DEDEE3;
+  /* Taubenblau */
+  --accent:       #4A6076;
+  --accent-soft:  #DEE5EB;
+  --accent-ink:   #4A6076;
+  --accent-line:  rgba(74, 96, 118, 0.22);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(74, 96, 118, 0.16) 0%, transparent 70%);
+  --tool-surface: #E6EAEF;
 }
 
-/* --- Dark Mode --- */
+/* --- Dark Mode: "Spieltisch bei Nacht" (Default-Theme) --- */
 .dark {
-  --background: #18130E;
-  --foreground: #EFEAE2;
-  --surface: #221C16;
-  --surface-muted: #14100B;
-  --border: rgba(255, 250, 240, 0.08);
-  --ring-focus: rgba(237, 157, 94, 0.32);
+  --background: #0B1F17;
+  --foreground: #F2EBD9;
+  --surface: #11281E;
+  --surface-muted: #071610;
+  --border: rgba(242, 235, 217, 0.10);
+  --ring-focus: rgba(201, 162, 39, 0.55);
   color-scheme: dark;
 
-  --vibe-bg-base:     #18130E;
-  --vibe-bg-elevated: #221C16;
-  --vibe-bg-sunken:   #0E0B07;
-  --vibe-bg-tinted:   #2A1F14;
+  --vibe-bg-base:     #0B1F17;  /* Filzgrün */
+  --vibe-bg-elevated: #11281E;
+  --vibe-bg-sunken:   #071610;
+  --vibe-bg-tinted:   #16301F;
+  --vibe-bg-overlay:  #173527;
 
-  --vibe-fg-base:  #EFEAE2;
-  --vibe-fg-muted: #A89E92;
-  --vibe-fg-faint: #6F665C;
+  --vibe-fg-base:  #F2EBD9;     /* Elfenbein */
+  --vibe-fg-muted: #C3BBA4;
+  --vibe-fg-faint: #8A8E78;
 
-  --vibe-line:        rgba(255, 250, 240, 0.08);
-  --vibe-line-strong: rgba(255, 250, 240, 0.16);
-  --vibe-ring:        rgba(237, 157, 94, 0.32);
+  --vibe-line:        rgba(242, 235, 217, 0.10);
+  --vibe-line-strong: rgba(242, 235, 217, 0.18);
+  --vibe-line-brass:  rgba(201, 162, 39, 0.32);
+  --vibe-ring:        rgba(201, 162, 39, 0.55);
+  --vibe-edge:        inset 0 1px 0 rgba(242, 235, 217, 0.06);
 
-  --vibe-shadow-flat:   0 1px 2px rgba(0, 0, 0, 0.30);
-  --vibe-shadow-soft:   0 2px 8px -2px rgba(0, 0, 0, 0.40), 0 8px 24px -8px rgba(0, 0, 0, 0.50);
-  --vibe-shadow-lifted: 0 8px 24px -6px rgba(0, 0, 0, 0.55), 0 24px 48px -16px rgba(0, 0, 0, 0.45);
+  --vibe-table-light: radial-gradient(120% 70% at 50% -10%, rgba(242, 235, 217, 0.05), transparent 60%);
+
+  --pasch-carmine:      #CF4F5E;
+  --pasch-carmine-text: #E0788A;
+  --pasch-carmine-soft: #3D161B;
+  --pasch-success:      #7CC08C;
+  --pasch-warn:         #E0B45C;
+
+  --vibe-shadow-flat:   0 1px 2px rgba(3, 10, 7, 0.50);
+  --vibe-shadow-soft:   0 2px 8px -2px rgba(3, 10, 7, 0.45), 0 8px 24px -8px rgba(3, 10, 7, 0.55);
+  --vibe-shadow-lifted: 0 8px 24px -6px rgba(3, 10, 7, 0.60), 0 24px 48px -16px rgba(3, 10, 7, 0.50);
   --vibe-shadow-glow:   0 0 0 1px var(--vibe-ring) inset, 0 8px 30px -10px var(--vibe-ring);
   --vibe-shadow-1: var(--vibe-shadow-flat);
   --vibe-shadow-2: var(--vibe-shadow-soft);
   --vibe-shadow-3: var(--vibe-shadow-lifted);
 
-  /* Brand-Dark */
-  --brand-50:  #220A01;
-  --brand-100: #3A1202;
-  --brand-200: #581C04;
-  --brand-300: #762605;
-  --brand-400: #9A3209;
-  --brand-500: #C2410C;
-  --brand-600: #DC7530;
-  --brand-700: #ED9D5E;
-  --brand-800: #F4C195;
-  --brand-900: #FAE1CB;
-  --brand-950: #FDF2EA;
+  /* Brand-Dark: Messing-Skala invertiert für dunklen Grund */
+  --brand-50:  #2A1F08;
+  --brand-100: #44330F;
+  --brand-200: #654C16;
+  --brand-300: #87671B;
+  --brand-400: #A98420;
+  --brand-500: #C9A227;
+  --brand-600: #D7B643;
+  --brand-700: #E4CB6B;
+  --brand-800: #EFDF9C;
+  --brand-900: #F7EEC8;
+  --brand-950: #FCF8E8;
 
-  --accent:       #ED9D5E;   /* gedämpft heller im Dark-Mode */
-  --accent-soft:  #3A1202;
-  --accent-ink:   #FFFFFF;
-  --accent-line:  rgba(237, 157, 94, 0.22);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(237, 157, 94, 0.18) 0%, transparent 70%);
-  --tool-surface: #2A1F14;
+  --accent:       #C9A227;   /* Messing */
+  --accent-soft:  #332808;
+  --accent-ink:   #EFDCA0;
+  --accent-line:  rgba(201, 162, 39, 0.30);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(201, 162, 39, 0.18) 0%, transparent 70%);
+  --tool-surface: #14291D;
 }
 
+/* --- Per-Tool Akzent-Map (Nacht): "Edelsteine bei Kerzenlicht" --- */
 .dark [data-tool="wizard"] {
-  --accent:       #B89BC5;
-  --accent-soft:  #4A2E54;
-  --accent-ink:   #FFFFFF;
-  --accent-line:  rgba(184, 155, 197, 0.22);
-  --tool-surface: #2A1830;
+  /* Amethyst */
+  --accent:       #B392D9;
+  --accent-soft:  #34284A;
+  --accent-ink:   #E9DCF5;
+  --accent-line:  rgba(179, 146, 217, 0.30);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(179, 146, 217, 0.18) 0%, transparent 70%);
+  --tool-surface: #241B33;
 }
 .dark [data-tool="kniffel"] {
-  --accent:       #E5B947;
-  --accent-soft:  #5A3D08;
-  --accent-ink:   #E5B947;
-  --accent-line:  rgba(229, 185, 71, 0.22);
-  --tool-surface: #3A2A0D;
+  /* Bernstein */
+  --accent:       #E2984A;
+  --accent-soft:  #3A2A0D;
+  --accent-ink:   #FBE5C8;
+  --accent-line:  rgba(226, 152, 74, 0.30);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(226, 152, 74, 0.18) 0%, transparent 70%);
+  --tool-surface: #2E2110;
 }
 .dark [data-tool="schiffe"] {
-  --accent:       #6FA8C9;
-  --accent-soft:  #143348;
-  --accent-ink:   #FFFFFF;
-  --accent-line:  rgba(111, 168, 201, 0.22);
-  --tool-surface: #122838;
+  /* Stahlblau */
+  --accent:       #6FA7D8;
+  --accent-soft:  #16293C;
+  --accent-ink:   #DCEAF7;
+  --accent-line:  rgba(111, 167, 216, 0.30);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(111, 167, 216, 0.18) 0%, transparent 70%);
+  --tool-surface: #16242F;
 }
 .dark [data-tool="romme"] {
-  --accent:       #DE8A7C;
-  --accent-soft:  #4D1A12;
-  --accent-ink:   #FFFFFF;
-  --accent-line:  rgba(222, 138, 124, 0.20);
-  --tool-surface: #2E1410;
+  /* Koralle */
+  --accent:       #E08573;
+  --accent-soft:  #3A1F1A;
+  --accent-ink:   #FBDFD8;
+  --accent-line:  rgba(224, 133, 115, 0.28);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(224, 133, 115, 0.18) 0%, transparent 70%);
+  --tool-surface: #2E1C18;
 }
 .dark [data-tool="turnier"] {
-  --accent:       #8FB89C;
-  --accent-soft:  #1F4028;
-  --accent-ink:   #FFFFFF;
-  --accent-line:  rgba(143, 184, 156, 0.22);
-  --tool-surface: #15291B;
+  /* Jade */
+  --accent:       #6FC7B5;
+  --accent-soft:  #173028;
+  --accent-ink:   #DBF2EC;
+  --accent-line:  rgba(111, 199, 181, 0.30);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(111, 199, 181, 0.18) 0%, transparent 70%);
+  --tool-surface: #142823;
 }
 .dark [data-tool="g2048"] {
-  --accent:       #E89456;
-  --accent-soft:  #5A2A0A;
-  --accent-ink:   #FFFFFF;
-  --accent-line:  rgba(232, 148, 86, 0.22);
-  --tool-surface: #3A1F0A;
+  /* Kupfer */
+  --accent:       #D98E62;
+  --accent-soft:  #3A2415;
+  --accent-ink:   #FBE3D2;
+  --accent-line:  rgba(217, 142, 98, 0.30);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(217, 142, 98, 0.18) 0%, transparent 70%);
+  --tool-surface: #2E1F15;
 }
 .dark [data-tool="snake"] {
-  --accent:       #B5C46E;
-  --accent-soft:  #2F3D14;
-  --accent-ink:   #B5C46E;
-  --accent-line:  rgba(181, 196, 110, 0.22);
-  --tool-surface: #1F2A10;
+  /* Lindgrün */
+  --accent:       #A8C463;
+  --accent-soft:  #2A3014;
+  --accent-ink:   #E8F0CE;
+  --accent-line:  rgba(168, 196, 99, 0.30);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(168, 196, 99, 0.18) 0%, transparent 70%);
+  --tool-surface: #232915;
 }
 .dark [data-tool="memory"] {
-  --accent:       #D49170;
-  --accent-soft:  #4A2010;
-  --accent-ink:   #FFFFFF;
-  --accent-line:  rgba(212, 145, 112, 0.20);
-  --tool-surface: #2D1A10;
+  /* Rosé */
+  --accent:       #DD93B4;
+  --accent-soft:  #38202C;
+  --accent-ink:   #FBE0EB;
+  --accent-line:  rgba(221, 147, 180, 0.28);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(221, 147, 180, 0.18) 0%, transparent 70%);
+  --tool-surface: #2E1E27;
 }
 .dark [data-tool="wordle"] {
-  --accent:       #C8C8CE;
-  --accent-soft:  #2A2A2F;
-  --accent-ink:   #C8C8CE;
-  --accent-line:  rgba(200, 200, 206, 0.22);
-  --tool-surface: #1F1F22;
+  /* Taubenblau */
+  --accent:       #9FB2C8;
+  --accent-soft:  #232C36;
+  --accent-ink:   #E5ECF2;
+  --accent-line:  rgba(159, 178, 200, 0.28);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(159, 178, 200, 0.16) 0%, transparent 70%);
+  --tool-surface: #1D262F;
+}
+
+/* --- Filz-Korn (nur bg-base): subtiles Noise via Inline-SVG, Tischlicht oben drauf --- */
+.bg-felt {
+  position: relative;
+  background-color: var(--vibe-bg-base);
+  background-image: var(--vibe-table-light);
+}
+.bg-felt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+}
+:root .bg-felt::before {
+  opacity: 0.03;
+}
+
+/* --- Messing-Haarlinie als Utility (z.B. Trenner, Tabellenlinien) --- */
+.rule-brass {
+  border-color: var(--vibe-line-brass);
+}
+
+/* --- Globaler Fokus-Ring (Messing) --- */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }

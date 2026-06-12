@@ -2,7 +2,7 @@
  * Cancels AppShell main padding so the Wizard can use the full width and, with
  * min-height, the area below the app header (mobile “full screen” content region).
  */
-export default function WizzardPunkterechnerLayout({
+export default function WizardLayout({
   children,
 }: {
   children: React.ReactNode;

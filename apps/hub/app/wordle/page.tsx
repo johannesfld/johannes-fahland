@@ -3,7 +3,7 @@ import path from "path";
 import WordleGame from "@/components/wordle/WordleGame";
 
 export const metadata = {
-  title: "Wordle · vibecode",
+  title: "Wordle · Pasch",
   description: "Errate das Tageswort in 6 Versuchen.",
 };
 

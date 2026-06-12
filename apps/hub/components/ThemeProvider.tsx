@@ -20,7 +20,7 @@ type Ctx = {
 const ThemeContext = createContext<Ctx | null>(null);
 
 function readResolved(setting: ThemeSetting): "light" | "dark" {
-  if (typeof window === "undefined") return "light";
+  if (typeof window === "undefined") return "dark";
   if (setting === "light") return "light";
   if (setting === "dark") return "dark";
   return window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -38,20 +38,23 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const [systemEpoch, setSystemEpoch] = useState(0);
 
-  /** Until mounted, match SSR: `readResolved("system")` uses `light` without `window` (see readResolved). */
+  /** Until mounted, match SSR: `readResolved("system")` uses `dark` without `window` (see readResolved). */
   const resolved: "light" | "dark" = mounted
     ? readResolved(theme)
-    : theme === "dark"
-      ? "dark"
-      : "light";
+    : theme === "light"
+      ? "light"
+      : "dark";
 
   useEffect(() => {
     queueMicrotask(() => {
       const stored = localStorage.getItem("theme") as ThemeSetting | null;
+      // Kein gespeicherter Wert: themeInitScript hat bereits Nacht erzwungen
+      // (`t === 'system' ? sysDark : true`). "system" würde hier stattdessen
+      // sysDark auflösen und den Dark-Default für Light-OS-Nutzer aufheben.
       const init: ThemeSetting =
         stored === "light" || stored === "dark" || stored === "system"
           ? stored
-          : "system";
+          : "dark";
       setThemeState(init);
       applyDom(readResolved(init));
       setMounted(true);

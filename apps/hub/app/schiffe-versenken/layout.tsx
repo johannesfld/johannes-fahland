@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@spielbrett/db";
+import { getCurrentUser } from "@pasch/db";
 
 export default async function SchiffeVersenkenLayout({
   children,

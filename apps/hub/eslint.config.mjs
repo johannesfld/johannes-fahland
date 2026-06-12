@@ -14,7 +14,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
   ]),
   {
-    files: ["app/wizzard-punkterechner/page.tsx"],
+    files: ["app/wizard/page.tsx"],
     rules: {
       "react-hooks/set-state-in-effect": "off",
     },

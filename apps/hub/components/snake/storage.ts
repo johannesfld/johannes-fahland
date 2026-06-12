@@ -1,4 +1,8 @@
-const BEST_KEY = "vibecode-snake-best-v1";
+import { migrateKey } from "@/lib/migrate-storage";
+
+const BEST_KEY = "pasch-snake-best-v1";
+
+migrateKey("vibecode-snake-best-v1", BEST_KEY);
 
 export function loadBest(): number {
   if (typeof window === "undefined") return 0;

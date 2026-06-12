@@ -7,7 +7,7 @@ import {
   hashPassword,
   prisma,
   verifyPassword,
-} from "@spielbrett/db";
+} from "@pasch/db";
 
 type AuthState = {
   error: string | null;

@@ -1,14 +1,23 @@
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Hanken_Grotesk, Spline_Sans_Mono } from "next/font/google";
 
-export const inter = Inter({
-  variable: "--font-inter",
+// ⚠️ Fraunces ist variable mit axes — KEIN `weight` setzen (sonst Turbopack-Build-Fehler).
+export const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  axes: ["opsz", "SOFT", "WONK"],
+  display: "swap",
+  preload: true,
+});
+
+export const hankenGrotesk = Hanken_Grotesk({
+  variable: "--font-hanken",
   subsets: ["latin"],
   display: "swap",
   preload: true,
 });
 
-export const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains",
+export const splineSansMono = Spline_Sans_Mono({
+  variable: "--font-spline-mono",
   subsets: ["latin"],
   display: "swap",
   preload: false,

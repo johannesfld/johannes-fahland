@@ -1,72 +1,54 @@
 import { cn } from "@/components/ui/styles";
 
 /**
- * Spielbrett-Logo: 4×4 Punkteraster wie auf einer Würfelfläche.
- * Aktive Punkte sind als Subset in Brand-/Tool-Farbe (`currentColor`).
- * Inaktive sind blasses Hintergrundgitter (`var(--vibe-fg-faint)`).
- *
- * Per-Tool-Kontext (via `[data-tool="x"]`-Wrapper) tönt das Logo automatisch
- * in der jeweiligen Tool-Farbe, weil das umschließende Element die Akzentfarbe
- * via CSS-Vars setzt und wir `currentColor` nutzen.
+ * Pasch-Logo „Doppelstein": ein Spielstein mit gravierter Mittellinie,
+ * ein Auge pro Hälfte. Liest sich als Würfel-Zwei, Einserpasch (zwei
+ * Würfel je eine 1) und Domino-Doppelstein zugleich — Spiegelsymmetrie
+ * als Markenkonzept ("zwei gleiche"). Knockout in `currentColor`, tönt
+ * sich über den umschließenden `[data-tool="x"]`-Wrapper automatisch ein.
  */
-type SpielbrettLogoProps = {
+type PaschLogoProps = {
   size?: number;
   className?: string;
 };
 
-const DOT_R = 1.6;
-const COORDS = [3, 11, 19, 27] as const;
-const ACTIVE = new Set<string>([
-  "11,3", "19,3", "27,3",
-  "3,11", "11,11",
-  "19,19", "27,19",
-  "3,27", "11,27", "19,27",
-]);
-
-export function VibeLogo({ size = 36, className }: SpielbrettLogoProps) {
+export function VibeLogo({ size = 36, className }: PaschLogoProps) {
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 30 30"
+      viewBox="0 0 64 64"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
       className={cn("shrink-0", className)}
     >
-      {COORDS.flatMap((y) =>
-        COORDS.map((x) => {
-          const key = `${x},${y}`;
-          const isActive = ACTIVE.has(key);
-          return (
-            <circle
-              key={key}
-              cx={x}
-              cy={y}
-              r={DOT_R}
-              fill={isActive ? "currentColor" : "var(--vibe-fg-faint)"}
-              opacity={isActive ? 1 : 0.22}
-            />
-          );
-        }),
-      )}
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M20 8 H44 A12 12 0 0 1 56 20 V44 A12 12 0 0 1 44 56 H20 A12 12 0 0 1 8 44 V20 A12 12 0 0 1 20 8 Z
+           M13.5 32 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0 Z
+           M38.5 32 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0 Z
+           M30.75 19.25 a1.25 1.25 0 0 1 2.5 0 v25.5 a1.25 1.25 0 0 1 -2.5 0 Z"
+      />
     </svg>
   );
 }
 
-type SpielbrettWordmarkProps = {
+type PaschWordmarkProps = {
   className?: string;
 };
 
-export function VibeWordmark({ className }: SpielbrettWordmarkProps) {
+export function VibeWordmark({ className }: PaschWordmarkProps) {
   return (
     <span
       className={cn(
-        "font-display text-base font-semibold tracking-[-0.01em] text-[var(--vibe-fg-base)]",
+        "font-display text-base font-semibold tracking-[-0.015em] text-[var(--vibe-fg-base)]",
         className,
       )}
     >
-      Spielbrett
+      Pasch
     </span>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { inter, jetbrainsMono } from "./fonts";
+import { fraunces, hankenGrotesk, splineSansMono } from "./fonts";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -8,8 +8,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F4F1EA" },
-    { media: "(prefers-color-scheme: dark)", color: "#18130E" },
+    { media: "(prefers-color-scheme: light)", color: "#F5F0E1" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B1F17" },
   ],
   viewportFit: "cover",
   interactiveWidget: "resizes-content",
@@ -35,9 +35,8 @@ const themeInitScript = `
 (function(){
   try {
     var t = localStorage.getItem('theme');
-    var d = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    var dark = t === 'dark' || ((t === 'system' || !t) && d);
-    if (t === 'light') dark = false;
+    var sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var dark = t === 'light' ? false : t === 'system' ? sysDark : true;
     var r = document.documentElement;
     r.classList.toggle('dark', dark);
     r.style.colorScheme = dark ? 'dark' : 'light';
@@ -54,7 +53,7 @@ export default function RootLayout({
       lang="de"
       suppressHydrationWarning
       data-tool="turnier"
-      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${hankenGrotesk.variable} ${splineSansMono.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />

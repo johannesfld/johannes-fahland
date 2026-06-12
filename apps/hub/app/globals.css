@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@spielbrett/ui/tokens.css";
+@import "@pasch/ui/tokens.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -12,9 +12,9 @@
   --color-accent-soft: var(--accent-soft);
   --color-accent-ink: var(--accent-ink);
   --color-brand: var(--brand-500);
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-jetbrains);
-  --font-display: var(--font-inter);
+  --font-sans: var(--font-hanken);
+  --font-mono: var(--font-spline-mono);
+  --font-display: var(--font-fraunces);
 }
 
 @keyframes app-page-enter {
@@ -53,13 +53,19 @@ body {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
+}
+
+.font-display {
+  font-family: var(--font-fraunces), serif;
+  font-variation-settings: "SOFT" 0, "WONK" 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
