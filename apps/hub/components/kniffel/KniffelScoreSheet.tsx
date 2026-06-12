@@ -84,7 +84,7 @@ export default function KniffelApp() {
             <Dices size={20} className="text-[var(--accent)]" aria-hidden />
           </div>
           <div>
-            <h1 className="font-sans text-4xl font-black italic tracking-tight leading-none text-[var(--accent-ink)]">
+            <h1 className="font-display text-4xl font-black italic tracking-tight leading-none text-[var(--accent-ink)]">
               KNIFFEL
             </h1>
             <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--accent)] opacity-60">
@@ -97,8 +97,8 @@ export default function KniffelApp() {
             onClick={resetGame}
             className={cn(
               "inline-flex items-center gap-1.5 rounded-[var(--vibe-r-md)] px-3 py-2 text-xs font-semibold",
-              "text-[var(--vibe-fg-faint)] transition-colors hover:text-red-500",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500/40",
+              "text-[var(--vibe-fg-faint)] transition-colors hover:text-[var(--pasch-carmine)]",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pasch-carmine)]/40",
             )}
           >
             <RotateCcw size={13} aria-hidden />
@@ -181,8 +181,8 @@ export default function KniffelApp() {
               <div className="overflow-auto min-h-0 flex-1">
                 <table className="w-full border-collapse">
                   <thead className="sticky top-0 z-20">
-                    <tr className="border-b border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)]">
-                      <th className="sticky left-0 z-30 bg-[var(--vibe-bg-sunken)] p-4 text-left text-[10px] font-semibold uppercase tracking-widest text-[var(--vibe-fg-faint)] border-r border-[var(--vibe-line)]">
+                    <tr className="border-b border-[var(--vibe-line-brass)] bg-[var(--vibe-bg-sunken)]">
+                      <th className="sticky left-0 z-30 bg-[var(--vibe-bg-sunken)] p-4 text-left text-[10px] font-semibold uppercase tracking-widest text-[var(--vibe-fg-faint)] border-r border-[var(--vibe-line-brass)]">
                         Feld
                       </th>
                       {gamePlayerNames.map((name, i) => (
@@ -244,7 +244,7 @@ type ScoreRowProps = {
 function ScoreRow({ catKey, scores, onUpdate }: ScoreRowProps) {
   return (
     <tr className="hover:bg-[var(--vibe-bg-sunken)]/50 transition-colors">
-      <td className="sticky left-0 z-10 bg-[var(--vibe-bg-elevated)] p-4 text-sm font-medium text-[var(--vibe-fg-base)] border-r border-[var(--vibe-line)]">
+      <td className="sticky left-0 z-10 bg-[var(--vibe-bg-elevated)] p-4 text-sm font-medium text-[var(--vibe-fg-base)] border-r border-[var(--vibe-line-brass)]">
         {CAT_LABELS[catKey]}
       </td>
       {scores.map((pScore, pIdx) => (
@@ -257,7 +257,7 @@ function ScoreRow({ catKey, scores, onUpdate }: ScoreRowProps) {
                   "flex-1 h-10 rounded-[var(--vibe-r-md)] border-2 font-bold text-sm transition-all",
                   pScore[catKey].score
                     ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-ink)]"
-                    : "border-[var(--vibe-line)] text-[var(--vibe-fg-faint)] hover:border-[var(--accent-line)]",
+                    : "border-[var(--vibe-line-strong)] text-[var(--vibe-fg-faint)] hover:border-[var(--accent-line)]",
                 )}
               >
                 {pScore[catKey].score ?? FIXED_PTS[catKey]}
@@ -271,7 +271,7 @@ function ScoreRow({ catKey, scores, onUpdate }: ScoreRowProps) {
                 onChange={e => onUpdate(pIdx, catKey, e.target.value === "" ? null : parseInt(e.target.value))}
                 className={cn(
                   "w-14 h-10 rounded-[var(--vibe-r-md)] border-2 text-center font-mono font-semibold text-sm tabular-nums",
-                  "bg-[var(--vibe-bg-sunken)] border-[var(--vibe-line)]",
+                  "bg-[var(--vibe-bg-sunken)] border-[var(--vibe-line-strong)]",
                   "focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]/25",
                   "disabled:opacity-25 transition-all",
                 )}
@@ -282,8 +282,8 @@ function ScoreRow({ catKey, scores, onUpdate }: ScoreRowProps) {
               className={cn(
                 "h-10 w-10 rounded-[var(--vibe-r-md)] border-2 flex items-center justify-center transition-all",
                 pScore[catKey].crossed
-                  ? "border-red-500 bg-red-500/15 text-red-500"
-                  : "border-[var(--vibe-line)] text-[var(--vibe-fg-faint)] hover:border-red-400/50 hover:text-red-400",
+                  ? "border-[var(--pasch-carmine)] bg-[var(--pasch-carmine-soft)] text-[var(--pasch-carmine-text)]"
+                  : "border-[var(--vibe-line)] text-[var(--vibe-fg-faint)] hover:border-[var(--pasch-carmine)]/50 hover:text-[var(--pasch-carmine)]",
               )}
             >
               <X size={13} aria-hidden />

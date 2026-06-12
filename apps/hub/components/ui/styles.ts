@@ -37,29 +37,28 @@ export const buttonVariants = {
     "active:scale-[0.985]",
   ),
   danger: cn(
-    "bg-red-500/10 border border-red-500/30 text-red-600",
-    "dark:bg-red-500/15 dark:border-red-500/30 dark:text-red-400",
-    "hover:bg-red-500/18 active:scale-[0.985]",
+    "bg-[var(--pasch-carmine-soft)] border border-[var(--pasch-carmine)]/30 text-[var(--pasch-carmine-text)]",
+    "hover:brightness-95 active:scale-[0.985]",
   ),
 } as const;
 
 export const cardBase = cn(
   "bg-[var(--vibe-bg-elevated)] border border-[var(--vibe-line)]",
-  "rounded-[var(--vibe-r-lg)] p-5 shadow-[var(--vibe-shadow-flat)]",
+  "rounded-[var(--vibe-r-lg)] p-5 shadow-[var(--vibe-edge),var(--vibe-shadow-flat)]",
 );
 
 export const cardInteractive = cn(
   cardBase,
   "transition-all duration-[var(--vibe-dur-2)] ease-[var(--vibe-ease-smooth)]",
   "cursor-pointer",
-  "hover:-translate-y-0.5 hover:shadow-[var(--vibe-shadow-soft)] hover:border-[var(--accent-line)]",
+  "hover:-translate-y-0.5 hover:shadow-[var(--vibe-edge),var(--vibe-shadow-soft)] hover:border-[var(--accent-line)]",
   "active:translate-y-0 active:scale-[0.99]",
   focusRing,
 );
 
 export const cardElevated = cn(
   "bg-[var(--vibe-bg-elevated)] border border-[var(--vibe-line-strong)]",
-  "rounded-[var(--vibe-r-xl)] p-7 shadow-[var(--vibe-shadow-lifted)]",
+  "rounded-[var(--vibe-r-xl)] p-7 shadow-[var(--vibe-edge),var(--vibe-shadow-lifted)]",
 );
 
 export const inputBase = cn(

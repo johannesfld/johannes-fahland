@@ -23,18 +23,20 @@ const KEYBOARD_ROWS = [
   ["ENTER","Y","X","C","V","B","N","M","⌫"],
 ];
 
+/* Wordle-Sonderfall (A6): dedizierte State-Farben, NIE Brand-Filzgrün oder Messing
+   als Letter-State — sonst Kollision mit Tool-Akzent/Markenfarbe. */
 const STATE_COLORS: Record<LetterState, { bg: string; fg: string; border: string }> = {
-  correct: { bg: "#3B9E4A", fg: "#fff",      border: "#3B9E4A" },
-  present: { bg: "#C8A020", fg: "#fff",      border: "#C8A020" },
-  absent:  { bg: "#555060", fg: "#fff",      border: "#555060" },
+  correct: { bg: "#2E7D44", fg: "#FCF9EF",   border: "#2E7D44" },
+  present: { bg: "#92660F", fg: "#FCF9EF",   border: "#92660F" },
+  absent:  { bg: "#8A8378", fg: "#FCF9EF",   border: "#8A8378" },
   empty:   { bg: "transparent", fg: "var(--vibe-fg-base)", border: "var(--vibe-line-strong)" },
   active:  { bg: "transparent", fg: "var(--vibe-fg-base)", border: "var(--accent)" },
 };
 
 const DARK_STATE_COLORS: Record<LetterState, { bg: string; fg: string; border: string }> = {
-  correct: { bg: "#5DC96C", fg: "#0E3515",   border: "#5DC96C" },
-  present: { bg: "#F0B83F", fg: "#3A2300",   border: "#F0B83F" },
-  absent:  { bg: "#3A3545", fg: "#9D97A6",   border: "#3A3545" },
+  correct: { bg: "#7CC08C", fg: "#0B1F17",   border: "#7CC08C" },
+  present: { bg: "#E0B45C", fg: "#2A1C05",   border: "#E0B45C" },
+  absent:  { bg: "#4A5650", fg: "#C3BBA4",   border: "#4A5650" },
   empty:   { bg: "transparent", fg: "var(--vibe-fg-base)", border: "var(--vibe-line-strong)" },
   active:  { bg: "transparent", fg: "var(--vibe-fg-base)", border: "var(--accent)" },
 };
@@ -172,7 +174,7 @@ export default function WordleGame({ words, accepted }: { words: string[]; accep
         {/* Header */}
         <div className="flex w-full max-w-sm items-center justify-between mb-1">
           <div className="flex flex-col leading-none">
-            <span className="font-sans text-2xl font-black uppercase tracking-tight sm:text-3xl" style={{ color: "var(--accent)" }}>
+            <span className="font-display text-2xl font-black uppercase tracking-tight sm:text-3xl" style={{ color: "var(--accent-ink)" }}>
               WORDLE
             </span>
             <span
@@ -192,7 +194,7 @@ export default function WordleGame({ words, accepted }: { words: string[]; accep
             </span>
             <button
               onClick={startNewGame}
-              className="flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors"
+              className="flex items-center gap-1 rounded-[var(--vibe-r-md)] border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors"
               style={{
                 borderColor: "var(--accent-line)",
                 color: "var(--accent-ink)",
@@ -241,7 +243,7 @@ export default function WordleGame({ words, accepted }: { words: string[]; accep
                       delay: isRevealing ? colIdx * 0.1 : 0,
                       ease: "easeInOut",
                     }}
-                    className="flex aspect-square items-center justify-center rounded-lg text-lg font-black uppercase sm:text-xl"
+                    className="flex aspect-square items-center justify-center rounded-[var(--vibe-r-md)] text-lg font-black uppercase sm:text-xl"
                     style={{
                       color: c.fg,
                       border: `2px solid ${c.border}`,
@@ -268,7 +270,7 @@ export default function WordleGame({ words, accepted }: { words: string[]; accep
                   <button
                     key={key}
                     onClick={() => handleKey(key)}
-                    className="flex min-w-0 items-center justify-center rounded font-bold uppercase transition-transform active:scale-95 sm:rounded-lg"
+                    className="flex min-w-0 items-center justify-center rounded-[var(--vibe-r-sm)] font-bold uppercase transition-transform active:scale-95 sm:rounded-[var(--vibe-r-md)]"
                     style={{
                       height: "2.4rem",
                       flex: isWide ? "1.5 1 0" : "1 1 0",
@@ -296,11 +298,11 @@ export default function WordleGame({ words, accepted }: { words: string[]; accep
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0 }}
-                className="rounded-lg px-4 py-1 text-sm font-bold"
+                className="rounded-[var(--vibe-r-md)] px-4 py-1 text-sm font-bold"
                 style={{
                   background: state.status === "won" ? "var(--accent)" : "var(--vibe-bg-elevated)",
-                  color: state.status === "won" ? "#fff" : "var(--vibe-fg-base)",
-                  boxShadow: "var(--vibe-shadow-soft)",
+                  color: state.status === "won" ? "var(--vibe-bg-elevated)" : "var(--vibe-fg-base)",
+                  boxShadow: "var(--vibe-edge), var(--vibe-shadow-soft)",
                 }}
               >
                 {state.message}

@@ -1,14 +1,6 @@
-import { redirect } from "next/navigation";
 import { FeatureTiles } from "@/components/home/FeatureTiles";
-import { getCurrentUser } from "@pasch/db";
 
-export default async function Home() {
-  const user = await getCurrentUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
+export default function Home() {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 py-6 sm:px-0 sm:py-4">
       {/* Header */}
@@ -17,7 +9,7 @@ export default async function Home() {
           Spielabend-Werkzeug
         </p>
         <h1 className="text-2xl font-semibold tracking-tight text-[var(--vibe-fg-base)]">
-          Hallo, {user.username === "Gast" ? "Johannes" : user.username}.
+          Hallo, Johannes.
         </h1>
       </div>
       {/* Grid */}

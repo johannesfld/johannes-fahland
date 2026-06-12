@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { fraunces, hankenGrotesk, splineSansMono } from "./fonts";
 import "./globals.css";
+import { InstallPrompt, PWAInstaller } from "@pasch/ui";
 import { AppShell } from "@/components/layout/AppShell";
 import { FullscreenProvider } from "@/components/FullscreenContext";
-import { PWAInstaller } from "@/components/PWAInstaller";
 import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const viewport: Viewport = {
@@ -105,6 +105,7 @@ export default function RootLayout({
       <body className="h-dvh min-h-dvh overflow-hidden overscroll-none">
         <ThemeProvider>
           <PWAInstaller />
+          <InstallPrompt appName="Pasch" />
           <FullscreenProvider>
             <AppShell>{children}</AppShell>
           </FullscreenProvider>

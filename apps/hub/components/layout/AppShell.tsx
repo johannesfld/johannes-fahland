@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/components/ui/styles";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { BottomNav } from "./BottomNav";
@@ -17,38 +16,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const isFullBleed = useMemo(() => navIsFullBleed(pathname), [pathname]);
 
-  const shouldShowChrome = useMemo(() => {
-    if (!pathname) return true;
-    return !pathname.startsWith("/login") && !pathname.startsWith("/register");
-  }, [pathname]);
-
   const handleToggleSidebar = useCallback(() => setSidebarOpen((v) => !v), []);
   const handleToggleFullscreen = useCallback(() => setFullscreen(!fullscreen), [setFullscreen, fullscreen]);
 
   useEffect(() => {
-    if (!shouldShowChrome || !fullscreen) return;
+    if (!fullscreen) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setFullscreen(false);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [fullscreen, setFullscreen, shouldShowChrome]);
-
-  if (!shouldShowChrome) {
-    return (
-      <main className="flex min-h-dvh flex-col bg-[var(--vibe-bg-base)]">
-        <div className="relative mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-8 sm:py-10">
-          <div className="mb-6 flex justify-end">
-            <ThemeToggle iconOnly />
-          </div>
-          {children}
-        </div>
-      </main>
-    );
-  }
+  }, [fullscreen, setFullscreen]);
 
   return (
-    <div className="flex h-dvh min-h-0 w-full min-w-0 flex-row overflow-hidden bg-[var(--vibe-bg-base)] text-[var(--vibe-fg-base)]">
+    <div className="bg-felt flex h-dvh min-h-0 w-full min-w-0 flex-row overflow-hidden text-[var(--vibe-fg-base)]">
       {/* Desktop Sidebar — nur auf md+ wenn nicht fullscreen */}
       {!fullscreen && <Sidebar pathname={pathname} open={sidebarOpen} />}
 

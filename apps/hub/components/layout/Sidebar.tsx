@@ -30,7 +30,7 @@ export function Sidebar({ pathname, open }: SidebarProps) {
           <div className="min-w-0">
             <VibeWordmark />
             <p className="text-[10px] font-medium uppercase tracking-widest text-[var(--vibe-fg-faint)]">
-              v2.0
+              Der digitale Spieleabend
             </p>
           </div>
         </div>

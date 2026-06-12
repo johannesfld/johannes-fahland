@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { InstallPrompt, PWAInstaller } from "@pasch/ui";
 import { fraunces, hankenGrotesk, splineSansMono } from "./fonts";
 import "./globals.css";
 
@@ -16,18 +17,27 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Turnierleitung",
-  description: "Tischtennis-Turnierleitung — Reihum-Doppel, Standings, TV-View.",
+  title: "Pasch Turnierleitung",
+  description: "Pasch Turnierleitung — Tischtennis-Turniere: Reihum-Doppel, Standings, TV-View.",
   creator: "Johannes Fahland",
   authors: [{ name: "Johannes Fahland" }],
   manifest: "/turnier-manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Turnierleitung",
+    title: "Pasch Turnier",
   },
   formatDetection: {
     telephone: false,
+  },
+  icons: {
+    icon: [
+      { url: "/brand/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/brand/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/brand/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
 };
 
@@ -62,8 +72,11 @@ export default function RootLayout({
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
+        <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
       </head>
       <body className="h-dvh min-h-dvh overflow-hidden overscroll-none bg-[var(--vibe-bg-base)] text-[var(--vibe-fg-base)]">
+        <PWAInstaller />
+        <InstallPrompt appName="Pasch Turnierleitung" />
         {children}
       </body>
     </html>

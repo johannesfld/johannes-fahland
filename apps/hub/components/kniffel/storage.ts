@@ -1,6 +1,9 @@
+import { migrateKey } from "@/lib/migrate-storage";
 import type { PlayerScores } from "@/components/kniffel/constants";
 
-const KEY = "kniffel-score-v1";
+const KEY = "pasch-kniffel-score-v1";
+
+migrateKey("kniffel-score-v1", KEY);
 
 type SavedState = {
   playerNames: string[];

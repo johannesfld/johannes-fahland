@@ -31,7 +31,8 @@ export function FeatureTiles() {
         icon={Grid3x3}
         meta="Solo · Highscore"
         reduced={reduced}
-        index={0}
+        index="2"
+        staggerIndex={0}
         wordmark={
           <span className={`${WORDMARK_CLASS} tabular-nums`}>2048</span>
         }
@@ -60,7 +61,8 @@ export function FeatureTiles() {
         icon={Zap}
         meta="Solo · Highscore"
         reduced={reduced}
-        index={1}
+        index="S"
+        staggerIndex={1}
         wordmark={<span className={WORDMARK_CLASS}>SNAKE</span>}
         pattern={
           <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
@@ -85,7 +87,8 @@ export function FeatureTiles() {
         icon={Type}
         meta="Solo · Tageswort"
         reduced={reduced}
-        index={2}
+        index="W"
+        staggerIndex={2}
         wordmark={<span className={WORDMARK_CLASS}>WORDLE</span>}
         pattern={
           <svg className="absolute inset-0 h-full w-full" aria-hidden>
@@ -114,7 +117,8 @@ export function FeatureTiles() {
         icon={Brain}
         meta="Solo · 2 Spieler"
         reduced={reduced}
-        index={3}
+        index="M"
+        staggerIndex={3}
         wordmark={<span className={WORDMARK_CLASS}>MEMORY</span>}
         pattern={
           <svg className="absolute inset-0 h-full w-full" aria-hidden>
@@ -143,7 +147,8 @@ export function FeatureTiles() {
         icon={Sparkles}
         meta="Multiplayer · bis 6 Spieler"
         reduced={reduced}
-        index={4}
+        index="Z"
+        staggerIndex={4}
         wordmark={<span className={WORDMARK_CLASS}>WIZARD</span>}
         pattern={
           <svg className="absolute inset-0 h-full w-full" aria-hidden>
@@ -168,7 +173,8 @@ export function FeatureTiles() {
         icon={Dices}
         meta="Multiplayer · Würfelspiel"
         reduced={reduced}
-        index={5}
+        index="K"
+        staggerIndex={5}
         wordmark={<span className={WORDMARK_CLASS}>KNIFFEL</span>}
         pattern={
           <svg className="absolute inset-0 h-full w-full" aria-hidden>
@@ -186,7 +192,8 @@ export function FeatureTiles() {
         icon={Ship}
         meta="Multiplayer · 1 – 2 Spieler"
         reduced={reduced}
-        index={6}
+        index="V"
+        staggerIndex={6}
         wordmark={
           <div className="flex flex-col leading-none gap-1">
             <span className={WORDMARK_CLASS}>SCHIFFE</span>
@@ -208,7 +215,8 @@ export function FeatureTiles() {
         icon={SquareStack}
         meta="Multiplayer · Kartenspiel"
         reduced={reduced}
-        index={7}
+        index="R"
+        staggerIndex={7}
         wordmark={<span className={WORDMARK_CLASS}>ROMMÉ</span>}
         pattern={
           <svg className="absolute inset-0 h-full w-full" aria-hidden>

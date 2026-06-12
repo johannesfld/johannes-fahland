@@ -3,8 +3,8 @@ export const schiffeShell =
   "bg-[var(--vibe-bg-base)] text-[var(--vibe-fg-base)]";
 
 export const schiffeCard =
-  "rounded-[2rem] border backdrop-blur-xl shadow-md " +
-  "border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/80 shadow-[var(--vibe-shadow-soft)]";
+  "rounded-[var(--vibe-r-2xl)] border backdrop-blur-xl " +
+  "border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/80 shadow-[var(--vibe-edge),var(--vibe-shadow-soft)]";
 
 export const schiffeGlow =
   "pointer-events-none absolute inset-0 opacity-60 " +

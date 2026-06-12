@@ -1,7 +1,10 @@
+import { migrateKey } from "@/lib/migrate-storage";
 import { INITIAL_STATE } from "@/components/wizard/state";
 import type { GameState } from "@/components/wizard/types";
 
-export const STORAGE_KEY = "wizard-pro-score-v3";
+export const STORAGE_KEY = "pasch-wizard-score-v3";
+
+migrateKey("wizard-pro-score-v3", STORAGE_KEY);
 
 export function loadWizardState(): GameState | null {
   const saved = localStorage.getItem(STORAGE_KEY);

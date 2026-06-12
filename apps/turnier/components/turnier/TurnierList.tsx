@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { Trash2 } from "lucide-react";
+import { Logo, Wordmark } from "@pasch/ui";
 import { createTournament, deleteTournament } from "@/app/actions/turnier";
 import {
   actionBtn,
@@ -45,10 +46,21 @@ export function TurnierList({ initialItems }: TurnierListProps) {
     <ToolShell>
     <div className="mx-auto flex min-h-0 w-full max-w-7xl min-w-0 flex-1 flex-col gap-4 overflow-y-auto overflow-x-hidden px-4 py-4 sm:px-6 sm:py-5 lg:px-8 lg:py-6">
       <section className={`${turnierCard} flex flex-col gap-3`}>
-        <h1 className="text-2xl font-black tracking-tighter">Tischtennis Turniere</h1>
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--vibe-r-md)] bg-[var(--brand-50)] text-[var(--brand-500)] dark:bg-[var(--brand-950)]">
+            <Logo size={22} />
+          </div>
+          <div className="min-w-0">
+            <Wordmark />
+            <p className="text-[10px] font-medium uppercase tracking-widest text-[var(--vibe-fg-faint)]">
+              Turnierleitung
+            </p>
+          </div>
+        </div>
+        <h1 className="font-display text-2xl font-black tracking-tighter">Tischtennis Turniere</h1>
         <div className="flex min-w-0 flex-col gap-4">
           <div className="flex min-w-0 flex-col gap-2">
-            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
+            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[var(--vibe-fg-muted)]">
               Format
             </p>
             <div className="flex flex-wrap gap-2">

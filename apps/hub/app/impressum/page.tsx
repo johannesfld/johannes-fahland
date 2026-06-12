@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Impressum · Spielbrett",
+  title: "Impressum · Pasch",
   description: "Anbieterkennzeichnung und rechtliche Angaben nach § 5 DDG.",
 };
 
@@ -55,7 +55,7 @@ export default function ImpressumPage() {
           Haftungsausschluss
         </h2>
         <p>
-          Spielbrett ist ein privates Hobbyprojekt. Inhalte und Tools werden mit Sorgfalt
+          Pasch ist ein privates Hobbyprojekt. Inhalte und Tools werden mit Sorgfalt
           erstellt, eine Gewährleistung für Vollständigkeit, Aktualität oder Eignung für
           einen bestimmten Zweck wird jedoch nicht übernommen.
         </p>
@@ -69,7 +69,7 @@ export default function ImpressumPage() {
           Die Spielstände, Highscores und Einstellungen aller Spiele werden ausschließlich
           lokal im Browser gespeichert (LocalStorage); es findet keine Übermittlung an
           einen Server statt. Das Turniertool speichert Turnierdaten in einer
-          SQLite-Datenbank auf dem Server, der unter Cloudflare-Tunnel betrieben wird.
+          Postgres-Datenbank, die bei Vercel gehostet wird.
         </p>
       </section>
 

@@ -15,22 +15,22 @@ import { BOARD_SIZE, type Direction, type GameState, type Tile } from "./types";
 const SWIPE_THRESHOLD = 24;
 const SWIPE_IGNORE_SELECTOR = "button, a, input, textarea, select, [data-no-swipe]";
 
+/** Tile-Farbrampe 2→4096: Filzgrün (niedrig) wandert über Olive/Ocker zu Messing/Karmin (hoch). */
 function tileColors(value: number): { bg: string; fg: string; shadow: string } {
-  // Vibe-coded palette stepping from soft to vivid via Plum→Amber accents.
   switch (value) {
-    case 2:    return { bg: "#F0EAFB", fg: "#3D2776", shadow: "0 2px 10px -4px rgba(124,91,217,0.20)" };
-    case 4:    return { bg: "#E1D4F5", fg: "#2A1B52", shadow: "0 2px 10px -4px rgba(124,91,217,0.25)" };
-    case 8:    return { bg: "#C9B2EE", fg: "#1F1244", shadow: "0 3px 14px -5px rgba(124,91,217,0.35)" };
-    case 16:   return { bg: "#A988E2", fg: "#FFFFFF", shadow: "0 4px 16px -6px rgba(124,91,217,0.45)" };
-    case 32:   return { bg: "#8B65D6", fg: "#FFFFFF", shadow: "0 5px 18px -6px rgba(124,91,217,0.55)" };
-    case 64:   return { bg: "#7C5BD9", fg: "#FFFFFF", shadow: "0 6px 22px -8px rgba(124,91,217,0.65)" };
-    case 128:  return { bg: "#E8AE3D", fg: "#3A2300", shadow: "0 6px 22px -8px rgba(232,174,61,0.55)" };
-    case 256:  return { bg: "#E89C2A", fg: "#3A2300", shadow: "0 7px 24px -8px rgba(232,156,42,0.60)" };
-    case 512:  return { bg: "#E58A1C", fg: "#FFFFFF", shadow: "0 8px 28px -10px rgba(229,138,28,0.65)" };
-    case 1024: return { bg: "#DE7510", fg: "#FFFFFF", shadow: "0 9px 30px -10px rgba(222,117,16,0.70)" };
-    case 2048: return { bg: "#D55F08", fg: "#FFFFFF", shadow: "0 10px 32px -10px rgba(213,95,8,0.80)" };
-    case 4096: return { bg: "#C24A03", fg: "#FFFFFF", shadow: "0 10px 32px -10px rgba(194,74,3,0.80)" };
-    default:   return { bg: "#1F0A03", fg: "#FFD58A", shadow: "0 12px 36px -10px rgba(255,213,138,0.40)" };
+    case 2:    return { bg: "#E4ECE3", fg: "#1F3A2C", shadow: "0 2px 10px -4px rgba(31,58,44,0.20)" };
+    case 4:    return { bg: "#CBDBC9", fg: "#1F3A2C", shadow: "0 2px 10px -4px rgba(31,58,44,0.25)" };
+    case 8:    return { bg: "#A3C2A0", fg: "#15281D", shadow: "0 3px 14px -5px rgba(31,58,44,0.35)" };
+    case 16:   return { bg: "#7BA478", fg: "#FCF9EF", shadow: "0 4px 16px -6px rgba(31,58,44,0.45)" };
+    case 32:   return { bg: "#5C8A57", fg: "#FCF9EF", shadow: "0 5px 18px -6px rgba(31,58,44,0.55)" };
+    case 64:   return { bg: "#3F6E3B", fg: "#FCF9EF", shadow: "0 6px 22px -8px rgba(31,58,44,0.65)" };
+    case 128:  return { bg: "#C7A24A", fg: "#2A1C05", shadow: "0 6px 22px -8px rgba(135,103,27,0.55)" };
+    case 256:  return { bg: "#BD9237", fg: "#2A1C05", shadow: "0 7px 24px -8px rgba(135,103,27,0.60)" };
+    case 512:  return { bg: "#AF8226", fg: "#FCF9EF", shadow: "0 8px 28px -10px rgba(135,103,27,0.65)" };
+    case 1024: return { bg: "#9C711C", fg: "#FCF9EF", shadow: "0 9px 30px -10px rgba(135,103,27,0.70)" };
+    case 2048: return { bg: "#87671B", fg: "#FCF9EF", shadow: "0 10px 32px -10px rgba(135,103,27,0.80)" };
+    case 4096: return { bg: "#A23B30", fg: "#FCF9EF", shadow: "0 10px 32px -10px rgba(162,59,48,0.80)" };
+    default:   return { bg: "#3A1410", fg: "#E0B45C", shadow: "0 12px 36px -10px rgba(224,180,92,0.40)" };
   }
 }
 
@@ -106,11 +106,11 @@ function TileView({
 function ScoreCard({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
   return (
     <div
-      className="flex min-w-[5rem] flex-col items-center rounded-xl px-3 py-1.5"
+      className="flex min-w-[5rem] flex-col items-center rounded-[var(--vibe-r-lg)] px-3 py-1.5"
       style={{
         background: accent ? "var(--accent)" : "var(--vibe-bg-tinted)",
-        color: accent ? "#FFFFFF" : "var(--vibe-fg-base)",
-        boxShadow: "var(--vibe-shadow-soft)",
+        color: accent ? "var(--vibe-bg-elevated)" : "var(--vibe-fg-base)",
+        boxShadow: "var(--vibe-edge), var(--vibe-shadow-soft)",
       }}
     >
       <span className="text-[0.65rem] font-bold uppercase tracking-[0.14em] opacity-75">
@@ -234,8 +234,8 @@ export default function Game2048() {
         <div className="flex w-full max-w-[28rem] shrink-0 items-center justify-between gap-3">
           <div className="flex flex-col leading-none">
             <span
-              className="font-sans text-3xl font-black uppercase tracking-tight sm:text-4xl"
-              style={{ color: "var(--accent)" }}
+              className="font-display text-3xl font-black uppercase tracking-tight tabular-nums sm:text-4xl"
+              style={{ color: "var(--accent-ink)" }}
             >
               2048
             </span>
@@ -252,13 +252,13 @@ export default function Game2048() {
         {/* Board */}
         <div className="relative flex w-full max-w-[28rem] flex-1 items-center justify-center" style={{ minHeight: 0 }}>
           <div
-            className="relative aspect-square w-full overflow-hidden rounded-2xl"
+            className="relative aspect-square w-full overflow-hidden rounded-[var(--vibe-r-2xl)]"
             style={{
               maxHeight: "100%",
               maxWidth: "calc(min(100vh,100%) - 0px)",
               background: "var(--tool-surface)",
               padding: "2.5%",
-              boxShadow: "var(--vibe-shadow-lifted), inset 0 0 0 1px var(--accent-line)",
+              boxShadow: "var(--vibe-edge), var(--vibe-shadow-lifted), inset 0 0 0 1px var(--accent-line)",
               touchAction: "none",
             }}
           >
@@ -283,7 +283,7 @@ export default function Game2048() {
                     <div
                       className="h-full w-full rounded-[12%]"
                       style={{
-                        background: "rgba(0,0,0,0.04)",
+                        background: "var(--vibe-bg-sunken)",
                       }}
                     />
                   </div>
@@ -307,25 +307,25 @@ export default function Game2048() {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl"
+                  className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[var(--vibe-r-2xl)]"
                   style={{
-                    background: "rgba(232,174,61,0.92)",
-                    color: "#3A2300",
+                    background: "rgba(135,103,27,0.92)",
+                    color: "#2A1C05",
                   }}
                 >
                   <Trophy className="h-12 w-12" />
-                  <p className="text-2xl font-black uppercase tracking-wide">2048!</p>
+                  <p className="font-display text-2xl font-black uppercase tracking-wide">2048!</p>
                   <p className="text-sm">Du hast es geschafft.</p>
                   <div className="flex gap-2">
                     <button
                       onClick={keepGoing}
-                      className="rounded-xl bg-[#3A2300] px-4 py-2 text-sm font-bold text-[#FFD58A] shadow-md hover:opacity-90"
+                      className="rounded-[var(--vibe-r-lg)] bg-[#2A1C05] px-4 py-2 text-sm font-bold text-[#E0B45C] shadow-[var(--vibe-shadow-soft)] hover:opacity-90"
                     >
                       Weiterspielen
                     </button>
                     <button
                       onClick={reset}
-                      className="rounded-xl bg-white px-4 py-2 text-sm font-bold text-[#3A2300] shadow-md hover:opacity-90"
+                      className="rounded-[var(--vibe-r-lg)] bg-[var(--vibe-bg-elevated)] px-4 py-2 text-sm font-bold text-[#2A1C05] shadow-[var(--vibe-shadow-soft)] hover:opacity-90"
                     >
                       Neu starten
                     </button>
@@ -338,19 +338,19 @@ export default function Game2048() {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl"
+                  className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[var(--vibe-r-2xl)]"
                   style={{
-                    background: "rgba(20,15,30,0.88)",
-                    color: "#FFFFFF",
+                    background: "rgba(11,31,23,0.88)",
+                    color: "var(--vibe-bg-elevated)",
                   }}
                 >
-                  <p className="text-2xl font-black uppercase tracking-wide">Aus.</p>
+                  <p className="font-display text-2xl font-black uppercase tracking-wide">Aus.</p>
                   <p className="text-sm opacity-80">Keine Züge mehr möglich.</p>
                   <p className="font-mono text-lg">{state.score} Punkte</p>
                   <button
                     onClick={reset}
-                    className="rounded-xl px-4 py-2 text-sm font-bold shadow-md hover:opacity-90"
-                    style={{ background: "var(--accent)", color: "#FFFFFF" }}
+                    className="rounded-[var(--vibe-r-lg)] px-4 py-2 text-sm font-bold shadow-[var(--vibe-shadow-soft)] hover:opacity-90"
+                    style={{ background: "var(--accent)", color: "var(--vibe-bg-elevated)" }}
                   >
                     Nochmal
                   </button>
@@ -370,7 +370,7 @@ export default function Game2048() {
             </p>
             <button
               onClick={reset}
-              className="flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold uppercase tracking-wide"
+              className="flex shrink-0 items-center gap-1.5 rounded-[var(--vibe-r-md)] border px-3 py-1.5 text-xs font-bold uppercase tracking-wide"
               style={{
                 borderColor: "var(--accent-line)",
                 color: "var(--accent-ink)",
@@ -410,12 +410,12 @@ function DPadButton({
     <button
       onClick={onClick}
       aria-label={label}
-      className="flex items-center justify-center rounded-xl"
+      className="flex items-center justify-center rounded-[var(--vibe-r-lg)]"
       style={{
         height: "clamp(2.5rem, 11vw, 3.25rem)",
         background: "var(--accent-soft)",
         color: "var(--accent-ink)",
-        boxShadow: "var(--vibe-shadow-soft)",
+        boxShadow: "var(--vibe-edge), var(--vibe-shadow-soft)",
       }}
     >
       <ArrowUp

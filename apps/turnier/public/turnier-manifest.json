@@ -1,25 +1,42 @@
 {
-  "name": "Turnierleitung",
+  "name": "Pasch Turnierleitung",
   "short_name": "Turnier",
-  "description": "Tischtennis-Turnierleitung",
+  "description": "Pasch Turnierleitung — Tischtennis-Turniere: Reihum-Doppel, Standings, TV-View.",
+  "id": "/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#F4F1EA",
-  "theme_color": "#3F8E5B",
+  "display_override": ["window-controls-overlay", "standalone", "browser"],
   "orientation": "any",
+  "theme_color": "#0B1F17",
+  "background_color": "#0B1F17",
+  "lang": "de",
+  "dir": "ltr",
+  "categories": ["sports", "productivity", "utilities"],
   "icons": [
     {
-      "src": "/icon-512.png",
+      "src": "/brand/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
+      "src": "/brand/icon-maskable-512.png",
+      "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-monochrome.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "monochrome"
     }
   ]
 }

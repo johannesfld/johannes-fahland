@@ -99,7 +99,7 @@ function BoardGrid({
         localRootRef.current = el;
         onRootRef?.(el);
       }}
-      className={`relative w-full max-h-full max-w-full rounded-2xl border border-slate-700/60 bg-slate-950/95 p-1.5 shadow-md transition-opacity duration-200 sm:p-2 ${
+      className={`relative w-full max-h-full max-w-full rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] p-1.5 shadow-[var(--vibe-shadow-soft)] transition-opacity duration-200 sm:p-2 ${
         dimmed ? "opacity-40" : "opacity-100"
       }`}
       style={
@@ -108,8 +108,8 @@ function BoardGrid({
           : { touchAction: "none" }
       }
     >
-      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl opacity-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.2)_0%,transparent_75%)]" />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[var(--vibe-r-xl)] opacity-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,color-mix(in_srgb,var(--accent)_60%,transparent)_0%,transparent_75%)]" />
       </div>
       <div className={`relative ${panelClassName ?? ""}`}>
         <div className="grid grid-cols-[1rem_minmax(0,1fr)] gap-0.5 sm:grid-cols-[1.5rem_minmax(0,1fr)] sm:gap-1">
@@ -118,7 +118,7 @@ function BoardGrid({
             {Array.from({ length: GRID_SIZE }, (_, c) => (
               <div
                 key={c}
-                className="flex h-4 items-center justify-center rounded-sm bg-slate-900/70 font-mono text-[8px] font-bold text-slate-400 sm:h-5 sm:text-[10px]"
+                className="flex h-4 items-center justify-center rounded-[var(--vibe-r-xs)] bg-[var(--vibe-bg-base)] font-mono text-[8px] font-bold text-[var(--vibe-fg-muted)] sm:h-5 sm:text-[10px]"
               >
                 {c + 1}
               </div>
@@ -128,7 +128,7 @@ function BoardGrid({
             {alphabetLabels.map((letter) => (
               <div
                 key={letter}
-                className="flex min-h-0 items-center justify-center rounded-sm bg-slate-900/70 font-mono text-[8px] font-bold text-slate-400 sm:text-[10px]"
+                className="flex min-h-0 items-center justify-center rounded-[var(--vibe-r-xs)] bg-[var(--vibe-bg-base)] font-mono text-[8px] font-bold text-[var(--vibe-fg-muted)] sm:text-[10px]"
               >
                 {letter}
               </div>
@@ -136,7 +136,7 @@ function BoardGrid({
           </div>
           <div
             ref={innerRef}
-            className="board-grid grid aspect-square flex-1 grid-cols-10 grid-rows-10 gap-[2px] rounded-md border border-slate-700/70 bg-slate-900/80 p-[2px]"
+            className="board-grid grid aspect-square flex-1 grid-cols-10 grid-rows-10 gap-[2px] rounded-[var(--vibe-r-sm)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-base)] p-[2px]"
           >
             {Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, i) => {
               const r = Math.floor(i / GRID_SIZE);
@@ -144,7 +144,7 @@ function BoardGrid({
               return (
                 <div
                   key={`${r}-${c}`}
-                  className="relative rounded-[2px] bg-slate-950/90"
+                  className="relative rounded-[2px] bg-[var(--vibe-bg-sunken)]"
                 >
                   {renderCell(r, c)}
                 </div>
@@ -621,13 +621,13 @@ export function SchiffeVersenkenApp() {
     <div className="flex min-h-0 flex-1 items-center justify-center">
       <div className={`${card} w-full max-w-3xl space-y-4 p-4 sm:p-6`}>
         <div className="space-y-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--vibe-fg-muted)]">
             Moduswahl
           </p>
-          <h2 className="font-sans text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-slate-100">
+          <h2 className="font-display text-2xl font-black tracking-tight text-[var(--vibe-fg-base)] sm:text-3xl">
             Schiffe versenken starten
           </h2>
-          <p className="text-sm text-slate-700 dark:text-slate-300">
+          <p className="text-sm text-[var(--vibe-fg-muted)]">
             Wähle, ob du gegen den Bot spielst oder das manuelle 2-Spieler-Tippfeld
             nutzt.
           </p>
@@ -636,30 +636,30 @@ export function SchiffeVersenkenApp() {
           <button
             type="button"
             onClick={() => dispatch({ type: "SET_MODE", mode: "single" })}
-            className="group rounded-2xl border border-slate-200/80 bg-white/90 p-4 text-left shadow-sm transition duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50/90 hover:shadow-md active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 dark:border-slate-600/50 dark:bg-slate-900/70 dark:hover:border-slate-400 dark:hover:bg-slate-800 dark:focus-visible:ring-offset-zinc-950"
+            className="group rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/90 p-4 text-left shadow-[var(--vibe-shadow-soft)] transition duration-200 ease-out hover:-translate-y-0.5 hover:border-[var(--accent-line)] hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] hover:shadow-[var(--vibe-shadow-lifted)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2"
           >
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 dark:text-slate-300">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--vibe-fg-muted)]">
               1 Spieler
             </p>
-            <p className="mt-1 font-sans text-xl font-black text-slate-900 dark:text-slate-100">
+            <p className="mt-1 font-display text-xl font-black text-[var(--vibe-fg-base)]">
               Gegen Bot
             </p>
-            <p className="mt-2 text-xs text-slate-700 dark:text-slate-300">
+            <p className="mt-2 text-xs text-[var(--vibe-fg-muted)]">
               Bot-Flotte wird zufällig gesetzt. Du feuerst pro Zug mit einem Button.
             </p>
           </button>
           <button
             type="button"
             onClick={() => dispatch({ type: "SET_MODE", mode: "twoPlayerTracker" })}
-            className="group rounded-2xl border border-slate-200/80 bg-white/90 p-4 text-left shadow-sm transition duration-200 ease-out hover:-translate-y-0.5 hover:border-slate-400 hover:bg-slate-50/90 hover:shadow-md active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 dark:border-slate-600/50 dark:bg-slate-900/70 dark:hover:border-slate-400 dark:hover:bg-slate-800 dark:focus-visible:ring-offset-zinc-950"
+            className="group rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/90 p-4 text-left shadow-[var(--vibe-shadow-soft)] transition duration-200 ease-out hover:-translate-y-0.5 hover:border-[var(--accent-line)] hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] hover:shadow-[var(--vibe-shadow-lifted)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2"
           >
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 dark:text-slate-300">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--vibe-fg-muted)]">
               2 Spieler
             </p>
-            <p className="mt-1 font-sans text-xl font-black text-slate-900 dark:text-slate-100">
+            <p className="mt-1 font-display text-xl font-black text-[var(--vibe-fg-base)]">
               Gegen Spieler
             </p>
-            <p className="mt-2 text-xs text-slate-700 dark:text-slate-300">
+            <p className="mt-2 text-xs text-[var(--vibe-fg-muted)]">
               Ein simpler Ersatz für das Spielfeld. Jeder Spieler öffnet diese Seite auf seinem Smartphone.
             </p>
           </button>
@@ -675,17 +675,17 @@ export function SchiffeVersenkenApp() {
         <header className="flex shrink-0 items-center gap-2">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <h1 className="truncate text-lg font-black uppercase tracking-wider text-slate-800 sm:text-2xl lg:text-3xl dark:text-white">
+              <h1 className="truncate font-display text-lg font-black uppercase tracking-wider text-[var(--vibe-fg-base)] sm:text-2xl lg:text-3xl">
                 Schiffe versenken
               </h1>
               {game.phase !== "modeSelect" && (
-                <span className="hidden shrink-0 rounded-full border border-slate-300/60 bg-slate-100/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-700 sm:inline-block dark:border-slate-700/70 dark:bg-slate-800/60 dark:text-slate-200">
+                <span className="hidden shrink-0 rounded-full border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[var(--vibe-fg-muted)] sm:inline-block">
                   {modeLabel}
                 </span>
               )}
             </div>
             {game.phase !== "modeSelect" && (
-              <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-600 sm:hidden dark:text-slate-400">
+              <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--vibe-fg-muted)] sm:hidden">
                 {modeLabel}
               </p>
             )}
@@ -696,7 +696,7 @@ export function SchiffeVersenkenApp() {
             onClick={() => setSettingsOpen((o) => !o)}
             aria-label="Einstellungen"
             title="Einstellungen"
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-700 shadow-sm transition duration-200 hover:bg-zinc-50 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-950"
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--vibe-r-lg)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] text-[var(--vibe-fg-muted)] shadow-[var(--vibe-shadow-soft)] transition duration-200 hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <circle cx="12" cy="12" r="3" />
@@ -714,7 +714,7 @@ export function SchiffeVersenkenApp() {
               }}
               aria-label="Spiel neu starten"
               title="Neu"
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-red-200 bg-white text-red-600 shadow-sm transition duration-200 hover:bg-red-50 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 dark:border-red-900/50 dark:bg-zinc-900 dark:text-red-300 dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-950"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--vibe-r-lg)] border border-[var(--pasch-carmine)]/40 bg-[var(--vibe-bg-elevated)] text-[var(--pasch-carmine)] shadow-[var(--vibe-shadow-soft)] transition duration-200 hover:bg-[var(--pasch-carmine-soft)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <path d="M3 12a9 9 0 1 0 9-9" />
@@ -728,21 +728,21 @@ export function SchiffeVersenkenApp() {
           {settingsOpen && (
             <div
               ref={settingsRef}
-              className="absolute inset-x-0 top-0 z-30 mx-auto max-w-3xl rounded-2xl border border-zinc-200 bg-zinc-50 p-4 shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-black/30"
+              className="absolute inset-x-0 top-0 z-30 mx-auto max-w-3xl rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] p-4 shadow-[var(--vibe-shadow-lifted)]"
             >
-              <p className="mb-2 text-xs font-semibold text-zinc-700 sm:text-sm dark:text-zinc-200">
+              <p className="mb-2 text-xs font-semibold text-[var(--vibe-fg-muted)] sm:text-sm">
                 Farben (Schuss-Raster)
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="flex items-center gap-2">
-                  <span className="min-w-[5rem] text-xs font-bold text-zinc-700 dark:text-zinc-200">
+                  <span className="min-w-[5rem] text-xs font-bold text-[var(--vibe-fg-muted)]">
                     Treffer
                   </span>
                   <input
                     type="color"
                     value={colors.hit}
                     onChange={(e) => persistColors({ ...colors, hit: e.target.value })}
-                    className="h-10 w-12 cursor-pointer rounded-lg border border-zinc-300 bg-white dark:border-zinc-600"
+                    className="h-10 w-12 cursor-pointer rounded-[var(--vibe-r-md)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)]"
                     aria-label="Farbe Treffer"
                   />
                   <input
@@ -766,18 +766,18 @@ export function SchiffeVersenkenApp() {
                     spellCheck={false}
                     autoCapitalize="off"
                     autoCorrect="off"
-                    className="w-24 rounded-lg border border-zinc-200 bg-white px-2 py-2 font-mono text-xs text-zinc-900 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100"
+                    className="w-24 rounded-[var(--vibe-r-md)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] px-2 py-2 font-mono text-xs text-[var(--vibe-fg-base)]"
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="min-w-[5rem] text-xs font-bold text-zinc-700 dark:text-zinc-200">
+                  <span className="min-w-[5rem] text-xs font-bold text-[var(--vibe-fg-muted)]">
                     Fehlschuss
                   </span>
                   <input
                     type="color"
                     value={colors.miss}
                     onChange={(e) => persistColors({ ...colors, miss: e.target.value })}
-                    className="h-10 w-12 cursor-pointer rounded-lg border border-zinc-300 bg-white dark:border-zinc-600"
+                    className="h-10 w-12 cursor-pointer rounded-[var(--vibe-r-md)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)]"
                     aria-label="Farbe Fehlschuss"
                   />
                   <input
@@ -801,14 +801,14 @@ export function SchiffeVersenkenApp() {
                     spellCheck={false}
                     autoCapitalize="off"
                     autoCorrect="off"
-                    className="w-24 rounded-lg border border-zinc-200 bg-white px-2 py-2 font-mono text-xs text-zinc-900 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100"
+                    className="w-24 rounded-[var(--vibe-r-md)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] px-2 py-2 font-mono text-xs text-[var(--vibe-fg-base)]"
                   />
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => persistColors(DEFAULT_COLORS)}
-                className="mt-4 w-full rounded-xl border border-zinc-200 bg-white px-4 py-2 text-xs font-bold text-zinc-700 transition duration-200 hover:bg-zinc-50 active:scale-[0.98] dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                className="mt-4 w-full rounded-[var(--vibe-r-lg)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] px-4 py-2 text-xs font-bold text-[var(--vibe-fg-muted)] transition duration-200 hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] active:scale-[0.98]"
               >
                 Farben zuruecksetzen
               </button>
@@ -819,7 +819,7 @@ export function SchiffeVersenkenApp() {
 
           {game.phase === "place" && (
             <div className="flex min-h-0 flex-1 flex-col gap-2">
-              <p className="shrink-0 rounded-xl border border-slate-200/70 bg-white/70 px-2 py-1.5 text-center text-[10px] font-semibold leading-snug text-slate-700 sm:text-xs dark:border-slate-700/50 dark:bg-slate-900/50 dark:text-slate-200">
+              <p className="shrink-0 rounded-[var(--vibe-r-lg)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/70 px-2 py-1.5 text-center text-[10px] font-semibold leading-snug text-[var(--vibe-fg-muted)] sm:text-xs">
                 <span className="hidden sm:inline">Schiff wählen, dann aufs Feld tippen zum Setzen. Ziehen geht auch. Anklicken zum Drehen.</span>
                 <span className="sm:hidden">Schiff wählen · auf Feld tippen · Ziehen · Drehen</span>
               </p>
@@ -863,12 +863,12 @@ export function SchiffeVersenkenApp() {
                           });
                         }}
                         className={[
-                          "shrink-0 rounded-lg border px-2 py-1.5 text-[11px] font-bold transition duration-200 select-none touch-manipulation active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:px-4 sm:text-xs lg:w-full dark:focus-visible:ring-offset-zinc-950",
+                          "shrink-0 rounded-[var(--vibe-r-md)] border px-2 py-1.5 text-[11px] font-bold transition duration-200 select-none touch-manipulation active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:px-4 sm:text-xs lg:w-full",
                           placed
-                            ? "cursor-grab border-slate-500 bg-slate-50 text-slate-950 active:cursor-grabbing dark:border-slate-400 dark:bg-slate-900/40 dark:text-slate-100"
+                            ? "cursor-grab border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] text-[var(--vibe-fg-muted)] active:cursor-grabbing"
                             : pickedId === f.id
-                              ? "border-amber-500 bg-amber-100 text-amber-950 dark:border-amber-400 dark:bg-amber-950/40 dark:text-amber-100"
-                              : "border-zinc-200 bg-white text-zinc-800 hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-600",
+                              ? "border-[var(--accent)] bg-[color-mix(in_srgb,var(--accent)_18%,transparent)] text-[var(--accent-ink)]"
+                              : "border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] text-[var(--vibe-fg-base)] hover:border-[var(--accent-line)]",
                         ].join(" ")}
                       >
                         {f.len}er
@@ -897,7 +897,7 @@ export function SchiffeVersenkenApp() {
                             type="button"
                             aria-label="Schiff drehen"
                             title="Drehen"
-                            className="flex items-center justify-center rounded-xl border border-slate-500/60 bg-slate-800/90 text-lg leading-none text-slate-100 shadow-lg backdrop-blur-sm transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60"
+                            className="flex items-center justify-center rounded-[var(--vibe-r-lg)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/90 text-lg leading-none text-[var(--vibe-fg-base)] shadow-[var(--vibe-shadow-lifted)] backdrop-blur-sm transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60"
                             style={{
                               width: PLACEMENT_ROTATE_BTN_PX,
                               height: PLACEMENT_ROTATE_BTN_PX,
@@ -930,7 +930,7 @@ export function SchiffeVersenkenApp() {
                             type="button"
                             aria-label="Schiff entfernen"
                             title="Entfernen"
-                            className="flex items-center justify-center rounded-xl border border-red-500/40 bg-slate-800/90 text-base font-black leading-none text-red-400 shadow-lg backdrop-blur-sm transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60"
+                            className="flex items-center justify-center rounded-[var(--vibe-r-lg)] border border-[var(--pasch-carmine)]/40 bg-[var(--vibe-bg-elevated)]/90 text-base font-black leading-none text-[var(--pasch-carmine)] shadow-[var(--vibe-shadow-lifted)] backdrop-blur-sm transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60"
                             style={{
                               width: PLACEMENT_ROTATE_BTN_PX,
                               height: PLACEMENT_ROTATE_BTN_PX,
@@ -969,7 +969,7 @@ export function SchiffeVersenkenApp() {
                           }}
                           className={[
                             "group relative h-full w-full touch-manipulation transition-colors text-[0px]",
-                            !sh && !prev ? "hover:bg-slate-800/70" : "",
+                            !sh && !prev ? "hover:bg-[color-mix(in_srgb,var(--accent)_12%,transparent)]" : "",
                           ].join(" ")}
                           onPointerDown={(e) => {
                             if (!sh) return;
@@ -1063,17 +1063,17 @@ export function SchiffeVersenkenApp() {
                             </div>
                           )}
                           {prev && !isHoverAnchor && placementDrag && !prevOk && (
-                            <div className="absolute inset-0 z-10 rounded-sm bg-red-500 opacity-40" />
+                            <div className="absolute inset-0 z-10 rounded-sm bg-[var(--pasch-carmine)] opacity-40" />
                           )}
                           {prev && !placementDrag && (
                             <div
                               className={`absolute inset-0 z-10 rounded-sm opacity-40 ${
-                                prevOk ? "bg-amber-400" : "bg-red-500"
+                                prevOk ? "bg-[var(--pasch-success)]" : "bg-[var(--pasch-carmine)]"
                               }`}
                             />
                           )}
                           {!sh && !prev && (
-                            <div className="absolute left-1/2 top-1/2 h-0.5 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-600 opacity-60" />
+                            <div className="absolute left-1/2 top-1/2 h-0.5 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--vibe-fg-muted)] opacity-60" />
                           )}
                           <span className="sr-only">Feld {formatCell({ r, c })}</span>
                         </button>
@@ -1086,7 +1086,7 @@ export function SchiffeVersenkenApp() {
                 type="button"
                 disabled={!fleetIsCompleteAndValid(game.myShips)}
                 onClick={() => dispatch({ type: "ADVANCE_PLACEMENT" })}
-                className="shrink-0 rounded-2xl bg-[var(--accent)] py-2 text-xs font-black uppercase tracking-wider text-[var(--accent-ink)] shadow-sm transition duration-200 hover:brightness-95 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:py-2.5 sm:text-sm"
+                className="shrink-0 rounded-[var(--vibe-r-xl)] bg-[var(--accent)] py-2 text-xs font-black uppercase tracking-wider text-[var(--accent-ink)] shadow-[var(--vibe-shadow-soft)] transition duration-200 hover:brightness-95 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:py-2.5 sm:text-sm"
               >
                 {game.mode === "single" ? "Spiel starten" : "Weiter zum Tippfeld"}
               </button>
@@ -1100,7 +1100,7 @@ export function SchiffeVersenkenApp() {
                 <div
                   role="tablist"
                   aria-label="Spielfeld wechseln"
-                  className="relative grid grid-cols-2 gap-1 rounded-xl border border-zinc-200 bg-zinc-100 p-1 dark:border-zinc-700 dark:bg-zinc-900"
+                  className="relative grid grid-cols-2 gap-1 rounded-[var(--vibe-r-lg)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] p-1"
                 >
                   <button
                     type="button"
@@ -1108,10 +1108,10 @@ export function SchiffeVersenkenApp() {
                     aria-selected={mobilePlayBoard === "target"}
                     onClick={() => setMobilePlayBoard("target")}
                     className={[
-                      "relative z-10 min-h-9 rounded-lg px-2 text-[12px] font-bold transition-all duration-200 active:scale-[0.98]",
+                      "relative z-10 min-h-9 rounded-[var(--vibe-r-md)] px-2 text-[12px] font-bold transition-all duration-200 active:scale-[0.98]",
                       mobilePlayBoard === "target"
-                        ? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-slate-100"
-                        : "text-slate-500 dark:text-slate-400",
+                        ? "bg-[var(--vibe-bg-elevated)] text-[var(--vibe-fg-base)] shadow-[var(--vibe-shadow-soft)]"
+                        : "text-[var(--vibe-fg-muted)]",
                     ].join(" ")}
                   >
                     {game.mode === "single" ? "Zielfeld" : "Tippfeld"}
@@ -1122,10 +1122,10 @@ export function SchiffeVersenkenApp() {
                     aria-selected={mobilePlayBoard === "fleet"}
                     onClick={() => setMobilePlayBoard("fleet")}
                     className={[
-                      "relative z-10 min-h-9 rounded-lg px-2 text-[12px] font-bold transition-all duration-200 active:scale-[0.98]",
+                      "relative z-10 min-h-9 rounded-[var(--vibe-r-md)] px-2 text-[12px] font-bold transition-all duration-200 active:scale-[0.98]",
                       mobilePlayBoard === "fleet"
-                        ? "bg-white text-slate-900 shadow-sm dark:bg-slate-700 dark:text-slate-100"
-                        : "text-slate-500 dark:text-slate-400",
+                        ? "bg-[var(--vibe-bg-elevated)] text-[var(--vibe-fg-base)] shadow-[var(--vibe-shadow-soft)]"
+                        : "text-[var(--vibe-fg-muted)]",
                     ].join(" ")}
                   >
                     Eigene Schiffe
@@ -1140,7 +1140,7 @@ export function SchiffeVersenkenApp() {
                     "relative min-h-0 min-w-0 flex-1 items-center justify-center lg:flex",
                   ].join(" ")}
                 >
-                  <span className="pointer-events-none absolute left-1 top-1 z-20 rounded-md bg-slate-900/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-300 backdrop-blur-sm">
+                  <span className="pointer-events-none absolute left-1 top-1 z-20 rounded-[var(--vibe-r-sm)] bg-[var(--vibe-bg-sunken)]/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--vibe-fg-muted)] backdrop-blur-sm">
                     Deine Schiffe
                   </span>
                   <BoardGrid
@@ -1154,17 +1154,17 @@ export function SchiffeVersenkenApp() {
                       const bg = sh
                         ? wasHitByBot
                           ? "border-transparent"
-                          : "border-slate-600 bg-slate-500/90 dark:border-slate-400 dark:bg-slate-500/85"
+                          : "border-[var(--vibe-line-brass)] bg-[color-mix(in_srgb,var(--accent)_55%,var(--vibe-bg-elevated))]"
                         : wasMissedByBot
                           ? "border-transparent"
-                          : "border-zinc-300 bg-white dark:border-zinc-600 dark:bg-zinc-800/80";
+                          : "border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/80";
                       return (
                         <div
-                          className={`relative h-full w-full rounded-md border ${bg}`}
+                          className={`relative h-full w-full rounded-[var(--vibe-r-sm)] border ${bg}`}
                           style={useInlineColor ? { backgroundColor: wasHitByBot ? colors.hit : colors.miss, borderColor: wasHitByBot ? colors.hit : colors.miss } : undefined}
                         >
                           {wasHitByBot && (
-                            <div className="absolute inset-0 flex items-center justify-center text-base font-black text-white">
+                            <div className="absolute inset-0 flex items-center justify-center text-base font-black text-[var(--vibe-bg-elevated)]">
                               ×
                             </div>
                           )}
@@ -1181,7 +1181,7 @@ export function SchiffeVersenkenApp() {
                     "relative min-h-0 min-w-0 flex-1 items-center justify-center lg:flex",
                   ].join(" ")}
                 >
-                  <span className="pointer-events-none absolute left-1 top-1 z-20 rounded-md bg-slate-900/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-300 backdrop-blur-sm">
+                  <span className="pointer-events-none absolute left-1 top-1 z-20 rounded-[var(--vibe-r-sm)] bg-[var(--vibe-bg-sunken)]/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[var(--vibe-fg-muted)] backdrop-blur-sm">
                     {game.mode === "single" ? "Zielfeld" : "Tippfeld"}
                   </span>
                   <BoardGrid
@@ -1213,9 +1213,9 @@ export function SchiffeVersenkenApp() {
                             dispatch({ type: "TRACKER_SELECT", cell: { r, c } });
                           }}
                           className={[
-                            "group relative h-full w-full border-zinc-800/50 transition-all touch-manipulation",
-                            shot === "empty" ? "hover:bg-zinc-800/50" : "",
-                            sel ? "z-10 ring-2 ring-amber-500 ring-inset" : "",
+                            "group relative h-full w-full border-[var(--vibe-line)]/50 transition-all touch-manipulation",
+                            shot === "empty" ? "hover:bg-[color-mix(in_srgb,var(--accent)_12%,transparent)]" : "",
+                            sel ? "z-10 ring-2 ring-[var(--accent)] ring-inset" : "",
                           ].join(" ")}
                         >
                           {shot === "hit" && (
@@ -1242,7 +1242,7 @@ export function SchiffeVersenkenApp() {
                             </div>
                           )}
                           {shot === "empty" && !sel && (
-                            <div className="absolute left-1/2 top-1/2 h-0.5 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-zinc-700 opacity-30" />
+                            <div className="absolute left-1/2 top-1/2 h-0.5 w-0.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--vibe-fg-muted)] opacity-30" />
                           )}
                           <span className="sr-only">{formatCell({ r, c })}</span>
                         </button>
@@ -1253,14 +1253,14 @@ export function SchiffeVersenkenApp() {
               </div>
 
               <div
-                className="shrink-0 rounded-xl border border-zinc-200 bg-white/95 p-2 shadow-sm dark:border-zinc-700 dark:bg-zinc-900/95 dark:shadow-black/30"
+                className="shrink-0 rounded-[var(--vibe-r-lg)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/95 p-2 shadow-[var(--vibe-shadow-soft)]"
                 style={{
                   paddingBottom: "max(0.5rem, env(safe-area-inset-bottom, 0px))",
                 }}
               >
                 {game.mode === "single" && game.single ? (
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="min-w-0 flex-1 truncate rounded-lg bg-zinc-50 px-2 py-1.5 text-[11px] font-semibold text-zinc-700 sm:text-xs dark:bg-zinc-800/70 dark:text-zinc-200">
+                    <span className="min-w-0 flex-1 truncate rounded-[var(--vibe-r-md)] bg-[var(--vibe-bg-sunken)] px-2 py-1.5 text-[11px] font-semibold text-[var(--vibe-fg-muted)] sm:text-xs">
                       {game.single.turn === "player"
                         ? game.single.selectedTarget
                           ? `Ziel: ${formatCell(game.single.selectedTarget)}`
@@ -1273,7 +1273,7 @@ export function SchiffeVersenkenApp() {
                         game.single.turn !== "player" || !game.single.selectedTarget
                       }
                       onClick={() => dispatch({ type: "SINGLE_FIRE" })}
-                      className="shrink-0 rounded-xl bg-amber-500 px-6 py-2 text-xs font-black uppercase tracking-wider text-slate-950 shadow-sm transition duration-200 hover:bg-amber-400 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm dark:bg-amber-400 dark:focus-visible:ring-offset-zinc-950"
+                      className="shrink-0 rounded-[var(--vibe-r-lg)] bg-[var(--accent)] px-6 py-2 text-xs font-black uppercase tracking-wider text-[var(--accent-ink)] shadow-[var(--vibe-shadow-soft)] transition duration-200 hover:brightness-95 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm"
                     >
                       Feuern
                     </button>
@@ -1295,7 +1295,7 @@ export function SchiffeVersenkenApp() {
                                 type="button"
                                 disabled={markHitMissDisabled}
                                 onClick={() => dispatch({ type: "TRACKER_MARK", mark: "hit" })}
-                                className="min-h-10 flex-1 rounded-xl px-4 py-2 text-xs font-black transition duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm dark:focus-visible:ring-offset-zinc-950"
+                                className="min-h-10 flex-1 rounded-[var(--vibe-r-lg)] px-4 py-2 text-xs font-black transition duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm"
                                 style={{ backgroundColor: colors.hit, color: textColorForBg(colors.hit) }}
                               >
                                 Treffer
@@ -1304,7 +1304,7 @@ export function SchiffeVersenkenApp() {
                                 type="button"
                                 disabled={markHitMissDisabled}
                                 onClick={() => dispatch({ type: "TRACKER_MARK", mark: "miss" })}
-                                className="min-h-10 flex-1 rounded-xl border-2 px-4 py-2 text-xs font-black transition duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm dark:focus-visible:ring-offset-zinc-950"
+                                className="min-h-10 flex-1 rounded-[var(--vibe-r-lg)] border-2 px-4 py-2 text-xs font-black transition duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm"
                                 style={{ backgroundColor: colors.miss, color: textColorForBg(colors.miss), borderColor: colors.miss }}
                               >
                                 Kein Treffer
@@ -1319,7 +1319,7 @@ export function SchiffeVersenkenApp() {
                                   title="Versenkt"
                                   aria-label="Versenkt"
                                   onClick={() => dispatch({ type: "TRACKER_SUNK" })}
-                                  className="min-h-10 rounded-xl border-2 border-amber-700 bg-amber-100 px-4 py-2 text-xs font-black text-amber-950 transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm dark:border-amber-500 dark:bg-amber-950/50 dark:text-amber-100 dark:focus-visible:ring-offset-zinc-950"
+                                  className="min-h-10 rounded-[var(--vibe-r-lg)] border-2 border-[var(--accent-line)] bg-[color-mix(in_srgb,var(--accent)_18%,transparent)] px-4 py-2 text-xs font-black text-[var(--accent-ink)] transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm"
                                 >
                                   Versenkt
                                 </button>
@@ -1327,7 +1327,7 @@ export function SchiffeVersenkenApp() {
                               <button
                                 type="button"
                                 onClick={() => dispatch({ type: "TRACKER_UNDO" })}
-                                className="min-h-10 flex-1 rounded-xl border-2 border-red-300 bg-red-50 px-4 py-2 text-xs font-black text-red-700 transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm dark:border-red-800 dark:bg-red-950/40 dark:text-red-300 dark:focus-visible:ring-offset-zinc-950"
+                                className="min-h-10 flex-1 rounded-[var(--vibe-r-lg)] border-2 border-[var(--pasch-carmine)]/40 bg-[var(--pasch-carmine-soft)] px-4 py-2 text-xs font-black text-[var(--pasch-carmine-text)] transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm"
                               >
                                 Aufheben
                               </button>
@@ -1337,13 +1337,13 @@ export function SchiffeVersenkenApp() {
                             <button
                               type="button"
                               onClick={() => dispatch({ type: "TRACKER_UNDO" })}
-                              className="min-h-10 flex-1 rounded-xl border-2 border-red-300 bg-red-50 px-4 py-2 text-xs font-black text-red-700 transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm dark:border-red-800 dark:bg-red-950/40 dark:text-red-300 dark:focus-visible:ring-offset-zinc-950"
+                              className="min-h-10 flex-1 rounded-[var(--vibe-r-lg)] border-2 border-[var(--pasch-carmine)]/40 bg-[var(--pasch-carmine-soft)] px-4 py-2 text-xs font-black text-[var(--pasch-carmine-text)] transition duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:text-sm"
                             >
                               Aufheben
                             </button>
                           )}
                           {!game.trackerPending && (
-                            <span className="flex-1 truncate rounded-lg bg-zinc-50 px-2 py-1.5 text-center text-[11px] font-semibold text-zinc-500 sm:text-xs dark:bg-zinc-800/70 dark:text-zinc-400">
+                            <span className="flex-1 truncate rounded-[var(--vibe-r-md)] bg-[var(--vibe-bg-sunken)] px-2 py-1.5 text-center text-[11px] font-semibold text-[var(--vibe-fg-muted)] sm:text-xs">
                               Feld antippen zum Markieren
                             </span>
                           )}
@@ -1359,10 +1359,10 @@ export function SchiffeVersenkenApp() {
           {game.phase === "finished" && (
             <div className="flex min-h-0 flex-1 items-center justify-center">
               <div className={`${card} w-full max-w-xl space-y-4 p-4 sm:p-6`}>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--vibe-fg-muted)]">
                   Spielende
                 </p>
-                <h2 className="font-sans text-3xl font-black tracking-tight text-slate-900 dark:text-slate-100">
+                <h2 className="font-display text-3xl font-black tracking-tight text-[var(--vibe-fg-base)]">
                   {game.mode === "single"
                     ? game.winner === "player"
                       ? "Du hast gewonnen."
@@ -1370,7 +1370,7 @@ export function SchiffeVersenkenApp() {
                     : "Tracking-Runde beendet."}
                 </h2>
                 {game.mode === "single" && (
-                  <p className="text-sm text-slate-700 dark:text-slate-300">
+                  <p className="text-sm text-[var(--vibe-fg-muted)]">
                     {game.winner === "player"
                       ? "Starker Abschluss. Alle Bot-Schiffe sind versenkt."
                       : "Deine Flotte wurde komplett getroffen. Neue Runde?"}
@@ -1381,7 +1381,7 @@ export function SchiffeVersenkenApp() {
                     <button
                       type="button"
                       onClick={() => dispatch({ type: "SET_MODE", mode: game.mode as GameMode })}
-                      className="min-h-11 rounded-2xl bg-amber-500 px-4 py-2 text-sm font-black uppercase tracking-wider text-slate-950 shadow-sm transition duration-200 hover:bg-amber-400 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 dark:bg-amber-400 dark:hover:bg-amber-300 dark:focus-visible:ring-offset-zinc-950"
+                      className="min-h-11 rounded-[var(--vibe-r-xl)] bg-[var(--accent)] px-4 py-2 text-sm font-black uppercase tracking-wider text-[var(--accent-ink)] shadow-[var(--vibe-shadow-soft)] transition duration-200 hover:brightness-95 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2"
                     >
                       Gleicher Modus
                     </button>
@@ -1389,7 +1389,7 @@ export function SchiffeVersenkenApp() {
                   <button
                     type="button"
                     onClick={() => dispatch({ type: "RESET" })}
-                    className="min-h-11 rounded-2xl border border-zinc-300 bg-white px-4 py-2 text-sm font-black uppercase tracking-wider text-zinc-900 transition duration-200 hover:bg-zinc-50 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:ring-offset-zinc-950"
+                    className="min-h-11 rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] px-4 py-2 text-sm font-black uppercase tracking-wider text-[var(--vibe-fg-base)] transition duration-200 hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2"
                   >
                     Moduswahl
                   </button>
@@ -1404,11 +1404,9 @@ export function SchiffeVersenkenApp() {
         <div className="pointer-events-none absolute inset-0 z-50 flex items-center justify-center">
           <div
             className={[
-              "rounded-2xl border bg-white/95 px-8 py-6 shadow-md backdrop-blur-sm dark:bg-slate-900/95",
+              "rounded-[var(--vibe-r-xl)] border bg-[var(--vibe-bg-elevated)]/95 px-8 py-6 shadow-[var(--vibe-shadow-lifted)] backdrop-blur-sm",
               "origin-center transform-gpu transition duration-200 ease-out",
-              botShotWasHit(game.single.lastBotShot)
-                ? "border-slate-300/70 dark:border-slate-600/60"
-                : "border-slate-300/70 dark:border-slate-700/70",
+              "border-[var(--vibe-line)]",
               botOverlayEntered ? "scale-100 opacity-100" : "scale-90 opacity-0",
             ].join(" ")}
             style={
@@ -1417,16 +1415,16 @@ export function SchiffeVersenkenApp() {
                 : undefined
             }
           >
-            <p className="text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 dark:text-slate-300">
+            <p className="text-center text-[10px] font-black uppercase tracking-[0.2em] text-[var(--vibe-fg-muted)]">
               Bot Zug
             </p>
             <p
-              className="text-center font-sans text-4xl font-black sm:text-5xl"
+              className="text-center font-display text-4xl font-black sm:text-5xl"
               style={botShotWasHit(game.single.lastBotShot) ? { color: colors.hit } : undefined}
             >
               {overlayCellLabel(game.single.lastBotShot)}
             </p>
-            <p className="mt-2 text-center text-sm font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">
+            <p className="mt-2 text-center text-sm font-black uppercase tracking-wider text-[var(--vibe-fg-muted)]">
               {botShotWasHit(game.single.lastBotShot) ? "Treffer" : "Kein Treffer"}
             </p>
           </div>
@@ -1437,7 +1435,7 @@ export function SchiffeVersenkenApp() {
 }
 
 const ShipVisual = ({ len, vertical, isSelected }: { len: number; vertical: boolean; isSelected?: boolean }) => {
-  const baseColor = isSelected ? "stroke-amber-400 fill-amber-500/20" : "stroke-slate-400 fill-slate-500/20";
+  const baseColor = isSelected ? "stroke-[var(--accent)] fill-[var(--accent)]/20" : "stroke-[var(--vibe-fg-muted)] fill-[var(--vibe-fg-muted)]/20";
   return (
     <svg
       viewBox={vertical ? `0 0 40 ${len * 40}` : `0 0 ${len * 40} 40`}

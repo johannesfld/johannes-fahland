@@ -256,7 +256,7 @@ export default function RommeScoreApp() {
             onClick={resetAll}
             className={cn(
               "inline-flex items-center gap-1.5 rounded-[var(--vibe-r-md)] px-3 py-2 text-xs font-semibold",
-              "text-[var(--vibe-fg-faint)] transition-colors hover:text-red-500",
+              "text-[var(--vibe-fg-faint)] transition-colors hover:text-[var(--pasch-carmine)]",
               ring,
             )}
           >
@@ -306,7 +306,7 @@ export default function RommeScoreApp() {
                         <button
                           type="button"
                           onClick={() => setPlayerNames(playerNames.filter((_, idx) => idx !== i))}
-                          className="flex h-11 w-11 items-center justify-center rounded-[var(--vibe-r-md)] text-[var(--vibe-fg-faint)] transition-colors hover:text-red-500"
+                          className="flex h-11 w-11 items-center justify-center rounded-[var(--vibe-r-md)] text-[var(--vibe-fg-faint)] transition-colors hover:text-[var(--pasch-carmine)]"
                           aria-label="Spieler entfernen"
                         >
                           <X size={16} aria-hidden />

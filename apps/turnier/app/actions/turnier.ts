@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getCurrentUser, prisma, Prisma } from "@pasch/db";
+import { prisma, Prisma } from "@pasch/db";
 import { isCoverageCompletePrisma } from "@/lib/turnier/coverage";
 import { createRandomDoublesDraw, createRandomSinglesDraw } from "@/lib/turnier/draw";
 import { buildStandings } from "@/lib/turnier/standings";
@@ -143,9 +143,7 @@ function mapTournamentDetail(raw: TournamentRaw): TournamentDetail {
 }
 
 export async function getTournamentList(): Promise<TournamentListItem[]> {
-  const user = await getCurrentUser();
   const list = await prisma.tournament.findMany({
-    where: user?.id === "guest" ? {} : { userId: user?.id },
     orderBy: [{ status: "asc" }, { updatedAt: "desc" }],
     include: {
       _count: { select: { players: { where: { active: true } } } },
@@ -174,14 +172,12 @@ export async function getTournamentById(tournamentId: string): Promise<Tournamen
 export async function createTournament(name: string, bestOf: BestOf, format: TournamentFormat) {
   const safeName = name.trim();
   if (!safeName) throw new Error("Bitte Turniername eingeben.");
-  const user = await getCurrentUser();
 
   const created = await prisma.tournament.create({
     data: {
       name: safeName,
       bestOf: toPrismaBestOf(bestOf),
       format: toPrismaFormat(format),
-      userId: user?.id === "guest" ? null : user?.id,
     },
   });
 
@@ -665,19 +661,11 @@ export async function finishTournament(tournamentId: string) {
 }
 
 export async function deleteTournament(tournamentId: string) {
-  const user = await getCurrentUser();
   const tournament = await prisma.tournament.findUnique({
     where: { id: tournamentId },
-    select: { userId: true },
+    select: { id: true },
   });
   if (!tournament) throw new Error("Turnier nicht gefunden.");
-  if (
-    user?.id !== "guest" &&
-    tournament.userId &&
-    tournament.userId !== user?.id
-  ) {
-    throw new Error("Keine Berechtigung dieses Turnier zu löschen.");
-  }
 
   await prisma.tournament.delete({ where: { id: tournamentId } });
   revalidatePath("/");

@@ -303,7 +303,7 @@ export default function WizardScoreMaster() {
   }, [setupPlayerCount]);
 
   const titleClass =
-    "font-serif text-3xl font-bold tracking-tighter text-[var(--accent)] sm:text-4xl md:text-5xl";
+    "font-display text-3xl font-bold tracking-tighter text-[var(--accent)] sm:text-4xl md:text-5xl";
 
   const labelMuted =
     "text-[10px] font-black uppercase tracking-widest text-[var(--accent)]/70 sm:text-xs";
@@ -342,7 +342,7 @@ export default function WizardScoreMaster() {
                             setError(null);
                           }}
                           className={
-                            `flex aspect-square w-full max-h-14 shrink-0 items-center justify-center rounded-full border-2 font-serif text-base transition-colors sm:max-h-16 sm:text-lg touch-manipulation ` +
+                            `flex aspect-square w-full max-h-14 shrink-0 items-center justify-center rounded-full border-2 font-display text-base transition-colors sm:max-h-16 sm:text-lg touch-manipulation ` +
                             (setupPlayerCount === n
                               ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
                               : "border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/60 text-[var(--vibe-fg-muted)] hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)]")
@@ -378,7 +378,7 @@ export default function WizardScoreMaster() {
                             setError(null);
                           }}
                           className={
-                            "w-full rounded-2xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] px-4 py-3 text-base text-[var(--vibe-fg-base)] outline-none " +
+                            "w-full rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] px-4 py-3 text-base text-[var(--vibe-fg-base)] outline-none " +
                             "placeholder:text-[var(--vibe-fg-faint)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/25"
                           }
                           placeholder={`Spieler ${i + 1}`}
@@ -401,7 +401,7 @@ export default function WizardScoreMaster() {
                           value={DUMMY_PLAYER_NAME}
                           disabled
                           className={
-                            "w-full rounded-2xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)]/70 px-4 py-3 text-base text-[var(--vibe-fg-muted)] outline-none opacity-60"
+                            "w-full rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)]/70 px-4 py-3 text-base text-[var(--vibe-fg-muted)] outline-none opacity-60"
                           }
                         />
                       </label>
@@ -436,7 +436,7 @@ export default function WizardScoreMaster() {
                     <div className="relative inline-block w-full">
                       <div className="absolute inset-0 mx-auto opacity-20 blur-3xl motion-safe:animate-pulse" style={{ background: "var(--accent)" }} />
                       <div className="relative space-y-2 p-4 sm:space-y-4 sm:p-8">
-                        <p className="break-words font-serif text-3xl font-black leading-tight text-[var(--vibe-fg-base)] sm:text-5xl md:text-6xl">
+                        <p className="break-words font-display text-3xl font-black leading-tight text-[var(--vibe-fg-base)] sm:text-5xl md:text-6xl">
                           {currentMixer?.name}
                         </p>
                         <p className="text-lg font-bold text-[var(--accent)] sm:text-xl md:text-2xl">
@@ -447,7 +447,7 @@ export default function WizardScoreMaster() {
                   </div>
 
                   <div
-                    className="space-y-2 rounded-2xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/50 p-3 sm:space-y-3 sm:p-6 md:rounded-3xl"
+                    className="space-y-2 rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/50 p-3 sm:space-y-3 sm:p-6 md:rounded-[var(--vibe-r-2xl)]"
                   >
                     <p className="text-sm font-bold text-[var(--vibe-fg-base)] sm:text-lg">
                       Bitte teile {state.roundNumber} Karten an jeden aus.
@@ -457,7 +457,7 @@ export default function WizardScoreMaster() {
                         <div
                           key={i}
                           className={
-                            `min-h-[2.5rem] min-w-0 break-words rounded-lg px-2 py-2 text-center text-xs font-bold leading-snug sm:text-sm ` +
+                            `min-h-[2.5rem] min-w-0 break-words rounded-[var(--vibe-r-md)] px-2 py-2 text-center text-xs font-bold leading-snug sm:text-sm ` +
                             (i === state.mixerIndex
                               ? "bg-[var(--accent)] text-[var(--accent-ink)]"
                               : "bg-[var(--vibe-bg-elevated)]/80 text-[var(--vibe-fg-muted)]")
@@ -492,11 +492,11 @@ export default function WizardScoreMaster() {
                 <div className="w-full max-w-md space-y-3 text-center sm:space-y-6 app-page-enter">
                   <div className="space-y-2 sm:space-y-3">
                     <p className={labelMuted}>2-Spieler-Regeln mit Bruv</p>
-                    <h2 className="font-serif text-2xl font-bold text-[var(--vibe-fg-base)] sm:text-3xl">
+                    <h2 className="font-display text-2xl font-bold text-[var(--vibe-fg-base)] sm:text-3xl">
                       Zusatzregeln
                     </h2>
                   </div>
-                  <div className="space-y-4 rounded-2xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/50 p-5 text-left text-sm leading-relaxed text-[var(--vibe-fg-base)] sm:text-base">
+                  <div className="space-y-4 rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/50 p-5 text-left text-sm leading-relaxed text-[var(--vibe-fg-base)] sm:text-base">
   <h3 className="font-semibold text-[var(--vibe-fg-base)]">So spielt der Dummy mit:</h3>
   
   <ul className="space-y-3 list-none">
@@ -546,7 +546,7 @@ export default function WizardScoreMaster() {
                   <div className="relative inline-block w-full">
                     <div className="absolute inset-0 mx-auto opacity-20 blur-3xl motion-safe:animate-pulse" style={{ background: "var(--accent)" }} />
                     <div className="relative space-y-2 p-3 sm:space-y-4 sm:p-8">
-                      <p className="break-words font-serif text-3xl font-black leading-tight text-[var(--vibe-fg-base)] sm:text-5xl md:text-6xl">
+                      <p className="break-words font-display text-3xl font-black leading-tight text-[var(--vibe-fg-base)] sm:text-5xl md:text-6xl">
                         {currentBidder?.name}
                       </p>
                       <p className="text-base font-bold text-[var(--accent)] sm:text-xl">
@@ -596,7 +596,7 @@ export default function WizardScoreMaster() {
                   </div>
 
                   {state.currentBidderIndex > 0 && (
-                    <div className="overflow-hidden rounded-xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/40">
+                    <div className="overflow-hidden rounded-[var(--vibe-r-lg)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/40">
                       {biddingPlayerOrder.slice(0, state.currentBidderIndex).map((pi) => (
                         <div key={pi} className="flex items-center justify-between px-3 py-1.5 text-xs border-b last:border-0 border-[var(--vibe-line)]">
                           <span className="font-medium text-[var(--vibe-fg-base)]">{state.players[pi]?.name}</span>
@@ -612,7 +612,7 @@ export default function WizardScoreMaster() {
                     <button
                       type="button"
                       onClick={handleBidBack}
-                      className="flex-none rounded-2xl border-2 border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/60 px-4 py-4 text-sm font-black text-[var(--accent)] transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] touch-manipulation"
+                      className="flex-none rounded-[var(--vibe-r-xl)] border-2 border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/60 px-4 py-4 text-sm font-black text-[var(--accent)] transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] touch-manipulation"
                       aria-label="Zurück"
                     >
                       ←
@@ -637,12 +637,12 @@ export default function WizardScoreMaster() {
                 <div className="w-full max-w-md space-y-3 text-center sm:space-y-6 app-page-enter">
                   <div className="space-y-1">
                     <p className={labelMuted}>Runde {state.roundNumber} – Ansagen</p>
-                    <h2 className="font-serif text-xl font-bold text-[var(--vibe-fg-base)] sm:text-2xl">
+                    <h2 className="font-display text-xl font-bold text-[var(--vibe-fg-base)] sm:text-2xl">
                       Übersicht
                     </h2>
                   </div>
 
-                  <div className="overflow-hidden rounded-2xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/50">
+                  <div className="overflow-hidden rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/50">
                     {biddingPlayerOrder.map((pi) => (
                       <div
                         key={pi}
@@ -651,7 +651,7 @@ export default function WizardScoreMaster() {
                         <span className="font-bold text-[var(--vibe-fg-base)]">
                           {state.players[pi]?.name}
                         </span>
-                        <span className="font-serif text-lg font-bold text-[var(--accent)]">
+                        <span className="font-display text-lg font-bold text-[var(--accent)]">
                           {state.pendingBids[pi]}
                         </span>
                       </div>
@@ -668,7 +668,7 @@ export default function WizardScoreMaster() {
                           currentBidderIndex: biddingPlayerOrder.length - 1,
                         }))
                       }
-                      className="flex-none rounded-2xl border-2 border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/60 px-4 py-4 text-sm font-black text-[var(--accent)] transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] touch-manipulation"
+                      className="flex-none rounded-[var(--vibe-r-xl)] border-2 border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/60 px-4 py-4 text-sm font-black text-[var(--accent)] transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] touch-manipulation"
                       aria-label="Zurück"
                     >
                       ←
@@ -707,7 +707,7 @@ export default function WizardScoreMaster() {
                   <div className="relative inline-block w-full">
                     <div className="absolute inset-0 mx-auto opacity-20 blur-3xl motion-safe:animate-pulse" style={{ background: "var(--accent)" }} />
                     <div className="relative space-y-1 p-3 sm:space-y-4 sm:p-8">
-                      <p className="break-words font-serif text-3xl font-black leading-tight text-[var(--vibe-fg-base)] sm:text-5xl md:text-6xl">
+                      <p className="break-words font-display text-3xl font-black leading-tight text-[var(--vibe-fg-base)] sm:text-5xl md:text-6xl">
                         {currentActualBidder?.name}
                       </p>
                       <div className="space-y-1">
@@ -764,7 +764,7 @@ export default function WizardScoreMaster() {
                   </div>
 
                   {/* Ansagen-Übersicht aller Spieler */}
-                  <div className="overflow-hidden rounded-xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/40">
+                  <div className="overflow-hidden rounded-[var(--vibe-r-lg)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/40">
                     {actualOrder.map((pi) => {
                       const isDone = pi < actualOrder[state.currentActualIndex];
                       const isCurrent = pi === currentActualBidderIndex;
@@ -797,7 +797,7 @@ export default function WizardScoreMaster() {
                     <button
                       type="button"
                       onClick={handleActualBack}
-                      className="flex-none rounded-2xl border-2 border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/60 px-4 py-4 text-sm font-black text-[var(--accent)] transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] touch-manipulation"
+                      className="flex-none rounded-[var(--vibe-r-xl)] border-2 border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/60 px-4 py-4 text-sm font-black text-[var(--accent)] transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] touch-manipulation"
                       aria-label="Zurück"
                     >
                       ←
@@ -824,14 +824,14 @@ export default function WizardScoreMaster() {
                     <p className={`${labelMuted} mb-1`}>
                       Runde {state.roundNumber} abgeschlossen
                     </p>
-                    <h2 className="font-serif text-xl font-bold text-[var(--vibe-fg-base)] sm:text-2xl md:text-3xl">
+                    <h2 className="font-display text-xl font-bold text-[var(--vibe-fg-base)] sm:text-2xl md:text-3xl">
                       Punktetabelle
                     </h2>
                   </div>
 
                   <div
                     className={
-                      "overflow-hidden rounded-2xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/50 app-page-enter"
+                      "overflow-hidden rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/50 app-page-enter"
                     }
                   >
                     <table className="w-full text-left text-xs sm:text-sm">
@@ -857,7 +857,7 @@ export default function WizardScoreMaster() {
                             <td className="px-2 py-2 sm:px-6">
                               <div
                                 className={
-                                  `flex h-4 w-4 items-center justify-center rounded-full text-[7px] font-bold sm:h-5 sm:w-5 sm:text-[8px] md:h-6 md:w-6 md:text-[10px] ` +
+                                  `flex h-4 w-4 items-center justify-center rounded-[var(--vibe-r-xs)] text-[7px] font-bold sm:h-5 sm:w-5 sm:text-[8px] md:h-6 md:w-6 md:text-[10px] ` +
                                   (i === 0
                                     ? "bg-[var(--accent)] text-[var(--accent-ink)]"
                                     : "bg-[color-mix(in_srgb,var(--accent)_15%,transparent)] text-[var(--vibe-fg-muted)]")
@@ -869,7 +869,7 @@ export default function WizardScoreMaster() {
                             <td className="truncate px-1 py-1 text-xs font-bold text-[var(--vibe-fg-base)] sm:px-2 sm:py-2 sm:text-sm">
                               {p.name}
                             </td>
-                            <td className="px-2 py-1 text-right font-serif text-xs font-bold text-[var(--accent)] sm:px-6 sm:py-2 sm:text-sm">
+                            <td className="px-2 py-1 text-right font-display text-xs font-bold text-[var(--accent)] sm:px-6 sm:py-2 sm:text-sm">
                               {p.totalScore}
                             </td>
                           </tr>
@@ -880,7 +880,7 @@ export default function WizardScoreMaster() {
 
                   <div
                     className={
-                      "space-y-2 rounded-2xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/50 p-2 sm:p-4"
+                      "space-y-2 rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/50 p-2 sm:p-4"
                     }
                   >
                     <h3 className="text-xs font-bold uppercase tracking-widest text-[var(--accent)] sm:text-sm">
@@ -893,7 +893,7 @@ export default function WizardScoreMaster() {
                           <div
                             key={i}
                             className={
-                              "flex items-center justify-between gap-1 rounded-lg border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)]/50 p-2 text-xs sm:gap-2 sm:text-sm"
+                              "flex items-center justify-between gap-1 rounded-[var(--vibe-r-md)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)]/50 p-2 text-xs sm:gap-2 sm:text-sm"
                             }
                           >
                             <span className="truncate font-bold text-[var(--vibe-fg-base)]">
@@ -904,10 +904,10 @@ export default function WizardScoreMaster() {
                             </span>
                             <span
                               className={
-                                `whitespace-nowrap font-serif text-xs font-bold sm:text-sm ` +
+                                `whitespace-nowrap font-display text-xs font-bold sm:text-sm ` +
                                 (roundData && roundData.points >= 0
-                                  ? "text-emerald-600 dark:text-emerald-400"
-                                  : "text-red-600 dark:text-red-400")
+                                  ? "text-[var(--pasch-success)]"
+                                  : "text-[var(--pasch-carmine)]")
                               }
                             >
                               {roundData && roundData.points >= 0
@@ -924,7 +924,7 @@ export default function WizardScoreMaster() {
                     <button
                       type="button"
                       onClick={handleScoreboardBack}
-                      className="flex-none rounded-2xl border-2 border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/60 px-4 py-4 text-sm font-black text-[var(--accent)] transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] touch-manipulation"
+                      className="flex-none rounded-[var(--vibe-r-xl)] border-2 border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/60 px-4 py-4 text-sm font-black text-[var(--accent)] transition-colors hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)] touch-manipulation"
                       aria-label="Zurück zur Abrechnung"
                     >
                       ←
@@ -933,7 +933,7 @@ export default function WizardScoreMaster() {
                       type="button"
                       onClick={handleNextRound}
                       className={
-                        "flex-1 rounded-2xl bg-[var(--accent)] py-4 text-base font-black uppercase tracking-widest text-[var(--accent-ink)] shadow-xl " +
+                        "flex-1 rounded-[var(--vibe-r-xl)] bg-[var(--accent)] py-4 text-base font-black uppercase tracking-widest text-[var(--accent-ink)] shadow-[var(--vibe-shadow-lifted)] " +
                         "transition-all hover:brightness-95 active:scale-[0.98] touch-manipulation"
                       }
                     >
@@ -952,7 +952,7 @@ export default function WizardScoreMaster() {
           <div className="flex min-h-0 w-full flex-1 items-center justify-center px-3 py-3 sm:px-4 sm:py-4">
             <div className="max-h-full w-full max-w-md space-y-3 overflow-hidden text-center sm:space-y-6 app-page-enter">
               <div className="space-y-1 sm:space-y-2">
-                <h2 className="font-serif text-xl font-bold text-[var(--vibe-fg-base)] sm:text-2xl md:text-3xl">
+                <h2 className="font-display text-xl font-bold text-[var(--vibe-fg-base)] sm:text-2xl md:text-3xl">
                   Das Schicksal ist besiegelt!
                 </h2>
                 <p className="text-xs text-[var(--vibe-fg-muted)] sm:text-sm">
@@ -964,10 +964,10 @@ export default function WizardScoreMaster() {
                 <div className="absolute inset-0 mx-auto opacity-20 blur-3xl motion-safe:animate-pulse" style={{ background: "var(--accent)" }} />
                 <div
                   className={
-                    "relative rounded-2xl border-2 border-[var(--accent-line)] bg-[var(--vibe-bg-elevated)]/80 p-4 shadow-2xl sm:p-8 md:rounded-[2.5rem]"
+                    "relative rounded-[var(--vibe-r-xl)] border-2 border-[var(--accent-line)] bg-[var(--vibe-bg-elevated)]/80 p-4 shadow-[var(--vibe-edge),var(--vibe-shadow-lifted)] sm:p-8 md:rounded-[var(--vibe-r-2xl)]"
                   }
                 >
-                  <p className="mb-1 break-words font-serif text-3xl font-black text-[var(--accent)] sm:mb-2 sm:text-4xl md:text-5xl">
+                  <p className="mb-1 break-words font-display text-3xl font-black text-[var(--accent)] sm:mb-2 sm:text-4xl md:text-5xl">
                     {leaderboard[0]?.name ?? "–"}
                   </p>
                   <p className="text-xs font-bold uppercase tracking-widest text-[var(--accent)]/80 sm:text-sm">
@@ -978,7 +978,7 @@ export default function WizardScoreMaster() {
 
               <div
                 className={
-                  "overflow-hidden rounded-2xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/50"
+                  "overflow-hidden rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/50"
                 }
               >
                 <table className="w-full text-left text-xs sm:text-sm">
@@ -1004,7 +1004,7 @@ export default function WizardScoreMaster() {
                         <td className="px-2 py-2 sm:px-6">
                           <div
                             className={
-                              `flex h-4 w-4 items-center justify-center rounded-full text-[7px] font-bold sm:h-5 sm:w-5 sm:text-[8px] md:h-6 md:w-6 md:text-[10px] ` +
+                              `flex h-4 w-4 items-center justify-center rounded-[var(--vibe-r-xs)] text-[7px] font-bold sm:h-5 sm:w-5 sm:text-[8px] md:h-6 md:w-6 md:text-[10px] ` +
                               (i === 0
                                 ? "bg-[var(--accent)] text-[var(--accent-ink)]"
                                 : "bg-[color-mix(in_srgb,var(--accent)_15%,transparent)] text-[var(--vibe-fg-muted)]")
@@ -1016,7 +1016,7 @@ export default function WizardScoreMaster() {
                         <td className="truncate px-1 py-1 text-xs font-bold text-[var(--vibe-fg-base)] sm:px-2 sm:py-2 sm:text-sm">
                           {p.name}
                         </td>
-                        <td className="px-2 py-1 text-right font-serif text-xs font-bold text-[var(--accent)] sm:px-6 sm:py-2 sm:text-sm">
+                        <td className="px-2 py-1 text-right font-display text-xs font-bold text-[var(--accent)] sm:px-6 sm:py-2 sm:text-sm">
                           {p.totalScore}
                         </td>
                       </tr>

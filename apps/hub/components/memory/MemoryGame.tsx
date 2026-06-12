@@ -61,8 +61,8 @@ export default function MemoryGame() {
         <div className="flex items-center justify-between gap-3">
           <div className="flex flex-col leading-none">
             <span
-              className="font-sans text-4xl font-black uppercase tracking-tight"
-              style={{ color: "var(--accent)" }}
+              className="font-display text-4xl font-black uppercase tracking-tight"
+              style={{ color: "var(--accent-ink)" }}
             >
               MEMORY
             </span>
@@ -94,10 +94,10 @@ export default function MemoryGame() {
             <button
               key={size}
               onClick={() => handleReset(size)}
-              className="rounded-lg px-3 py-1 text-xs font-bold transition-colors"
+              className="rounded-[var(--vibe-r-md)] px-3 py-1 text-xs font-bold transition-colors"
               style={{
                 background: state.gridSize === size ? "var(--accent)" : "var(--accent-soft)",
-                color: state.gridSize === size ? "#fff" : "var(--accent-ink)",
+                color: state.gridSize === size ? "var(--vibe-bg-elevated)" : "var(--accent-ink)",
               }}
             >
               {size}×{size}
@@ -107,20 +107,20 @@ export default function MemoryGame() {
             <span className="text-xs font-semibold text-[var(--vibe-fg-muted)]">Modus</span>
             <button
               onClick={() => handleReset(undefined, "1p")}
-              className="flex items-center gap-1 rounded-lg px-3 py-1 text-xs font-bold transition-colors"
+              className="flex items-center gap-1 rounded-[var(--vibe-r-md)] px-3 py-1 text-xs font-bold transition-colors"
               style={{
                 background: state.mode === "1p" ? "var(--accent)" : "var(--accent-soft)",
-                color: state.mode === "1p" ? "#fff" : "var(--accent-ink)",
+                color: state.mode === "1p" ? "var(--vibe-bg-elevated)" : "var(--accent-ink)",
               }}
             >
               <User className="h-3 w-3" /> Solo
             </button>
             <button
               onClick={() => handleReset(undefined, "2p")}
-              className="flex items-center gap-1 rounded-lg px-3 py-1 text-xs font-bold transition-colors"
+              className="flex items-center gap-1 rounded-[var(--vibe-r-md)] px-3 py-1 text-xs font-bold transition-colors"
               style={{
                 background: state.mode === "2p" ? "var(--accent)" : "var(--accent-soft)",
-                color: state.mode === "2p" ? "#fff" : "var(--accent-ink)",
+                color: state.mode === "2p" ? "var(--vibe-bg-elevated)" : "var(--accent-ink)",
               }}
             >
               <Users className="h-3 w-3" /> 2P
@@ -128,7 +128,7 @@ export default function MemoryGame() {
           </div>
           <button
             onClick={() => handleReset()}
-            className="ml-auto flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold uppercase tracking-wide"
+            className="ml-auto flex items-center gap-1.5 rounded-[var(--vibe-r-md)] border px-3 py-1.5 text-xs font-bold uppercase tracking-wide"
             style={{
               borderColor: "var(--accent-line)",
               color: "var(--accent-ink)",
@@ -163,17 +163,17 @@ export default function MemoryGame() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 p-6"
-              style={{ background: "rgba(10,8,16,0.82)" }}
+              style={{ background: "rgba(11,31,23,0.75)" }}
             >
               <div
-                className="flex w-full max-w-xs flex-col items-center gap-4 rounded-2xl p-6"
+                className="flex w-full max-w-xs flex-col items-center gap-4 rounded-[var(--vibe-r-2xl)] border border-[var(--vibe-line)] p-6"
                 style={{
                   background: "var(--vibe-bg-elevated)",
-                  boxShadow: "var(--vibe-shadow-lifted)",
+                  boxShadow: "var(--vibe-edge), var(--vibe-shadow-lifted)",
                 }}
               >
                 <span className="text-4xl">🎉</span>
-                <p className="text-xl font-black" style={{ color: "var(--accent)" }}>
+                <p className="font-display text-xl font-black" style={{ color: "var(--accent-ink)" }}>
                   {state.mode === "2p"
                     ? state.scores[0] > state.scores[1]
                       ? "Spieler 1 gewinnt!"
@@ -195,8 +195,8 @@ export default function MemoryGame() {
                 )}
                 <button
                   onClick={() => handleReset()}
-                  className="rounded-xl px-6 py-2.5 text-sm font-bold text-white shadow-md"
-                  style={{ background: "var(--accent)" }}
+                  className="rounded-[var(--vibe-r-lg)] px-6 py-2.5 text-sm font-bold shadow-[var(--vibe-shadow-soft)]"
+                  style={{ background: "var(--accent)", color: "var(--vibe-bg-elevated)" }}
                 >
                   Nochmal
                 </button>
@@ -224,7 +224,7 @@ function CardTile({
     <button
       onClick={onClick}
       disabled={state !== "hidden"}
-      className="relative aspect-square w-full overflow-hidden rounded-xl transition-transform active:scale-95"
+      className="relative aspect-square w-full overflow-hidden rounded-[var(--vibe-r-lg)] transition-transform active:scale-95"
       style={{
         background: isVisible
           ? state === "matched"
@@ -234,7 +234,7 @@ function CardTile({
         boxShadow: isVisible
           ? state === "matched"
             ? "inset 0 0 0 2px var(--accent)"
-            : "var(--vibe-shadow-soft)"
+            : "var(--vibe-edge), var(--vibe-shadow-soft)"
           : "var(--vibe-shadow-flat)",
         cursor: state === "hidden" ? "pointer" : "default",
       }}
@@ -276,11 +276,11 @@ function CardTile({
 function ScoreCard({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
   return (
     <div
-      className="flex min-w-[4.5rem] flex-col items-center rounded-xl px-3 py-1.5"
+      className="flex min-w-[4.5rem] flex-col items-center rounded-[var(--vibe-r-lg)] px-3 py-1.5"
       style={{
         background: accent ? "var(--accent)" : "var(--vibe-bg-tinted)",
-        color: accent ? "#fff" : "var(--vibe-fg-base)",
-        boxShadow: "var(--vibe-shadow-soft)",
+        color: accent ? "var(--vibe-bg-elevated)" : "var(--vibe-fg-base)",
+        boxShadow: "var(--vibe-edge), var(--vibe-shadow-soft)",
       }}
     >
       <span className="text-[0.65rem] font-bold uppercase tracking-[0.14em] opacity-75">

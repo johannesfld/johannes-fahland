@@ -176,8 +176,8 @@ export default function SnakeGame() {
         <div className="flex w-full max-w-[28rem] shrink-0 items-center justify-between gap-3">
           <div className="flex flex-col leading-none">
             <span
-              className="font-sans text-3xl font-black uppercase tracking-tight sm:text-4xl"
-              style={{ color: "var(--accent)" }}
+              className="font-display text-3xl font-black uppercase tracking-tight sm:text-4xl"
+              style={{ color: "var(--accent-ink)" }}
             >
               SNAKE
             </span>
@@ -200,12 +200,12 @@ export default function SnakeGame() {
         {/* Board */}
         <div className="relative flex w-full max-w-[28rem] flex-1 items-center justify-center" style={{ minHeight: 0 }}>
           <div
-            className="relative aspect-square w-full overflow-hidden rounded-2xl"
+            className="relative aspect-square w-full overflow-hidden rounded-[var(--vibe-r-2xl)]"
             style={{
               maxHeight: "100%",
               maxWidth: "calc(min(100vh,100%) - 0px)",
               background: "var(--tool-surface)",
-              boxShadow: "var(--vibe-shadow-lifted), inset 0 0 0 1px var(--accent-line)",
+              boxShadow: "var(--vibe-edge), var(--vibe-shadow-lifted), inset 0 0 0 1px var(--accent-line)",
               touchAction: "none",
             }}
             onClick={() => {
@@ -267,11 +267,11 @@ export default function SnakeGame() {
             {/* Idle overlay */}
             {state.status === "idle" && (
               <div
-                className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl"
-                style={{ background: "rgba(0,0,0,0.45)", color: "#fff" }}
+                className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[var(--vibe-r-2xl)]"
+                style={{ background: "rgba(11,31,23,0.75)", color: "var(--vibe-bg-elevated)" }}
               >
                 <Play className="h-12 w-12" style={{ color: "var(--accent)" }} />
-                <p className="text-lg font-bold uppercase tracking-wide">Start</p>
+                <p className="font-display text-lg font-bold uppercase tracking-wide">Start</p>
                 <p className="text-xs opacity-70">Tippen oder Pfeiltaste</p>
               </div>
             )}
@@ -279,15 +279,15 @@ export default function SnakeGame() {
             {/* Paused overlay */}
             {state.status === "paused" && (
               <div
-                className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl"
-                style={{ background: "rgba(0,0,0,0.55)", color: "#fff" }}
+                className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[var(--vibe-r-2xl)]"
+                style={{ background: "rgba(11,31,23,0.82)", color: "var(--vibe-bg-elevated)" }}
               >
                 <Pause className="h-10 w-10" style={{ color: "var(--accent)" }} />
-                <p className="text-lg font-bold uppercase tracking-wide">Pause</p>
+                <p className="font-display text-lg font-bold uppercase tracking-wide">Pause</p>
                 <button
                   onClick={(e) => { e.stopPropagation(); togglePause(); }}
-                  className="rounded-xl px-5 py-2 text-sm font-bold shadow-md"
-                  style={{ background: "var(--accent)", color: "#fff" }}
+                  className="rounded-[var(--vibe-r-lg)] px-5 py-2 text-sm font-bold shadow-[var(--vibe-shadow-soft)]"
+                  style={{ background: "var(--accent)", color: "var(--vibe-bg-elevated)" }}
                 >
                   Weiter
                 </button>
@@ -297,15 +297,15 @@ export default function SnakeGame() {
             {/* Game over overlay */}
             {state.status === "over" && (
               <div
-                className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl"
-                style={{ background: "rgba(15,10,20,0.88)", color: "#fff" }}
+                className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[var(--vibe-r-2xl)]"
+                style={{ background: "rgba(11,31,23,0.88)", color: "var(--vibe-bg-elevated)" }}
               >
-                <p className="text-2xl font-black uppercase tracking-wide">Aus.</p>
+                <p className="font-display text-2xl font-black uppercase tracking-wide">Aus.</p>
                 <p className="font-mono text-lg">{state.score} Punkte</p>
                 <button
                   onClick={(e) => { e.stopPropagation(); startGame(); }}
-                  className="rounded-xl px-5 py-2 text-sm font-bold shadow-md"
-                  style={{ background: "var(--accent)", color: "#fff" }}
+                  className="rounded-[var(--vibe-r-lg)] px-5 py-2 text-sm font-bold shadow-[var(--vibe-shadow-soft)]"
+                  style={{ background: "var(--accent)", color: "var(--vibe-bg-elevated)" }}
                 >
                   Nochmal
                 </button>
@@ -326,7 +326,7 @@ export default function SnakeGame() {
               {state.status === "running" || state.status === "paused" ? (
                 <button
                   onClick={togglePause}
-                  className="flex shrink-0 items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold uppercase tracking-wide"
+                  className="flex shrink-0 items-center gap-1.5 rounded-[var(--vibe-r-md)] border px-3 py-1.5 text-xs font-bold uppercase tracking-wide"
                   style={{
                     borderColor: "var(--accent-line)",
                     color: "var(--accent-ink)",
@@ -370,11 +370,11 @@ export default function SnakeGame() {
 function ScoreCard({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
   return (
     <div
-      className="flex min-w-[5rem] flex-col items-center rounded-xl px-3 py-1.5"
+      className="flex min-w-[5rem] flex-col items-center rounded-[var(--vibe-r-lg)] px-3 py-1.5"
       style={{
         background: accent ? "var(--accent)" : "var(--vibe-bg-tinted)",
-        color: accent ? "#FFFFFF" : "var(--vibe-fg-base)",
-        boxShadow: "var(--vibe-shadow-soft)",
+        color: accent ? "var(--vibe-bg-elevated)" : "var(--vibe-fg-base)",
+        boxShadow: "var(--vibe-edge), var(--vibe-shadow-soft)",
       }}
     >
       <span className="text-[0.65rem] font-bold uppercase tracking-[0.14em] opacity-75">
@@ -392,12 +392,12 @@ function DPadButton({ onClick, label, rotate }: { onClick: () => void; label: st
     <button
       onClick={onClick}
       aria-label={label}
-      className="flex items-center justify-center rounded-xl"
+      className="flex items-center justify-center rounded-[var(--vibe-r-lg)]"
       style={{
         height: "clamp(2.5rem, 11vw, 3.25rem)",
         background: "var(--accent-soft)",
         color: "var(--accent-ink)",
-        boxShadow: "var(--vibe-shadow-soft)",
+        boxShadow: "var(--vibe-edge), var(--vibe-shadow-soft)",
       }}
     >
       <ArrowUp className="h-5 w-5" style={{ transform: `rotate(${rotate}deg)` }} />

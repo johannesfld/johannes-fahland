@@ -46,19 +46,5 @@
       "url": "/wizard",
       "icons": [{ "src": "/brand/icon-192.png", "sizes": "192x192" }]
     }
-  ],
-  "screenshots": [
-    {
-      "src": "/screenshots/hub.png",
-      "sizes": "1170x2532",
-      "type": "image/png",
-      "form_factor": "narrow"
-    },
-    {
-      "src": "/screenshots/hub-desktop.png",
-      "sizes": "1920x1080",
-      "type": "image/png",
-      "form_factor": "wide"
-    }
   ]
 }

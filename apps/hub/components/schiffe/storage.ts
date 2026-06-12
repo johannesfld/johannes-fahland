@@ -1,6 +1,9 @@
+import { migrateKey } from "@/lib/migrate-storage";
 import type { GameState } from "@/components/schiffe/types";
 
-const KEY = "schiffe-game-v1";
+const KEY = "pasch-schiffe-game-v1";
+
+migrateKey("schiffe-game-v1", KEY);
 
 type SerializedGameState = Omit<GameState, "trackerManualMisses"> & {
   trackerManualMisses: string[];

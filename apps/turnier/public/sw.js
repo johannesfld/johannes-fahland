@@ -1,8 +1,7 @@
-const CACHE_NAME = "pasch-v1";
-const OLD_CACHES = ["spielbrett-v1", "vibecode-v6", "vibecode-v5", "vibecode-v4", "vibecode-v3", "vibecode-v2", "vibecode-v1"];
+const CACHE_NAME = "pasch-turnier-v1";
 
 const PRECACHE_URLS = [
-  "/manifest.json",
+  "/turnier-manifest.json",
   "/brand/icon-192.png",
   "/brand/icon-512.png",
   "/brand/apple-touch-icon.png",
@@ -26,7 +25,7 @@ self.addEventListener("activate", (event) => {
       caches.keys().then((cacheNames) =>
         Promise.all(
           cacheNames.map((name) => {
-            if (name !== CACHE_NAME || OLD_CACHES.includes(name)) {
+            if (name !== CACHE_NAME) {
               return caches.delete(name);
             }
           }),
@@ -51,7 +50,7 @@ self.addEventListener("fetch", (event) => {
 
   const accept = event.request.headers.get("accept") ?? "";
 
-  // Never cache HTML: stale shells break Next.js hydration
+  // Never cache HTML: stale shells break Next.js hydration and live Turnier-Daten
   if (
     event.request.mode === "navigate" ||
     accept.includes("text/html") ||
@@ -68,7 +67,7 @@ self.addEventListener("fetch", (event) => {
   // Static brand assets: stale-while-revalidate
   if (
     url.pathname.startsWith("/brand/") ||
-    url.pathname === "/manifest.json" ||
+    url.pathname === "/turnier-manifest.json" ||
     url.pathname.startsWith("/icon-")
   ) {
     event.respondWith(

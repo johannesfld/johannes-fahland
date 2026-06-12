@@ -1,4 +1,8 @@
-const KEY = "romme-score-v1";
+import { migrateKey } from "@/lib/migrate-storage";
+
+const KEY = "pasch-romme-score-v1";
+
+migrateKey("romme-score-v1", KEY);
 
 type RommeRound = {
   winnerIndex: number | null;

@@ -6,27 +6,6 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id           String    @id @default(cuid())
-  username     String    @unique
-  passwordHash String
-  createdAt    DateTime  @default(now())
-  sessions     Session[]
-  tournaments  Tournament[]
-}
-
-model Session {
-  id        String   @id @default(cuid())
-  tokenHash String   @unique
-  userId    String
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
 enum TournamentStatus {
   setup
   active
@@ -66,13 +45,10 @@ model Tournament {
   winnerName  String?
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
-  userId      String?
-  user        User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
   players     TournamentPlayer[]
   rounds      Round[]
 
   @@index([status, updatedAt])
-  @@index([userId])
 }
 
 model TournamentPlayer {

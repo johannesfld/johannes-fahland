@@ -37,7 +37,8 @@ export default function OfflinePage() {
           Du bist offline
         </h1>
         <p className="max-w-xs text-base text-[var(--vibe-fg-muted)]">
-          Sobald du wieder Empfang hast, geht&apos;s weiter. Pasch funktioniert auch ohne Netz — deine Spielstände sind lokal gespeichert.
+          Sobald du wieder Empfang hast, geht&apos;s weiter. Bereits geladene Turniere bleiben
+          bis zum nächsten Sync sichtbar.
         </p>
       </div>
 
