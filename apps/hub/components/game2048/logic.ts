@@ -44,6 +44,23 @@ export function createInitialState(best: number): GameState {
   };
 }
 
+/**
+ * Deterministischer Leer-Zustand für SSR + ersten Client-Render. Enthält bewusst
+ * KEINE zufällig platzierten Start-Tiles (würde sonst Hydration-Mismatch erzeugen,
+ * weil Math.random() auf Server und Client unterschiedlich auflöst). Das echte
+ * Brett wird erst nach dem Mount via createInitialState() erzeugt.
+ */
+export function createEmptyState(best: number): GameState {
+  return {
+    tiles: [],
+    score: 0,
+    best,
+    nextId: 1,
+    status: "playing",
+    keepPlaying: false,
+  };
+}
+
 type Vector = { row: number; col: number };
 
 function vectorFor(dir: Direction): Vector {

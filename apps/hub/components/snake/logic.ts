@@ -12,15 +12,33 @@ function randomFood(snake: Point[]): Point {
   return food;
 }
 
+const START_SNAKE: Point[] = [
+  { x: 10, y: 10 },
+  { x: 9, y: 10 },
+  { x: 8, y: 10 },
+];
+
 export function createInitialState(): GameState {
-  const snake = [
-    { x: 10, y: 10 },
-    { x: 9, y: 10 },
-    { x: 8, y: 10 },
-  ];
+  const snake = START_SNAKE.map((s) => ({ ...s }));
   return {
     snake,
     food: randomFood(snake),
+    dir: "right",
+    nextDir: "right",
+    score: 0,
+    status: "idle",
+  };
+}
+
+/**
+ * Deterministischer Zustand für SSR + ersten Client-Render. food-Position fix
+ * (kein Math.random → kein Hydration-Mismatch). Die Komponente ersetzt food nach
+ * dem Mount durch eine echte Zufallsposition.
+ */
+export function createSSRState(): GameState {
+  return {
+    snake: START_SNAKE.map((s) => ({ ...s })),
+    food: { x: 14, y: 10 },
     dir: "right",
     nextDir: "right",
     score: 0,

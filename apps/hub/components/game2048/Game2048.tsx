@@ -6,6 +6,7 @@ import { RotateCcw, Trophy, ArrowUp } from "lucide-react";
 import { ToolShell } from "@/components/tool-shell/ToolShell";
 import {
   continueAfterWin,
+  createEmptyState,
   createInitialState,
   move as moveEngine,
 } from "./logic";
@@ -126,7 +127,9 @@ function ScoreCard({ label, value, accent }: { label: string; value: number; acc
 export default function Game2048() {
   const reduced = useReducedMotion();
   const [hydrated, setHydrated] = useState(false);
-  const [state, setState] = useState<GameState>(() => createInitialState(0));
+  // SSR + erster Client-Render: leeres, deterministisches Brett (kein Math.random
+  // → kein Hydration-Mismatch). Das echte Spiel wird im Mount-Effect erzeugt.
+  const [state, setState] = useState<GameState>(() => createEmptyState(0));
   const lastDirRef = useRef<Direction | null>(null);
 
   // Hydrate from localStorage after mount (SSR-safe)

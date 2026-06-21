@@ -368,3 +368,97 @@
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+
+/* ============================================================================
+   Wählbare Tisch-Hintergründe ("Spieltisch-Filz in deiner Farbe")
+   Überschreiben NUR die Surface-Variablen — Vordergrund, Akzent und Tool-Farben
+   bleiben unangetastet, damit Lesbarkeit & Markenakzente überall erhalten sind.
+   Gesetzt über [data-bg="x"] auf <html> (BackgroundProvider + Init-Script).
+   `filz` = Default; ohne data-bg greifen die Basiswerte oben.
+   ============================================================================ */
+
+/* ---- Dark-Varianten (Default-Theme) ---- */
+.dark[data-bg="mitternacht"] {
+  --vibe-bg-base: #0C1626; --vibe-bg-elevated: #142136; --vibe-bg-sunken: #070F1C;
+  --vibe-bg-tinted: #182943; --vibe-bg-overlay: #1B2E4B;
+  --background: #0C1626; --surface: #142136; --surface-muted: #070F1C;
+}
+.dark[data-bg="aubergine"] {
+  --vibe-bg-base: #1B1224; --vibe-bg-elevated: #271836; --vibe-bg-sunken: #130C1A;
+  --vibe-bg-tinted: #2E1C40; --vibe-bg-overlay: #331F47;
+  --background: #1B1224; --surface: #271836; --surface-muted: #130C1A;
+}
+.dark[data-bg="espresso"] {
+  --vibe-bg-base: #201712; --vibe-bg-elevated: #2E211A; --vibe-bg-sunken: #160F0B;
+  --vibe-bg-tinted: #38281E; --vibe-bg-overlay: #3D2C21;
+  --background: #201712; --surface: #2E211A; --surface-muted: #160F0B;
+}
+.dark[data-bg="anthrazit"] {
+  --vibe-bg-base: #17191C; --vibe-bg-elevated: #212429; --vibe-bg-sunken: #0F1113;
+  --vibe-bg-tinted: #282C32; --vibe-bg-overlay: #2C3037;
+  --background: #17191C; --surface: #212429; --surface-muted: #0F1113;
+}
+.dark[data-bg="burgund"] {
+  --vibe-bg-base: #211115; --vibe-bg-elevated: #311A20; --vibe-bg-sunken: #170B0E;
+  --vibe-bg-tinted: #3B2027; --vibe-bg-overlay: #41232B;
+  --background: #211115; --surface: #311A20; --surface-muted: #170B0E;
+}
+/* Pink — Markenfarbe, Default-Hintergrund. Tief, gedämpft, warm: ein „Spieltisch
+   in Magenta-Nacht", auf dem Elfenbein-Text & Messing-Akzent klar lesbar bleiben. */
+.dark[data-bg="rosa"] {
+  --vibe-bg-base: #240E1C; --vibe-bg-elevated: #341527; --vibe-bg-sunken: #190914;
+  --vibe-bg-tinted: #3E1A2F; --vibe-bg-overlay: #451E34;
+  --background: #240E1C; --surface: #341527; --surface-muted: #190914;
+}
+.dark[data-bg="petrol"] {
+  --vibe-bg-base: #0B1F22; --vibe-bg-elevated: #112C30; --vibe-bg-sunken: #071619;
+  --vibe-bg-tinted: #163539; --vibe-bg-overlay: #193C41;
+  --background: #0B1F22; --surface: #112C30; --surface-muted: #071619;
+}
+.dark[data-bg="rosenholz"] {
+  --vibe-bg-base: #241820; --vibe-bg-elevated: #33232D; --vibe-bg-sunken: #190F16;
+  --vibe-bg-tinted: #3D2A36; --vibe-bg-overlay: #432F3C;
+  --background: #241820; --surface: #33232D; --surface-muted: #190F16;
+}
+
+/* ---- Light-Varianten (Tag) — passend abgestimmte Papiertöne ---- */
+:root:not(.dark)[data-bg="mitternacht"] {
+  --vibe-bg-base: #EEF1F7; --vibe-bg-elevated: #F8FAFD; --vibe-bg-sunken: #E1E6F0;
+  --vibe-bg-tinted: #E7ECF5;
+  --background: #EEF1F7; --surface: #F8FAFD; --surface-muted: #E1E6F0;
+}
+:root:not(.dark)[data-bg="aubergine"] {
+  --vibe-bg-base: #F3EEF6; --vibe-bg-elevated: #FBF8FD; --vibe-bg-sunken: #E8E0EE;
+  --vibe-bg-tinted: #EDE5F2;
+  --background: #F3EEF6; --surface: #FBF8FD; --surface-muted: #E8E0EE;
+}
+:root:not(.dark)[data-bg="espresso"] {
+  --vibe-bg-base: #F4EEE7; --vibe-bg-elevated: #FCF8F2; --vibe-bg-sunken: #E9E0D4;
+  --vibe-bg-tinted: #EFE6DA;
+  --background: #F4EEE7; --surface: #FCF8F2; --surface-muted: #E9E0D4;
+}
+:root:not(.dark)[data-bg="anthrazit"] {
+  --vibe-bg-base: #EEEFF1; --vibe-bg-elevated: #F9FAFB; --vibe-bg-sunken: #E2E4E7;
+  --vibe-bg-tinted: #E8EAED;
+  --background: #EEEFF1; --surface: #F9FAFB; --surface-muted: #E2E4E7;
+}
+:root:not(.dark)[data-bg="burgund"] {
+  --vibe-bg-base: #F6ECEE; --vibe-bg-elevated: #FDF7F8; --vibe-bg-sunken: #ECDDE0;
+  --vibe-bg-tinted: #F1E3E6;
+  --background: #F6ECEE; --surface: #FDF7F8; --surface-muted: #ECDDE0;
+}
+:root:not(.dark)[data-bg="petrol"] {
+  --vibe-bg-base: #E8F1F1; --vibe-bg-elevated: #F5FAFA; --vibe-bg-sunken: #DBE8E8;
+  --vibe-bg-tinted: #E2EDED;
+  --background: #E8F1F1; --surface: #F5FAFA; --surface-muted: #DBE8E8;
+}
+:root:not(.dark)[data-bg="rosenholz"] {
+  --vibe-bg-base: #F6EDF1; --vibe-bg-elevated: #FDF8FA; --vibe-bg-sunken: #ECDEE5;
+  --vibe-bg-tinted: #F1E4EA;
+  --background: #F6EDF1; --surface: #FDF8FA; --surface-muted: #ECDEE5;
+}
+:root:not(.dark)[data-bg="rosa"] {
+  --vibe-bg-base: #FCE9F2; --vibe-bg-elevated: #FFF5FA; --vibe-bg-sunken: #F6D9E8;
+  --vibe-bg-tinted: #FAE1EE;
+  --background: #FCE9F2; --surface: #FFF5FA; --surface-muted: #F6D9E8;
+}

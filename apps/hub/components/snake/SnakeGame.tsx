@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { RotateCcw, Play, Pause, ArrowUp } from "lucide-react";
 import { ToolShell } from "@/components/tool-shell/ToolShell";
-import { applyDir, createInitialState, tick } from "./logic";
+import { applyDir, createInitialState, createSSRState, tick } from "./logic";
 import { loadBest, saveBest } from "./storage";
 import { GRID, TICK_MS, type Dir, type GameState } from "./types";
 
@@ -15,15 +15,18 @@ const OPPOSITE: Record<Dir, Dir> = {
 };
 
 export default function SnakeGame() {
-  const [state, setState] = useState<GameState>(() => createInitialState());
+  // SSR + erster Client-Render: deterministischer Zustand (fixe food-Position,
+  // kein Math.random → kein Hydration-Mismatch). Echte Zufalls-Food nach Mount.
+  const [state, setState] = useState<GameState>(() => createSSRState());
   const [best, setBest] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const stateRef = useRef(state);
   stateRef.current = state;
 
-  // Hydrate best score
+  // Hydrate best score + echte Zufalls-Food (nur solange noch nicht gespielt wurde)
   useEffect(() => {
     setBest(loadBest());
+    setState((s) => (s.status === "idle" ? createInitialState() : s));
   }, []);
 
   // Persist best on game over

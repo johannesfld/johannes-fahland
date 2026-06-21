@@ -36,11 +36,16 @@ export default function KniffelApp() {
 
   useEffect(() => {
     const saved = loadKniffelState();
-    if (saved) {
+    // Nur als "gestartet" laden, wenn der State auch tatsächlich Spieler enthält.
+    // Schützt vor korrupten States (isStarted:true, playerNames:[]), die sonst eine
+    // leere, nicht spielbare Scorecard ergeben würden.
+    if (saved && saved.isStarted && saved.playerNames.length > 0) {
       setPlayerNames(saved.playerNames);
       setGamePlayerNames(saved.playerNames);
       setScores(saved.scores);
-      setIsStarted(saved.isStarted);
+      setIsStarted(true);
+    } else if (saved && !saved.isStarted && saved.playerNames.length > 0) {
+      setPlayerNames(saved.playerNames);
     }
     isHydrated.current = true;
   }, []);

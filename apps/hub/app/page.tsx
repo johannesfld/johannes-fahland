@@ -1,4 +1,5 @@
 import { FeatureTiles } from "@/components/home/FeatureTiles";
+import { BackgroundPicker } from "@/components/BackgroundPicker";
 
 export default function Home() {
   return (
@@ -14,6 +15,11 @@ export default function Home() {
       </div>
       {/* Grid */}
       <FeatureTiles />
+
+      {/* Hintergrund-Auswahl — v.a. für Mobile (ohne Sidebar) erreichbar */}
+      <div className="mt-2 rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/60 p-4 desk:hidden">
+        <BackgroundPicker variant="full" />
+      </div>
     </div>
   );
 }

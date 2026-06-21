@@ -5,6 +5,7 @@ import { cn } from "@/components/ui/styles";
 import { VibeLogo, VibeWordmark } from "./VibeLogo";
 import { NAV, navIsActive } from "./nav-config";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { BackgroundPicker } from "@/components/BackgroundPicker";
 
 type SidebarProps = {
   pathname: string | null;
@@ -76,7 +77,9 @@ export function Sidebar({ pathname, open }: SidebarProps) {
         <div className="flex-1" />
 
         {/* Footer */}
-        <div className="flex flex-col gap-1.5 rounded-[var(--vibe-r-md)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)]/50 px-3 py-2">
+        <div className="flex flex-col gap-2.5 rounded-[var(--vibe-r-md)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)]/50 px-3 py-2.5">
+          <BackgroundPicker variant="compact" />
+          <div className="h-px bg-[var(--vibe-line)]" />
           <div className="flex items-center justify-between gap-2">
             <p className="text-[11px] text-[var(--vibe-fg-faint)]">
               von <span className="font-medium text-[var(--vibe-fg-muted)]">Johannes Fahland</span>

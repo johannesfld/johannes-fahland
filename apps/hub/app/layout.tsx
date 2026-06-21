@@ -5,15 +5,18 @@ import { InstallPrompt, PWAInstaller } from "@pasch/ui";
 import { AppShell } from "@/components/layout/AppShell";
 import { FullscreenProvider } from "@/components/FullscreenContext";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { BackgroundProvider } from "@/components/BackgroundProvider";
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
+  // Default passend zum Rosa-Hintergrund; BackgroundProvider aktualisiert die
+  // theme-color zur Laufzeit auf die jeweils gewählte Tisch-Farbe.
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F5F0E1" },
-    { media: "(prefers-color-scheme: dark)", color: "#0B1F17" },
+    { media: "(prefers-color-scheme: light)", color: "#FCE9F2" },
+    { media: "(prefers-color-scheme: dark)", color: "#240E1C" },
   ],
   viewportFit: "cover",
   interactiveWidget: "resizes-content",
@@ -47,12 +50,19 @@ export const metadata: Metadata = {
 const themeInitScript = `
 (function(){
   try {
+    var r = document.documentElement;
     var t = localStorage.getItem('theme');
     var sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     var dark = t === 'light' ? false : t === 'system' ? sysDark : true;
-    var r = document.documentElement;
     r.classList.toggle('dark', dark);
     r.style.colorScheme = dark ? 'dark' : 'light';
+    // Tisch-Hintergrund vor dem ersten Paint setzen (FOUC-Schutz). Default 'rosa';
+    // 'filz' = Basiszustand der Tokens, braucht kein data-bg.
+    var valid = {rosa:1,filz:1,mitternacht:1,aubergine:1,petrol:1,burgund:1,espresso:1,rosenholz:1,anthrazit:1};
+    var bg = localStorage.getItem('pasch-bg');
+    if (!bg || !valid[bg]) bg = 'rosa';
+    if (bg === 'filz') r.removeAttribute('data-bg');
+    else r.setAttribute('data-bg', bg);
   } catch (e) {}
 })();`;
 
@@ -104,11 +114,13 @@ export default function RootLayout({
       </head>
       <body className="h-dvh min-h-dvh overflow-hidden overscroll-none">
         <ThemeProvider>
-          <PWAInstaller />
-          <InstallPrompt appName="Pasch" />
-          <FullscreenProvider>
-            <AppShell>{children}</AppShell>
-          </FullscreenProvider>
+          <BackgroundProvider>
+            <PWAInstaller />
+            <InstallPrompt appName="Pasch" />
+            <FullscreenProvider>
+              <AppShell>{children}</AppShell>
+            </FullscreenProvider>
+          </BackgroundProvider>
         </ThemeProvider>
       </body>
     </html>

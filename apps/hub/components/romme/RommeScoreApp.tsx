@@ -109,11 +109,16 @@ export default function RommeScoreApp() {
 
   useEffect(() => {
     const saved = loadRommeState();
-    if (saved) {
+    // Nur als "gestartet" laden, wenn auch Spieler vorhanden sind — schützt vor
+    // korrupten States (isStarted:true, playerNames:[]), die sonst eine leere,
+    // spaltenlose Tabelle ergäben.
+    if (saved && saved.isStarted && saved.playerNames.length > 0) {
       setPlayerNames(saved.playerNames);
       setGamePlayerNames(saved.playerNames);
       setRounds(saved.rounds);
-      setIsStarted(saved.isStarted);
+      setIsStarted(true);
+    } else if (saved && !saved.isStarted && saved.playerNames.length > 0) {
+      setPlayerNames(saved.playerNames);
     }
     isHydrated.current = true;
   }, []);

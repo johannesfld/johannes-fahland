@@ -49,6 +49,21 @@ function getRandomWord(words: string[], exclude?: string): string {
   return word!;
 }
 
+/**
+ * Animierbare „transparente" Variante einer Zielfarbe. framer-motion kann nicht von
+ * "transparent" interpolieren — eine alpha-0-Version derselben Farbe verhindert die
+ * Warnung und lässt den Hintergrund sauber zur Zielfarbe ausfaden. */
+function fadeFrom(color: string): string {
+  const hex = color.trim();
+  const m = /^#([0-9a-f]{6})$/i.exec(hex);
+  if (m) {
+    const n = parseInt(m[1], 16);
+    return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, 0)`;
+  }
+  // Nicht-Hex (z.B. CSS-Variable) → unsichtbares Grau als sicherer Startwert.
+  return "rgba(127, 127, 127, 0)";
+}
+
 export default function WordleGame({ words, accepted }: { words: string[]; accepted: string[] }) {
   const acceptedSet = useMemo(() => new Set(accepted), [accepted]);
   const dailyWord = getDailyWord(words);
@@ -236,7 +251,7 @@ export default function WordleGame({ words, accepted }: { words: string[]; accep
                     initial={false}
                     animate={isRevealing && hydrated ? {
                       rotateX: [0, -90, 0],
-                      backgroundColor: [colors.empty.bg, colors.empty.bg, c.bg],
+                      backgroundColor: [fadeFrom(c.bg), fadeFrom(c.bg), c.bg],
                     } : { backgroundColor: c.bg }}
                     transition={{
                       duration: isRevealing ? 0.5 : 0.12,

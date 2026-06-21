@@ -63,14 +63,22 @@ export function InstallPrompt({ appName, className }: InstallPromptProps) {
   };
 
   const classes = [
-    "fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] z-50 mx-auto flex w-[calc(100%-1.5rem)] max-w-sm items-center gap-3 rounded-[var(--vibe-r-lg)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] p-3 shadow-[var(--vibe-shadow-lifted)]",
+    // bottom-Offset via Inline-Style statt arbitrary-Klasse: Tailwind v4 kompiliert
+    // `bottom-[calc(env(safe-area-inset-bottom,0px)+0.75rem)]` nicht zuverlässig, der
+    // Banner landete dadurch am oberen Rand. Inline ist robust.
+    "fixed inset-x-0 z-50 mx-auto flex w-[calc(100%-1.5rem)] max-w-sm items-center gap-3 rounded-[var(--vibe-r-lg)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] p-3 shadow-[var(--vibe-shadow-lifted)]",
     className,
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
-    <div role="dialog" aria-label="App installieren" className={classes}>
+    <div
+      role="dialog"
+      aria-label="App installieren"
+      className={classes}
+      style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 0.75rem)" }}
+    >
       <div className="min-w-0 flex-1">
         <p className="font-display text-sm font-semibold text-[var(--vibe-fg-base)]">
           {appName} installieren

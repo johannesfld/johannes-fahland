@@ -450,7 +450,7 @@ export default function WizardScoreMaster() {
                     className="space-y-2 rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/50 p-3 sm:space-y-3 sm:p-6 md:rounded-[var(--vibe-r-2xl)]"
                   >
                     <p className="text-sm font-bold text-[var(--vibe-fg-base)] sm:text-lg">
-                      Bitte teile {state.roundNumber} Karten an jeden aus.
+                      Bitte teile {state.roundNumber} {state.roundNumber === 1 ? "Karte" : "Karten"} an jeden aus.
                     </p>
                     <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
                       {state.players.map((p, i) => (
