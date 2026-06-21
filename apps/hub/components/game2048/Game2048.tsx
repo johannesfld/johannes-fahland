@@ -344,7 +344,7 @@ export default function Game2048() {
                   className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[var(--vibe-r-2xl)]"
                   style={{
                     background: "rgba(11,31,23,0.88)",
-                    color: "var(--vibe-bg-elevated)",
+                    color: "#F2EBD9",
                   }}
                 >
                   <p className="font-display text-2xl font-black uppercase tracking-wide">Aus.</p>

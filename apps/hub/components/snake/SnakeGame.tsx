@@ -271,7 +271,7 @@ export default function SnakeGame() {
             {state.status === "idle" && (
               <div
                 className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[var(--vibe-r-2xl)]"
-                style={{ background: "rgba(11,31,23,0.75)", color: "var(--vibe-bg-elevated)" }}
+                style={{ background: "rgba(11,31,23,0.75)", color: "#F2EBD9" }}
               >
                 <Play className="h-12 w-12" style={{ color: "var(--accent)" }} />
                 <p className="font-display text-lg font-bold uppercase tracking-wide">Start</p>
@@ -283,7 +283,7 @@ export default function SnakeGame() {
             {state.status === "paused" && (
               <div
                 className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[var(--vibe-r-2xl)]"
-                style={{ background: "rgba(11,31,23,0.82)", color: "var(--vibe-bg-elevated)" }}
+                style={{ background: "rgba(11,31,23,0.82)", color: "#F2EBD9" }}
               >
                 <Pause className="h-10 w-10" style={{ color: "var(--accent)" }} />
                 <p className="font-display text-lg font-bold uppercase tracking-wide">Pause</p>
@@ -301,7 +301,7 @@ export default function SnakeGame() {
             {state.status === "over" && (
               <div
                 className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-[var(--vibe-r-2xl)]"
-                style={{ background: "rgba(11,31,23,0.88)", color: "var(--vibe-bg-elevated)" }}
+                style={{ background: "rgba(11,31,23,0.88)", color: "#F2EBD9" }}
               >
                 <p className="font-display text-2xl font-black uppercase tracking-wide">Aus.</p>
                 <p className="font-mono text-lg">{state.score} Punkte</p>
