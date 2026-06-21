@@ -74,9 +74,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div
             className={cn(
               "flex min-h-0 w-full flex-1 flex-col overflow-hidden",
+              // Notch-Schutz: oberer Inhalt darf auf iPhone (black-translucent
+              // Statusbar + viewportFit cover) nicht unter die Notch rutschen.
+              // Auf Desktop ist env(safe-area-inset-top) = 0 → unschädlich.
               isFullBleed
-                ? "h-full px-0 py-0"
-                : "mx-auto max-w-7xl px-4 py-4 pb-[calc(1rem+64px+env(safe-area-inset-bottom,0px))] sm:py-6 sm:pb-6 desk:pb-6",
+                ? "h-full px-0 pt-[env(safe-area-inset-top,0px)] pb-0"
+                : "mx-auto max-w-7xl px-4 pt-[calc(env(safe-area-inset-top,0px)+1rem)] pb-[calc(1rem+64px+env(safe-area-inset-bottom,0px))] sm:pt-6 sm:pb-6 desk:pt-4 desk:pb-6",
             )}
           >
             {children}

@@ -23,7 +23,6 @@ export const tileVariants = {
 type FeatureTileProps = {
   href: string;
   tool: string;
-  index: string;
   wordmark: React.ReactNode;
   icon: LucideIcon;
   meta: string;
@@ -35,7 +34,6 @@ type FeatureTileProps = {
 export function FeatureTile({
   href,
   tool,
-  index,
   wordmark,
   icon: Icon,
   meta,
@@ -61,43 +59,24 @@ export function FeatureTile({
           className,
         )}
       >
-        {/* Akzent-Schimmer am oberen Rand — Spielfarbe als zarter Lichtsaum */}
-        <span
+        {/* Spielsymbol oben — nur das farbige Icon, kein bunter Kasten, keine Kante. */}
+        <Icon
+          size={26}
+          strokeWidth={2}
+          className="relative mb-auto text-[var(--accent)] transition-transform duration-[var(--vibe-dur-2)] group-hover:scale-105"
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[var(--accent)] opacity-40 group-hover:opacity-70 transition-opacity duration-[var(--vibe-dur-2)]"
         />
 
-        {/* Ecken-Index oben links: Tool-Initial + Akzent-Pip (Spielkarten-Eckzahl) */}
-        <div className="relative mb-auto flex items-center gap-2">
-          <span
-            className="grid h-7 w-7 place-items-center rounded-[var(--vibe-r-sm)] bg-[var(--accent-soft)] font-display text-sm font-bold leading-none text-[var(--accent-ink)]"
-            aria-hidden
-          >
-            {index}
-          </span>
-          <Icon size={15} className="text-[var(--accent)]" aria-hidden />
-        </div>
-
-        {/* Bottom: Wordmark + meta */}
-        <div className="relative mt-8 flex flex-col gap-1.5">
-          {/* Meta pill */}
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)] opacity-80">
-            {meta}
-          </p>
-          {/* Wordmark — rendered by caller for font control */}
+        {/* Titel + Nebentitel */}
+        <div className="relative mt-8 flex flex-col gap-1">
+          {/* Titel (Hanken Grotesk, vom Caller gesetzt) */}
           <div className="text-[var(--vibe-fg-base)] transition-colors duration-[var(--vibe-dur-2)] group-hover:text-[var(--accent-ink)]">
             {wordmark}
           </div>
-        </div>
-
-        {/* Ecken-Index unten rechts: 180°-gespiegeltes "Doppel" der oberen Ecke */}
-        <div className="absolute bottom-5 right-5 rotate-180 transition-opacity duration-[var(--vibe-dur-2)]">
-          <span
-            className="font-display text-lg font-bold leading-none text-[var(--accent-ink)] opacity-40 group-hover:opacity-70"
-            aria-hidden
-          >
-            {index}
-          </span>
+          {/* Nebentitel: Spielmodus */}
+          <p className="text-[11px] font-medium text-[var(--vibe-fg-faint)]">
+            {meta}
+          </p>
         </div>
       </MotionLink>
     </div>

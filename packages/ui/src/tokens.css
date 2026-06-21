@@ -319,13 +319,13 @@
   --tool-surface: #2E1F15;
 }
 .dark [data-tool="snake"] {
-  /* Lindgrün */
-  --accent:       #A8C463;
-  --accent-soft:  #2A3014;
-  --accent-ink:   #E8F0CE;
-  --accent-line:  rgba(168, 196, 99, 0.30);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(168, 196, 99, 0.18) 0%, transparent 70%);
-  --tool-surface: #232915;
+  /* Türkis (kein Grün als Schriftfarbe im Dark-Mode) */
+  --accent:       #5FC8D8;
+  --accent-soft:  #11313A;
+  --accent-ink:   #CFEFF5;
+  --accent-line:  rgba(95, 200, 216, 0.30);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(95, 200, 216, 0.18) 0%, transparent 70%);
+  --tool-surface: #14272E;
 }
 .dark [data-tool="memory"] {
   /* Rosé */

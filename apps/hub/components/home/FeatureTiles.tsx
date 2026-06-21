@@ -9,8 +9,8 @@ const containerVariants = {
   show: { transition: { staggerChildren: 0.06 } },
 };
 
-/** Einheitlicher Wordmark-Stil für alle Tiles: gleiche Schriftgröße, -gewicht und -form. */
-const WORDMARK_CLASS = "font-display text-4xl font-black uppercase tracking-tight leading-none";
+/** Einheitlicher Wordmark-Stil für alle Tiles: Hanken Grotesk, klar & modern. */
+const WORDMARK_CLASS = "font-sans text-[1.75rem] font-extrabold tracking-tight leading-none";
 
 export function FeatureTiles() {
   const reduced = useReducedMotion();
@@ -30,7 +30,6 @@ export function FeatureTiles() {
         icon={Grid3x3}
         meta="Solo · Highscore"
         reduced={reduced}
-        index="2"
         staggerIndex={0}
         wordmark={<span className={`${WORDMARK_CLASS} tabular-nums`}>2048</span>}
       />
@@ -41,9 +40,8 @@ export function FeatureTiles() {
         icon={Zap}
         meta="Solo · Highscore"
         reduced={reduced}
-        index="S"
         staggerIndex={1}
-        wordmark={<span className={WORDMARK_CLASS}>SNAKE</span>}
+        wordmark={<span className={WORDMARK_CLASS}>Snake</span>}
       />
 
       <FeatureTile
@@ -52,9 +50,8 @@ export function FeatureTiles() {
         icon={Type}
         meta="Solo · Tageswort"
         reduced={reduced}
-        index="W"
         staggerIndex={2}
-        wordmark={<span className={WORDMARK_CLASS}>WORDLE</span>}
+        wordmark={<span className={WORDMARK_CLASS}>Wordle</span>}
       />
 
       <FeatureTile
@@ -63,9 +60,8 @@ export function FeatureTiles() {
         icon={Brain}
         meta="Solo · 2 Spieler"
         reduced={reduced}
-        index="M"
         staggerIndex={3}
-        wordmark={<span className={WORDMARK_CLASS}>MEMORY</span>}
+        wordmark={<span className={WORDMARK_CLASS}>Memory</span>}
       />
 
       {/* --- Multiplayer Games --- */}
@@ -76,9 +72,8 @@ export function FeatureTiles() {
         icon={Sparkles}
         meta="Multiplayer · bis 6 Spieler"
         reduced={reduced}
-        index="Z"
         staggerIndex={4}
-        wordmark={<span className={WORDMARK_CLASS}>WIZARD</span>}
+        wordmark={<span className={WORDMARK_CLASS}>Wizard</span>}
       />
 
       <FeatureTile
@@ -87,9 +82,8 @@ export function FeatureTiles() {
         icon={Dices}
         meta="Multiplayer · Würfelspiel"
         reduced={reduced}
-        index="K"
         staggerIndex={5}
-        wordmark={<span className={WORDMARK_CLASS}>KNIFFEL</span>}
+        wordmark={<span className={WORDMARK_CLASS}>Kniffel</span>}
       />
 
       <FeatureTile
@@ -98,12 +92,11 @@ export function FeatureTiles() {
         icon={Ship}
         meta="Multiplayer · 1 – 2 Spieler"
         reduced={reduced}
-        index="V"
         staggerIndex={6}
         wordmark={
-          <div className="flex flex-col leading-none gap-1">
-            <span className={WORDMARK_CLASS}>SCHIFFE</span>
-            <span className={WORDMARK_CLASS}>VERSENKEN</span>
+          <div className="flex flex-col leading-tight">
+            <span className={WORDMARK_CLASS}>Schiffe</span>
+            <span className={WORDMARK_CLASS}>versenken</span>
           </div>
         }
       />
@@ -114,9 +107,8 @@ export function FeatureTiles() {
         icon={SquareStack}
         meta="Multiplayer · Kartenspiel"
         reduced={reduced}
-        index="R"
         staggerIndex={7}
-        wordmark={<span className={WORDMARK_CLASS}>ROMMÉ</span>}
+        wordmark={<span className={WORDMARK_CLASS}>Rommé</span>}
       />
     </motion.div>
   );

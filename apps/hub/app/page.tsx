@@ -4,7 +4,7 @@ import { BackgroundPicker } from "@/components/BackgroundPicker";
 
 export default function Home() {
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 pb-[calc(72px+env(safe-area-inset-bottom,0px))] pt-[max(1.5rem,calc(env(safe-area-inset-top,0px)+0.75rem))] sm:px-0 desk:pb-6 desk:pt-4">
+    <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 pb-[calc(72px+env(safe-area-inset-bottom,0px))] sm:px-0 desk:pb-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--vibe-r-lg)] bg-[var(--brand-500)] text-[var(--brand-50)] shadow-[var(--vibe-shadow-soft)] desk:hidden">

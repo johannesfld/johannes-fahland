@@ -33,10 +33,11 @@ export function BottomNav({ pathname }: BottomNavProps) {
     <nav
       aria-label="Hauptnavigation"
       className={cn(
-        "fixed bottom-0 left-0 right-0 z-30 desk:hidden",
+        "fixed inset-x-0 bottom-0 z-30 desk:hidden",
         "border-t border-[var(--vibe-line)]",
-        "bg-[var(--vibe-bg-elevated)]/92 backdrop-blur-xl",
-        "shadow-[0_-8px_24px_-12px_rgba(0,0,0,0.35)]",
+        // Voll deckende Fläche bis zum physischen Rand — kein durchscheinender
+        // Filz, kein Schatten. Die safe-area unten gehört zur Nav-Fläche.
+        "bg-[var(--vibe-bg-elevated)]",
         "pb-[env(safe-area-inset-bottom,0px)]",
       )}
     >
