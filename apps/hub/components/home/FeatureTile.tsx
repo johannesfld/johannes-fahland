@@ -27,7 +27,6 @@ type FeatureTileProps = {
   wordmark: React.ReactNode;
   icon: LucideIcon;
   meta: string;
-  pattern?: React.ReactNode;
   reduced?: boolean | null;
   staggerIndex?: number;
   className?: string;
@@ -40,77 +39,65 @@ export function FeatureTile({
   wordmark,
   icon: Icon,
   meta,
-  pattern,
   reduced,
   staggerIndex = 0,
   className,
 }: FeatureTileProps) {
   return (
-    <div data-tool={tool}>
+    <div data-tool={tool} className="feature-tile-host">
       <MotionLink
         href={href}
         custom={staggerIndex}
         variants={reduced ? undefined : tileVariants}
         className={cn(
-          "group relative flex h-full flex-col overflow-hidden",
-          "rounded-[var(--vibe-r-xl)] border border-[var(--accent-line)]",
-          "bg-[var(--tool-surface)]",
+          "feature-tile group relative flex h-full flex-col overflow-hidden",
+          "rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)]",
           "p-5 sm:p-6",
           "shadow-[var(--vibe-edge),var(--vibe-shadow-flat)]",
           "transition-all duration-[var(--vibe-dur-2)] ease-[var(--vibe-ease-smooth)]",
-          "hover:-translate-y-0.5 hover:shadow-[var(--vibe-edge),var(--vibe-shadow-soft)] hover:border-[var(--accent)]",
+          "hover:-translate-y-0.5 hover:border-[var(--accent)] hover:shadow-[var(--vibe-edge),var(--vibe-shadow-soft)]",
           "active:scale-[0.99] active:translate-y-0",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--vibe-bg-base)]",
           className,
         )}
       >
-        {/* Subtle pattern overlay (tool-specific) */}
-        {pattern && (
-          <div className="pointer-events-none absolute inset-0 opacity-100">
-            {pattern}
-          </div>
-        )}
+        {/* Akzent-Schimmer am oberen Rand — Spielfarbe als zarter Lichtsaum */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[var(--accent)] opacity-40 group-hover:opacity-70 transition-opacity duration-[var(--vibe-dur-2)]"
+        />
 
         {/* Ecken-Index oben links: Tool-Initial + Akzent-Pip (Spielkarten-Eckzahl) */}
-        <div className="relative mb-auto flex items-center gap-1.5">
+        <div className="relative mb-auto flex items-center gap-2">
           <span
-            className="font-display text-lg font-semibold leading-none text-[var(--accent-ink)]"
+            className="grid h-7 w-7 place-items-center rounded-[var(--vibe-r-sm)] bg-[var(--accent-soft)] font-display text-sm font-bold leading-none text-[var(--accent-ink)]"
             aria-hidden
           >
             {index}
           </span>
-          <Icon
-            size={13}
-            className="text-[var(--accent)] opacity-70"
-            aria-hidden
-          />
+          <Icon size={15} className="text-[var(--accent)]" aria-hidden />
         </div>
 
         {/* Bottom: Wordmark + meta */}
         <div className="relative mt-8 flex flex-col gap-1.5">
           {/* Meta pill */}
-          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)] opacity-70">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--accent)] opacity-80">
             {meta}
           </p>
           {/* Wordmark — rendered by caller for font control */}
-          <div className="text-[var(--accent-ink)] transition-all duration-[var(--vibe-dur-2)]">
+          <div className="text-[var(--vibe-fg-base)] transition-colors duration-[var(--vibe-dur-2)] group-hover:text-[var(--accent-ink)]">
             {wordmark}
           </div>
         </div>
 
         {/* Ecken-Index unten rechts: 180°-gespiegeltes "Doppel" der oberen Ecke */}
-        <div className="absolute bottom-5 right-5 flex items-center gap-1.5 rotate-180 transition-opacity duration-[var(--vibe-dur-2)]">
+        <div className="absolute bottom-5 right-5 rotate-180 transition-opacity duration-[var(--vibe-dur-2)]">
           <span
-            className="font-display text-lg font-semibold leading-none text-[var(--accent-ink)] opacity-50 group-hover:opacity-80"
+            className="font-display text-lg font-bold leading-none text-[var(--accent-ink)] opacity-40 group-hover:opacity-70"
             aria-hidden
           >
             {index}
           </span>
-          <Icon
-            size={13}
-            className="text-[var(--accent)] opacity-40 transition-transform duration-[var(--vibe-dur-2)] group-hover:translate-x-0.5 group-hover:opacity-70"
-            aria-hidden
-          />
         </div>
       </MotionLink>
     </div>

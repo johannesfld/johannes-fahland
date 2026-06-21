@@ -25,7 +25,12 @@ export type BackgroundId =
   | "burgund"
   | "espresso"
   | "rosenholz"
-  | "anthrazit";
+  | "anthrazit"
+  | "smaragd"
+  | "kobalt"
+  | "pflaume"
+  | "graphit"
+  | "safran";
 
 export const DEFAULT_BACKGROUND: BackgroundId = "rosa";
 
@@ -33,14 +38,19 @@ export const BACKGROUND_STORAGE_KEY = "pasch-bg";
 
 /** Kuratierte Reihenfolge + Anzeigenamen + Swatch-Farbe (repräsentativer Dark-Ton). */
 export const BACKGROUNDS: { id: BackgroundId; label: string; swatch: string }[] = [
-  { id: "rosa",        label: "Rosa",        swatch: "#341527" },
-  { id: "filz",        label: "Filz",        swatch: "#0B1F17" },
-  { id: "mitternacht", label: "Mitternacht", swatch: "#142136" },
-  { id: "petrol",      label: "Petrol",      swatch: "#112C30" },
+  { id: "rosa",        label: "Rosa",        swatch: "#4C1A38" },
+  { id: "pflaume",     label: "Pflaume",     swatch: "#391A45" },
   { id: "aubergine",   label: "Aubergine",   swatch: "#271836" },
   { id: "burgund",     label: "Burgund",     swatch: "#311A20" },
   { id: "rosenholz",   label: "Rosenholz",   swatch: "#33232D" },
+  { id: "kobalt",      label: "Kobalt",      swatch: "#172747" },
+  { id: "mitternacht", label: "Mitternacht", swatch: "#142136" },
+  { id: "petrol",      label: "Petrol",      swatch: "#112C30" },
+  { id: "smaragd",     label: "Smaragd",     swatch: "#13362D" },
+  { id: "filz",        label: "Filz",        swatch: "#0B1F17" },
+  { id: "safran",      label: "Safran",      swatch: "#362814" },
   { id: "espresso",    label: "Espresso",    swatch: "#2E211A" },
+  { id: "graphit",     label: "Graphit",     swatch: "#1E2630" },
   { id: "anthrazit",   label: "Anthrazit",   swatch: "#212429" },
 ];
 

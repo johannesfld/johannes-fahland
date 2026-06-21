@@ -15,8 +15,8 @@ export const viewport: Viewport = {
   // Default passend zum Rosa-Hintergrund; BackgroundProvider aktualisiert die
   // theme-color zur Laufzeit auf die jeweils gewählte Tisch-Farbe.
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#FCE9F2" },
-    { media: "(prefers-color-scheme: dark)", color: "#240E1C" },
+    { media: "(prefers-color-scheme: light)", color: "#FCE2EF" },
+    { media: "(prefers-color-scheme: dark)", color: "#3A1228" },
   ],
   viewportFit: "cover",
   interactiveWidget: "resizes-content",
@@ -58,7 +58,7 @@ const themeInitScript = `
     r.style.colorScheme = dark ? 'dark' : 'light';
     // Tisch-Hintergrund vor dem ersten Paint setzen (FOUC-Schutz). Default 'rosa';
     // 'filz' = Basiszustand der Tokens, braucht kein data-bg.
-    var valid = {rosa:1,filz:1,mitternacht:1,aubergine:1,petrol:1,burgund:1,espresso:1,rosenholz:1,anthrazit:1};
+    var valid = {rosa:1,filz:1,mitternacht:1,aubergine:1,petrol:1,burgund:1,espresso:1,rosenholz:1,anthrazit:1,smaragd:1,kobalt:1,pflaume:1,graphit:1,safran:1};
     var bg = localStorage.getItem('pasch-bg');
     if (!bg || !valid[bg]) bg = 'rosa';
     if (bg === 'filz') r.removeAttribute('data-bg');

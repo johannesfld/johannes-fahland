@@ -97,7 +97,7 @@ export function InstallPrompt({ appName, className }: InstallPromptProps) {
       <button
         type="button"
         onClick={handleInstall}
-        className="shrink-0 rounded-[var(--vibe-r-md)] bg-[var(--accent)] px-3 py-1.5 text-xs font-semibold text-[var(--accent-ink)] shadow-[var(--vibe-shadow-soft)] transition-all hover:brightness-95 active:scale-[0.98]"
+        className="shrink-0 rounded-[var(--vibe-r-md)] bg-[var(--brand-500)] px-3 py-1.5 text-xs font-semibold text-[var(--brand-50)] shadow-[var(--vibe-shadow-soft)] transition-all hover:brightness-110 active:scale-[0.98]"
       >
         Installieren
       </button>

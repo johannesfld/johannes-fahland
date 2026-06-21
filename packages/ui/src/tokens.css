@@ -1,7 +1,8 @@
 /* @pasch/ui — Design-Tokens für Hub und Turnier-Subdomain.
-   "Spieltisch bei Nacht": Filzgrün + Messing + Elfenbein + Karmin. Nacht (.dark) ist Default,
-   Tag (:root) ist Sekundär-Theme. 9 Tool-Akzente ("Edelsteine bei Kerzenlicht") per [data-tool="x"].
-   Per-Tool-Surfaces für skeuomorphe Spielflächen. */
+   Marke = Logo-Pink (#E44890): Brand-Skala, Default-Akzent, aktive States, Tisch "rosa".
+   Nacht (.dark) ist Default, Tag (:root) ist Sekundär-Theme. 9 Tool-Akzente
+   ("Edelsteine bei Kerzenlicht") per [data-tool="x"] bleiben spielspezifisch.
+   Wählbare Tisch-Hintergründe per [data-bg="x"]. */
 
 /* Desk-Variante: nur Geräte ab 1024px UND mit echtem Pointer (Maus, Trackpad).
    iPad Portrait/Landscape ohne Maus fällt darunter raus → bekommt BottomNav statt Sidebar.
@@ -15,7 +16,7 @@
   --surface: #FCF9EF;
   --surface-muted: #EAE3CE;
   --border: rgba(20, 39, 30, 0.12);
-  --ring-focus: rgba(135, 103, 27, 0.55);
+  --ring-focus: rgba(206, 47, 120, 0.55);
   --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
   color-scheme: light;
 
@@ -34,8 +35,8 @@
   /* --- Linien --- */
   --vibe-line:        rgba(20, 39, 30, 0.12);
   --vibe-line-strong: rgba(20, 39, 30, 0.22);
-  --vibe-line-brass:  rgba(135, 103, 27, 0.40);
-  --vibe-ring:        rgba(135, 103, 27, 0.55);
+  --vibe-line-brass:  rgba(206, 47, 120, 0.36);
+  --vibe-ring:        rgba(206, 47, 120, 0.55);
   --vibe-edge:        inset 0 1px 0 rgba(255, 253, 246, 0.6);
 
   /* --- Tischlicht (nur auf bg-base) --- */
@@ -88,26 +89,30 @@
   --vibe-pad-page: 1rem;
   --vibe-pad-card: 1.25rem;
 
-  /* --- Brand: Pasch (Messing) --- */
-  --brand-50:  #FCF8E8;
-  --brand-100: #F7EEC8;
-  --brand-200: #EFDF9C;
-  --brand-300: #E4CB6B;
-  --brand-400: #D7B643;
-  --brand-500: #C9A227;   /* Messing */
-  --brand-600: #A98420;
-  --brand-700: #87671B;
-  --brand-800: #654C16;
-  --brand-900: #44330F;
-  --brand-950: #2A1F08;
+  /* --- Brand: Pasch (Pink) — abgeleitet aus dem Logo-Stein (#E44890) --- */
+  --brand-50:  #FDF0F6;
+  --brand-100: #FBDDEC;
+  --brand-200: #F8BBD9;
+  --brand-300: #F38FBF;
+  --brand-400: #EC619F;
+  --brand-500: #E44890;   /* Logo-Pink */
+  --brand-600: #CE2F78;
+  --brand-700: #AC2061;
+  --brand-800: #861A4C;
+  --brand-900: #5F1336;
+  --brand-950: #3A0B21;
 
   /* Brand-Alias als Default-Akzent (Hub-Home, Footer, Impressum) */
-  --accent:       var(--brand-500);
-  --accent-soft:  #F2E8C4;
-  --accent-ink:   #87671B;   /* Messing-Text auf Papier (4.5:1+) */
-  --accent-line:  rgba(135, 103, 27, 0.26);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(201, 162, 39, 0.16) 0%, transparent 70%);
-  --tool-surface: #F1EAD5;
+  --accent:       #CE2F78;   /* Pink, dunkel genug für Text auf Papier (4.5:1+) */
+  --accent-soft:  #FBDDEC;
+  --accent-ink:   #AC2061;   /* tiefes Pink für Wordmarks auf hellem Grund */
+  --accent-line:  rgba(206, 47, 120, 0.26);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(228, 72, 144, 0.16) 0%, transparent 70%);
+  --tool-surface: #FBE3EF;
+
+  /* Home-Tiles: Fläche aus dem Tisch + Pink-Schimmer (siehe .feature-tile).
+     Spielfarbe lebt nur noch im Akzent-Pip, nicht in der Fläche. */
+  --tile-texture-opacity: 0.45;
 }
 
 /* --- Per-Tool Akzent-Map (Tag): "Edelsteine bei Kerzenlicht", gedämpft für Papier --- */
@@ -200,7 +205,7 @@
   --surface: #11281E;
   --surface-muted: #071610;
   --border: rgba(242, 235, 217, 0.10);
-  --ring-focus: rgba(201, 162, 39, 0.55);
+  --ring-focus: rgba(236, 97, 159, 0.55);
   color-scheme: dark;
 
   --vibe-bg-base:     #0B1F17;  /* Filzgrün */
@@ -215,8 +220,8 @@
 
   --vibe-line:        rgba(242, 235, 217, 0.10);
   --vibe-line-strong: rgba(242, 235, 217, 0.18);
-  --vibe-line-brass:  rgba(201, 162, 39, 0.32);
-  --vibe-ring:        rgba(201, 162, 39, 0.55);
+  --vibe-line-brass:  rgba(236, 97, 159, 0.34);
+  --vibe-ring:        rgba(236, 97, 159, 0.55);
   --vibe-edge:        inset 0 1px 0 rgba(242, 235, 217, 0.06);
 
   --vibe-table-light: radial-gradient(120% 70% at 50% -10%, rgba(242, 235, 217, 0.05), transparent 60%);
@@ -235,25 +240,27 @@
   --vibe-shadow-2: var(--vibe-shadow-soft);
   --vibe-shadow-3: var(--vibe-shadow-lifted);
 
-  /* Brand-Dark: Messing-Skala invertiert für dunklen Grund */
-  --brand-50:  #2A1F08;
-  --brand-100: #44330F;
-  --brand-200: #654C16;
-  --brand-300: #87671B;
-  --brand-400: #A98420;
-  --brand-500: #C9A227;
-  --brand-600: #D7B643;
-  --brand-700: #E4CB6B;
-  --brand-800: #EFDF9C;
-  --brand-900: #F7EEC8;
-  --brand-950: #FCF8E8;
+  /* Brand-Dark: Pink-Skala invertiert für dunklen Grund */
+  --brand-50:  #3A0B21;
+  --brand-100: #5F1336;
+  --brand-200: #861A4C;
+  --brand-300: #AC2061;
+  --brand-400: #CE2F78;
+  --brand-500: #E44890;
+  --brand-600: #EC619F;
+  --brand-700: #F38FBF;
+  --brand-800: #F8BBD9;
+  --brand-900: #FBDDEC;
+  --brand-950: #FDF0F6;
 
-  --accent:       #C9A227;   /* Messing */
-  --accent-soft:  #332808;
-  --accent-ink:   #EFDCA0;
-  --accent-line:  rgba(201, 162, 39, 0.30);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(201, 162, 39, 0.18) 0%, transparent 70%);
-  --tool-surface: #14291D;
+  --accent:       #EC619F;   /* helles Pink, leuchtet auf dunklem Grund */
+  --accent-soft:  #3D1228;
+  --accent-ink:   #F9C3DD;
+  --accent-line:  rgba(236, 97, 159, 0.32);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(236, 97, 159, 0.18) 0%, transparent 70%);
+  --tool-surface: #2A1320;
+
+  --tile-texture-opacity: 0.55;
 }
 
 /* --- Per-Tool Akzent-Map (Nacht): "Edelsteine bei Kerzenlicht" --- */
@@ -358,6 +365,45 @@
   opacity: 0.03;
 }
 
+/* ============================================================================
+   Home-Tiles: einheitliche Pink-Oberfläche mit hinterlegter Filz-Textur.
+   Alle Kacheln teilen dieselbe Fläche; die Spielfarbe (--accent per [data-tool])
+   erscheint nur im Eckpip, Icon und Hover-Saum. Ruhig, markentreu, edel.
+   ============================================================================ */
+.feature-tile {
+  /* Fläche leitet sich vom gewählten Tisch ab (harmoniert mit jedem Hintergrund),
+     trägt aber einen dezenten Pink-Marken-Schimmer obendrauf — so bleibt die Marke
+     präsent, ohne auf nicht-pinken Tischen zu beißen. Auf Rosa = maximal pink. */
+  background-color: var(--vibe-bg-elevated);
+  background-image:
+    linear-gradient(155deg, color-mix(in srgb, var(--brand-500) 12%, transparent) 0%, transparent 70%),
+    linear-gradient(155deg, var(--vibe-bg-elevated) 0%, var(--vibe-bg-sunken) 92%);
+}
+/* Textur-Schicht: feines Korn, identisch zum Tisch-Filz, sehr subtil. */
+.feature-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--tile-texture-opacity);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='t'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23t)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+/* Akzent-Glow oben: Spielfarbe als zarter Lichtschein, nur beim Hover spürbar. */
+.feature-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--accent) 22%, transparent) 0%, transparent 60%);
+  transition: opacity var(--vibe-dur-3) var(--vibe-ease-smooth);
+}
+.feature-tile:hover::before {
+  opacity: 1;
+}
+
 /* --- Messing-Haarlinie als Utility (z.B. Trenner, Tabellenlinien) --- */
 .rule-brass {
   border-color: var(--vibe-line-brass);
@@ -403,12 +449,13 @@
   --vibe-bg-tinted: #3B2027; --vibe-bg-overlay: #41232B;
   --background: #211115; --surface: #311A20; --surface-muted: #170B0E;
 }
-/* Pink — Markenfarbe, Default-Hintergrund. Tief, gedämpft, warm: ein „Spieltisch
-   in Magenta-Nacht", auf dem Elfenbein-Text & Messing-Akzent klar lesbar bleiben. */
+/* Pink — Markenfarbe, Default-Hintergrund. Sattes, warmes Magenta-Nacht: deutlich
+   als Pink erkennbar, aber tief genug, dass Elfenbein-Text & Pink-Akzent klar lesbar
+   bleiben. (Vorher #240E1C — zu dunkel, wirkte schwarz-bräunlich.) */
 .dark[data-bg="rosa"] {
-  --vibe-bg-base: #240E1C; --vibe-bg-elevated: #341527; --vibe-bg-sunken: #190914;
-  --vibe-bg-tinted: #3E1A2F; --vibe-bg-overlay: #451E34;
-  --background: #240E1C; --surface: #341527; --surface-muted: #190914;
+  --vibe-bg-base: #3A1228; --vibe-bg-elevated: #4C1A38; --vibe-bg-sunken: #2A0C1D;
+  --vibe-bg-tinted: #58204A; --vibe-bg-overlay: #5E2347;
+  --background: #3A1228; --surface: #4C1A38; --surface-muted: #2A0C1D;
 }
 .dark[data-bg="petrol"] {
   --vibe-bg-base: #0B1F22; --vibe-bg-elevated: #112C30; --vibe-bg-sunken: #071619;
@@ -419,6 +466,31 @@
   --vibe-bg-base: #241820; --vibe-bg-elevated: #33232D; --vibe-bg-sunken: #190F16;
   --vibe-bg-tinted: #3D2A36; --vibe-bg-overlay: #432F3C;
   --background: #241820; --surface: #33232D; --surface-muted: #190F16;
+}
+.dark[data-bg="smaragd"] {
+  --vibe-bg-base: #0C2620; --vibe-bg-elevated: #13362D; --vibe-bg-sunken: #081B16;
+  --vibe-bg-tinted: #194036; --vibe-bg-overlay: #1C463B;
+  --background: #0C2620; --surface: #13362D; --surface-muted: #081B16;
+}
+.dark[data-bg="kobalt"] {
+  --vibe-bg-base: #0E1A33; --vibe-bg-elevated: #172747; --vibe-bg-sunken: #0A1226;
+  --vibe-bg-tinted: #1E3158; --vibe-bg-overlay: #213560;
+  --background: #0E1A33; --surface: #172747; --surface-muted: #0A1226;
+}
+.dark[data-bg="pflaume"] {
+  --vibe-bg-base: #2A1133; --vibe-bg-elevated: #391A45; --vibe-bg-sunken: #1E0B26;
+  --vibe-bg-tinted: #441F52; --vibe-bg-overlay: #4A2259;
+  --background: #2A1133; --surface: #391A45; --surface-muted: #1E0B26;
+}
+.dark[data-bg="graphit"] {
+  --vibe-bg-base: #141A22; --vibe-bg-elevated: #1E2630; --vibe-bg-sunken: #0E131A;
+  --vibe-bg-tinted: #252F3B; --vibe-bg-overlay: #28333F;
+  --background: #141A22; --surface: #1E2630; --surface-muted: #0E131A;
+}
+.dark[data-bg="safran"] {
+  --vibe-bg-base: #271C0C; --vibe-bg-elevated: #362814; --vibe-bg-sunken: #1B1308;
+  --vibe-bg-tinted: #40301A; --vibe-bg-overlay: #46351D;
+  --background: #271C0C; --surface: #362814; --surface-muted: #1B1308;
 }
 
 /* ---- Light-Varianten (Tag) — passend abgestimmte Papiertöne ---- */
@@ -457,8 +529,33 @@
   --vibe-bg-tinted: #F1E4EA;
   --background: #F6EDF1; --surface: #FDF8FA; --surface-muted: #ECDEE5;
 }
+:root:not(.dark)[data-bg="smaragd"] {
+  --vibe-bg-base: #E7F2EE; --vibe-bg-elevated: #F4FAF7; --vibe-bg-sunken: #DAE9E2;
+  --vibe-bg-tinted: #E1EDE8;
+  --background: #E7F2EE; --surface: #F4FAF7; --surface-muted: #DAE9E2;
+}
+:root:not(.dark)[data-bg="kobalt"] {
+  --vibe-bg-base: #EAEFF8; --vibe-bg-elevated: #F6F9FD; --vibe-bg-sunken: #DCE4F1;
+  --vibe-bg-tinted: #E3EAF5;
+  --background: #EAEFF8; --surface: #F6F9FD; --surface-muted: #DCE4F1;
+}
+:root:not(.dark)[data-bg="pflaume"] {
+  --vibe-bg-base: #F2EAF6; --vibe-bg-elevated: #FBF7FD; --vibe-bg-sunken: #E6DAEE;
+  --vibe-bg-tinted: #ECE2F2;
+  --background: #F2EAF6; --surface: #FBF7FD; --surface-muted: #E6DAEE;
+}
+:root:not(.dark)[data-bg="graphit"] {
+  --vibe-bg-base: #ECEEF1; --vibe-bg-elevated: #F8F9FB; --vibe-bg-sunken: #DFE3E8;
+  --vibe-bg-tinted: #E6E9ED;
+  --background: #ECEEF1; --surface: #F8F9FB; --surface-muted: #DFE3E8;
+}
+:root:not(.dark)[data-bg="safran"] {
+  --vibe-bg-base: #F5EEDF; --vibe-bg-elevated: #FCF8EE; --vibe-bg-sunken: #EAE0CB;
+  --vibe-bg-tinted: #F0E6D3;
+  --background: #F5EEDF; --surface: #FCF8EE; --surface-muted: #EAE0CB;
+}
 :root:not(.dark)[data-bg="rosa"] {
-  --vibe-bg-base: #FCE9F2; --vibe-bg-elevated: #FFF5FA; --vibe-bg-sunken: #F6D9E8;
-  --vibe-bg-tinted: #FAE1EE;
-  --background: #FCE9F2; --surface: #FFF5FA; --surface-muted: #F6D9E8;
+  --vibe-bg-base: #FCE2EF; --vibe-bg-elevated: #FFF2F8; --vibe-bg-sunken: #F7CEE2;
+  --vibe-bg-tinted: #FBD8E9;
+  --background: #FCE2EF; --surface: #FFF2F8; --surface-muted: #F7CEE2;
 }
