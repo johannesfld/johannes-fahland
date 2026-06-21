@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { Shuffle } from "lucide-react";
 import { FLEET, GRID_SIZE, type FleetShipId } from "@/lib/schiffe/constants";
 import { formatCell, type Cell } from "@/lib/schiffe/coords";
 import {
@@ -159,11 +160,9 @@ function BoardGrid({
 }
 
 export function SchiffeVersenkenApp() {
-  const [game, dispatch] = useReducer(
-    gameReducer,
-    undefined,
-    () => loadSchiffeState() ?? initialGame(),
-  );
+  // SSR + erster Client-Render: deterministisch initialGame() (kein localStorage),
+  // sonst Hydration-Mismatch. Gespeicherter State wird nach Mount via HYDRATE geladen.
+  const [game, dispatch] = useReducer(gameReducer, undefined, initialGame);
   const isHydrated = useRef(false);
   const [colors, setColors] = useState<SchiffeColorSettings>(() =>
     loadColorSettings(),
@@ -187,11 +186,16 @@ export function SchiffeVersenkenApp() {
   const settingsBtnRef = useRef<HTMLButtonElement>(null);
   const settingsRef = useRef<HTMLDivElement>(null);
 
+  // Gespeicherten Spielstand nach Mount übernehmen (einmalig).
   useEffect(() => {
-    if (!isHydrated.current) {
-      isHydrated.current = true;
-      return;
-    }
+    const saved = loadSchiffeState();
+    if (saved) dispatch({ type: "HYDRATE", state: saved });
+    isHydrated.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!isHydrated.current) return;
     if (game.phase === "modeSelect") {
       clearSchiffeState();
     } else {
@@ -1082,14 +1086,24 @@ export function SchiffeVersenkenApp() {
                   />
                 </div>
               </div>
-              <button
-                type="button"
-                disabled={!fleetIsCompleteAndValid(game.myShips)}
-                onClick={() => dispatch({ type: "ADVANCE_PLACEMENT" })}
-                className="shrink-0 rounded-[var(--vibe-r-xl)] bg-[var(--accent)] py-2 text-xs font-black uppercase tracking-wider text-[var(--accent-ink)] shadow-[var(--vibe-shadow-soft)] transition duration-200 hover:brightness-95 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:py-2.5 sm:text-sm"
-              >
-                {game.mode === "single" ? "Spiel starten" : "Weiter zum Tippfeld"}
-              </button>
+              <div className="flex shrink-0 gap-2">
+                <button
+                  type="button"
+                  onClick={() => dispatch({ type: "PLACE_ALL_RANDOM" })}
+                  className="flex shrink-0 items-center justify-center gap-1.5 rounded-[var(--vibe-r-xl)] border border-[var(--accent-line)] bg-[var(--accent-soft)] px-3 py-2 text-xs font-black uppercase tracking-wider text-[var(--accent-ink)] transition duration-200 hover:brightness-95 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:py-2.5 sm:text-sm"
+                >
+                  <Shuffle className="h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden />
+                  <span>Zufällig</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={!fleetIsCompleteAndValid(game.myShips)}
+                  onClick={() => dispatch({ type: "ADVANCE_PLACEMENT" })}
+                  className="flex-1 rounded-[var(--vibe-r-xl)] bg-[var(--accent)] py-2 text-xs font-black uppercase tracking-wider text-[var(--accent-ink)] shadow-[var(--vibe-shadow-soft)] transition duration-200 hover:brightness-95 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 focus-visible:ring-offset-2 sm:py-2.5 sm:text-sm"
+                >
+                  {game.mode === "single" ? "Spiel starten" : "Weiter zum Tippfeld"}
+                </button>
+              </div>
             </div>
           )}
 

@@ -36,9 +36,11 @@ export type GameState = {
 
 export type GameAction =
   | { type: "RESET" }
+  | { type: "HYDRATE"; state: GameState }
   | { type: "SET_MODE"; mode: GameMode }
   | { type: "CLEAR_BOT_FEEDBACK" }
   | { type: "PLACE_SHIP"; ship: PlacedShip }
+  | { type: "PLACE_ALL_RANDOM" }
   | { type: "REMOVE_SHIP"; id: FleetShipId }
   | { type: "ADVANCE_PLACEMENT" }
   | { type: "TRACKER_SELECT"; cell: Cell }

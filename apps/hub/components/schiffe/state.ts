@@ -100,6 +100,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "RESET":
       return initialGame();
+    case "HYDRATE":
+      // Gespeicherten State nach Mount übernehmen (SSR rendert initialGame()).
+      return action.state;
     case "SET_MODE":
       return {
         ...initialGame(),
@@ -121,6 +124,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const rest = state.myShips.filter((s) => s.id !== action.ship.id);
       if (!canAddShip(rest, action.ship)) return state;
       return { ...state, myShips: [...rest, action.ship] };
+    }
+    case "PLACE_ALL_RANDOM": {
+      // Komplette eigene Flotte zufällig (aber gültig) setzen — gleiche erprobte
+      // Logik wie die Bot-Platzierung. Spart mühsames Einzeln-Setzen.
+      if (state.phase !== "place") return state;
+      return { ...state, myShips: randomBotFleet() };
     }
     case "REMOVE_SHIP": {
       if (state.phase !== "place") return state;

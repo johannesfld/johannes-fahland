@@ -1,10 +1,13 @@
 import type { Card, GameMode, GameState } from "./types";
 
-const SYMBOLS_4 = ["🎯", "🎲", "🃏", "♟️", "🎸", "🎺", "🎻", "🥁"];
+/* Symbol-Keys statt Emojis: gerendert als monochrome Lucide-Icons (siehe
+   SYMBOL_ICONS in MemoryGame.tsx). Konsistent mit der Icon-Designsprache der App
+   und plattformunabhängig scharf. Match-Logik vergleicht weiterhin Key-Gleichheit. */
+const SYMBOLS_4 = ["target", "dice", "club", "spade", "guitar", "music", "drum", "trophy"];
 const SYMBOLS_6 = [
-  "🎯", "🎲", "🃏", "♟️", "🎸", "🎺", "🎻", "🥁",
-  "🎮", "🎳", "🏆", "🎪", "🎨", "🎭", "🎬", "🎤",
-  "🎹", "🎵",
+  "target", "dice", "club", "spade", "guitar", "music", "drum", "trophy",
+  "gamepad", "rocket", "crown", "star", "anchor", "bell", "gem", "flame",
+  "moon", "ghost",
 ];
 
 function shuffle<T>(arr: T[]): T[] {

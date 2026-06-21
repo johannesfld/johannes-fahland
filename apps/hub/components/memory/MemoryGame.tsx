@@ -2,13 +2,26 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { RotateCcw, Users, User } from "lucide-react";
+import {
+  RotateCcw, Users, User, PartyPopper,
+  Target, Dices, Club, Spade, Guitar, Music, Drum, Trophy,
+  Gamepad2, Rocket, Crown, Star, Anchor, Bell, Gem, Flame, Moon, Ghost,
+  type LucideIcon,
+} from "lucide-react";
 import { ToolShell } from "@/components/tool-shell/ToolShell";
 import { createInitialState, flipCard, unflipMismatched } from "./logic";
 import { loadBest, saveBest } from "./storage";
 import type { GameMode, GameState } from "./types";
 
 const FLIP_DELAY = 900;
+
+/** Karten-Symbol-Keys (siehe logic.ts) → monochrome Lucide-Icons. */
+const SYMBOL_ICONS: Record<string, LucideIcon> = {
+  target: Target, dice: Dices, club: Club, spade: Spade,
+  guitar: Guitar, music: Music, drum: Drum, trophy: Trophy,
+  gamepad: Gamepad2, rocket: Rocket, crown: Crown, star: Star,
+  anchor: Anchor, bell: Bell, gem: Gem, flame: Flame, moon: Moon, ghost: Ghost,
+};
 
 export default function MemoryGame() {
   const [state, setState] = useState<GameState>(() => createInitialState(4, "1p"));
@@ -172,7 +185,7 @@ export default function MemoryGame() {
                   boxShadow: "var(--vibe-edge), var(--vibe-shadow-lifted)",
                 }}
               >
-                <span className="text-4xl">🎉</span>
+                <PartyPopper className="h-10 w-10" style={{ color: "var(--accent)" }} aria-hidden />
                 <p className="font-display text-xl font-black" style={{ color: "var(--accent-ink)" }}>
                   {state.mode === "2p"
                     ? state.scores[0] > state.scores[1]
@@ -185,7 +198,7 @@ export default function MemoryGame() {
                 {state.mode === "1p" && (
                   <p className="text-sm text-[var(--vibe-fg-muted)]">
                     {state.moves} Züge
-                    {bestScore !== null && bestScore === state.moves && " · Neuer Rekord! 🏆"}
+                    {bestScore !== null && bestScore === state.moves && " · Neuer Rekord!"}
                   </p>
                 )}
                 {state.mode === "2p" && (
@@ -219,6 +232,7 @@ function CardTile({
   onClick: () => void;
 }) {
   const isVisible = state !== "hidden";
+  const SymbolIcon = SYMBOL_ICONS[symbol];
 
   return (
     <button
@@ -247,10 +261,15 @@ function CardTile({
             animate={{ rotateY: 0, opacity: 1 }}
             exit={{ rotateY: 90, opacity: 0 }}
             transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute inset-0 flex items-center justify-center text-2xl sm:text-3xl"
-            style={{ backfaceVisibility: "hidden" }}
+            className="absolute inset-0 flex items-center justify-center"
+            style={{
+              backfaceVisibility: "hidden",
+              color: state === "matched" ? "var(--accent)" : "var(--accent-ink)",
+            }}
           >
-            {symbol}
+            {SymbolIcon ? (
+              <SymbolIcon className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.75} aria-hidden />
+            ) : null}
           </motion.span>
         ) : (
           <motion.span
