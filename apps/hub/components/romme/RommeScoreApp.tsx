@@ -350,9 +350,11 @@ export default function RommeScoreApp() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.28, ease }}
-              className="flex min-h-0 flex-1 flex-col"
+              className="flex min-h-0 flex-1 flex-col items-stretch"
             >
-              <div className="min-h-0 flex-1 overflow-auto rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] shadow-[var(--vibe-shadow-soft)]">
+              {/* Kasten wächst mit dem Inhalt (max. volle Höhe → dann scrollbar),
+                  statt bei wenigen Runden als großer leerer Rahmen zu wirken. */}
+              <div className="min-h-0 max-h-full overflow-auto rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] shadow-[var(--vibe-shadow-soft)]">
                 <table
                   style={narrowTableMinWidth ? { minWidth: narrowTableMinWidth } : undefined}
                   className={cn(

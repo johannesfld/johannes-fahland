@@ -168,7 +168,12 @@ input[type="number"]::-webkit-inner-spin-button {
   }
   body {
     position: fixed;
+    inset: 0;
     width: 100%;
-    height: 100dvh;
+    /* In iOS-Standalone ist 100dvh manchmal größer als der sichtbare Bereich →
+       die fixe BottomNav saß dann über einer Lücke. inset:0 + height:100% bindet
+       den Body exakt an den html-Kasten (html ist height:100%), die Nav klebt
+       so am physischen unteren Rand. */
+    height: 100%;
   }
 }

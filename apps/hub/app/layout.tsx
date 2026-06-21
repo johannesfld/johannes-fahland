@@ -56,13 +56,38 @@ const themeInitScript = `
     var dark = t === 'light' ? false : t === 'system' ? sysDark : true;
     r.classList.toggle('dark', dark);
     r.style.colorScheme = dark ? 'dark' : 'light';
-    // Tisch-Hintergrund vor dem ersten Paint setzen (FOUC-Schutz). Default 'rosa';
-    // 'filz' = Basiszustand der Tokens, braucht kein data-bg.
-    var valid = {rosa:1,filz:1,mitternacht:1,aubergine:1,petrol:1,burgund:1,espresso:1,rosenholz:1,anthrazit:1,smaragd:1,kobalt:1,pflaume:1,graphit:1,safran:1};
-    var bg = localStorage.getItem('pasch-bg');
-    if (!bg || !valid[bg]) bg = 'rosa';
-    if (bg === 'filz') r.removeAttribute('data-bg');
-    else r.setAttribute('data-bg', bg);
+    // Frei gewählte Tisch-Farbe (Hex) vor dem ersten Paint in Surfaces übersetzen
+    // (FOUC-Schutz). Spiegelt surfacesFor() aus BackgroundProvider. Default = Logo-Pink.
+    var hex = localStorage.getItem('pasch-bg');
+    if (!hex || !/^#?[0-9a-fA-F]{6}$/.test(hex)) hex = '#E44890';
+    if (hex[0] !== '#') hex = '#' + hex;
+    function hsl(x){
+      var R=parseInt(x.slice(1,3),16)/255,G=parseInt(x.slice(3,5),16)/255,B=parseInt(x.slice(5,7),16)/255;
+      var mx=Math.max(R,G,B),mn=Math.min(R,G,B),d=mx-mn,h=0;
+      if(d!==0){ if(mx===R)h=((G-B)/d)%6; else if(mx===G)h=(B-R)/d+2; else h=(R-G)/d+4; h*=60; if(h<0)h+=360; }
+      var l=(mx+mn)/2, s=d===0?0:d/(1-Math.abs(2*l-1));
+      return {h:h,s:s*100,l:l*100};
+    }
+    function toHex(h,s,l){
+      s/=100; l/=100;
+      var c=(1-Math.abs(2*l-1))*s, xx=c*(1-Math.abs((h/60)%2-1)), m=l-c/2, R,G,B;
+      if(h<60){R=c;G=xx;B=0;} else if(h<120){R=xx;G=c;B=0;} else if(h<180){R=0;G=c;B=xx;}
+      else if(h<240){R=0;G=xx;B=c;} else if(h<300){R=xx;G=0;B=c;} else {R=c;G=0;B=xx;}
+      function p(n){return Math.round((n+m)*255).toString(16).padStart(2,'0');}
+      return '#'+p(R)+p(G)+p(B);
+    }
+    var c = hsl(hex);
+    var sat = dark ? Math.min(60,Math.max(28,c.s)) : Math.min(48,Math.max(22,c.s));
+    var L = dark ? {base:13,elevated:18,sunken:9,tinted:22,overlay:24}
+                 : {base:93,elevated:97,sunken:88,tinted:90,overlay:99};
+    r.style.setProperty('--vibe-bg-base', toHex(c.h,sat,L.base));
+    r.style.setProperty('--vibe-bg-elevated', toHex(c.h,sat,L.elevated));
+    r.style.setProperty('--vibe-bg-sunken', toHex(c.h,sat,L.sunken));
+    r.style.setProperty('--vibe-bg-tinted', toHex(c.h,sat,L.tinted));
+    r.style.setProperty('--vibe-bg-overlay', toHex(c.h,sat,L.overlay));
+    r.style.setProperty('--background', toHex(c.h,sat,L.base));
+    r.style.setProperty('--surface', toHex(c.h,sat,L.elevated));
+    r.style.setProperty('--surface-muted', toHex(c.h,sat,L.sunken));
   } catch (e) {}
 })();`;
 

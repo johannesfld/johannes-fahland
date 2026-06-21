@@ -263,86 +263,86 @@
   --tile-texture-opacity: 0.55;
 }
 
-/* --- Per-Tool Akzent-Map (Nacht): "Edelsteine bei Kerzenlicht" --- */
+/* --- Per-Tool Akzent-Map (Nacht): leuchtende Neon-Edelsteine, kräftig & hell --- */
 .dark [data-tool="wizard"] {
-  /* Amethyst */
-  --accent:       #B392D9;
+  /* Amethyst — leuchtendes Violett */
+  --accent:       #C49BFF;
   --accent-soft:  #34284A;
-  --accent-ink:   #E9DCF5;
-  --accent-line:  rgba(179, 146, 217, 0.30);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(179, 146, 217, 0.18) 0%, transparent 70%);
+  --accent-ink:   #EFE2FF;
+  --accent-line:  rgba(196, 155, 255, 0.40);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(196, 155, 255, 0.28) 0%, transparent 70%);
   --tool-surface: #241B33;
 }
 .dark [data-tool="kniffel"] {
-  /* Bernstein */
-  --accent:       #E2984A;
+  /* Bernstein — goldgelb, satt */
+  --accent:       #F5A623;
   --accent-soft:  #3A2A0D;
-  --accent-ink:   #FBE5C8;
-  --accent-line:  rgba(226, 152, 74, 0.30);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(226, 152, 74, 0.18) 0%, transparent 70%);
+  --accent-ink:   #FFEACB;
+  --accent-line:  rgba(245, 166, 35, 0.42);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(245, 166, 35, 0.28) 0%, transparent 70%);
   --tool-surface: #2E2110;
 }
 .dark [data-tool="schiffe"] {
-  /* Stahlblau */
-  --accent:       #6FA7D8;
+  /* Stahlblau — leuchtendes Azur */
+  --accent:       #58B6FF;
   --accent-soft:  #16293C;
-  --accent-ink:   #DCEAF7;
-  --accent-line:  rgba(111, 167, 216, 0.30);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(111, 167, 216, 0.18) 0%, transparent 70%);
+  --accent-ink:   #DCEEFF;
+  --accent-line:  rgba(88, 182, 255, 0.42);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(88, 182, 255, 0.28) 0%, transparent 70%);
   --tool-surface: #16242F;
 }
 .dark [data-tool="romme"] {
-  /* Koralle */
-  --accent:       #E08573;
+  /* Koralle — warmes Coral, kräftig */
+  --accent:       #FF7E66;
   --accent-soft:  #3A1F1A;
-  --accent-ink:   #FBDFD8;
-  --accent-line:  rgba(224, 133, 115, 0.28);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(224, 133, 115, 0.18) 0%, transparent 70%);
+  --accent-ink:   #FFE0D7;
+  --accent-line:  rgba(255, 126, 102, 0.40);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(255, 126, 102, 0.28) 0%, transparent 70%);
   --tool-surface: #2E1C18;
 }
 .dark [data-tool="turnier"] {
-  /* Jade */
-  --accent:       #6FC7B5;
+  /* Jade — leuchtendes Mint */
+  --accent:       #4FD8BE;
   --accent-soft:  #173028;
-  --accent-ink:   #DBF2EC;
-  --accent-line:  rgba(111, 199, 181, 0.30);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(111, 199, 181, 0.18) 0%, transparent 70%);
+  --accent-ink:   #DBF7EF;
+  --accent-line:  rgba(79, 216, 190, 0.42);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(79, 216, 190, 0.28) 0%, transparent 70%);
   --tool-surface: #142823;
 }
 .dark [data-tool="g2048"] {
-  /* Kupfer */
-  --accent:       #D98E62;
+  /* Kupfer — warmes Orange, satt */
+  --accent:       #FF9A57;
   --accent-soft:  #3A2415;
-  --accent-ink:   #FBE3D2;
-  --accent-line:  rgba(217, 142, 98, 0.30);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(217, 142, 98, 0.18) 0%, transparent 70%);
+  --accent-ink:   #FFE6D4;
+  --accent-line:  rgba(255, 154, 87, 0.42);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(255, 154, 87, 0.28) 0%, transparent 70%);
   --tool-surface: #2E1F15;
 }
 .dark [data-tool="snake"] {
-  /* Türkis (kein Grün als Schriftfarbe im Dark-Mode) */
-  --accent:       #5FC8D8;
+  /* Türkis — leuchtendes Cyan (kein Grün als Schrift im Dark-Mode) */
+  --accent:       #3FD9EC;
   --accent-soft:  #11313A;
-  --accent-ink:   #CFEFF5;
-  --accent-line:  rgba(95, 200, 216, 0.30);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(95, 200, 216, 0.18) 0%, transparent 70%);
+  --accent-ink:   #D2F5FB;
+  --accent-line:  rgba(63, 217, 236, 0.42);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(63, 217, 236, 0.28) 0%, transparent 70%);
   --tool-surface: #14272E;
 }
 .dark [data-tool="memory"] {
-  /* Rosé */
-  --accent:       #DD93B4;
+  /* Rosé — leuchtendes Magenta-Pink */
+  --accent:       #FF8FC4;
   --accent-soft:  #38202C;
-  --accent-ink:   #FBE0EB;
-  --accent-line:  rgba(221, 147, 180, 0.28);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(221, 147, 180, 0.18) 0%, transparent 70%);
+  --accent-ink:   #FFE2EF;
+  --accent-line:  rgba(255, 143, 196, 0.40);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(255, 143, 196, 0.28) 0%, transparent 70%);
   --tool-surface: #2E1E27;
 }
 .dark [data-tool="wordle"] {
-  /* Taubenblau */
-  --accent:       #9FB2C8;
+  /* Taubenblau — helles, klares Blau */
+  --accent:       #8FB8E8;
   --accent-soft:  #232C36;
-  --accent-ink:   #E5ECF2;
-  --accent-line:  rgba(159, 178, 200, 0.28);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(159, 178, 200, 0.16) 0%, transparent 70%);
+  --accent-ink:   #E7F0FB;
+  --accent-line:  rgba(143, 184, 232, 0.40);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(143, 184, 232, 0.24) 0%, transparent 70%);
   --tool-surface: #1D262F;
 }
 
@@ -413,149 +413,4 @@
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-}
-
-/* ============================================================================
-   Wählbare Tisch-Hintergründe ("Spieltisch-Filz in deiner Farbe")
-   Überschreiben NUR die Surface-Variablen — Vordergrund, Akzent und Tool-Farben
-   bleiben unangetastet, damit Lesbarkeit & Markenakzente überall erhalten sind.
-   Gesetzt über [data-bg="x"] auf <html> (BackgroundProvider + Init-Script).
-   `filz` = Default; ohne data-bg greifen die Basiswerte oben.
-   ============================================================================ */
-
-/* ---- Dark-Varianten (Default-Theme) ---- */
-.dark[data-bg="mitternacht"] {
-  --vibe-bg-base: #0C1626; --vibe-bg-elevated: #142136; --vibe-bg-sunken: #070F1C;
-  --vibe-bg-tinted: #182943; --vibe-bg-overlay: #1B2E4B;
-  --background: #0C1626; --surface: #142136; --surface-muted: #070F1C;
-}
-.dark[data-bg="aubergine"] {
-  --vibe-bg-base: #1B1224; --vibe-bg-elevated: #271836; --vibe-bg-sunken: #130C1A;
-  --vibe-bg-tinted: #2E1C40; --vibe-bg-overlay: #331F47;
-  --background: #1B1224; --surface: #271836; --surface-muted: #130C1A;
-}
-.dark[data-bg="espresso"] {
-  --vibe-bg-base: #201712; --vibe-bg-elevated: #2E211A; --vibe-bg-sunken: #160F0B;
-  --vibe-bg-tinted: #38281E; --vibe-bg-overlay: #3D2C21;
-  --background: #201712; --surface: #2E211A; --surface-muted: #160F0B;
-}
-.dark[data-bg="anthrazit"] {
-  --vibe-bg-base: #17191C; --vibe-bg-elevated: #212429; --vibe-bg-sunken: #0F1113;
-  --vibe-bg-tinted: #282C32; --vibe-bg-overlay: #2C3037;
-  --background: #17191C; --surface: #212429; --surface-muted: #0F1113;
-}
-.dark[data-bg="burgund"] {
-  --vibe-bg-base: #211115; --vibe-bg-elevated: #311A20; --vibe-bg-sunken: #170B0E;
-  --vibe-bg-tinted: #3B2027; --vibe-bg-overlay: #41232B;
-  --background: #211115; --surface: #311A20; --surface-muted: #170B0E;
-}
-/* Pink — Markenfarbe, Default-Hintergrund. Sattes, warmes Magenta-Nacht: deutlich
-   als Pink erkennbar, aber tief genug, dass Elfenbein-Text & Pink-Akzent klar lesbar
-   bleiben. (Vorher #240E1C — zu dunkel, wirkte schwarz-bräunlich.) */
-.dark[data-bg="rosa"] {
-  --vibe-bg-base: #3A1228; --vibe-bg-elevated: #4C1A38; --vibe-bg-sunken: #2A0C1D;
-  --vibe-bg-tinted: #58204A; --vibe-bg-overlay: #5E2347;
-  --background: #3A1228; --surface: #4C1A38; --surface-muted: #2A0C1D;
-}
-.dark[data-bg="petrol"] {
-  --vibe-bg-base: #0B1F22; --vibe-bg-elevated: #112C30; --vibe-bg-sunken: #071619;
-  --vibe-bg-tinted: #163539; --vibe-bg-overlay: #193C41;
-  --background: #0B1F22; --surface: #112C30; --surface-muted: #071619;
-}
-.dark[data-bg="rosenholz"] {
-  --vibe-bg-base: #241820; --vibe-bg-elevated: #33232D; --vibe-bg-sunken: #190F16;
-  --vibe-bg-tinted: #3D2A36; --vibe-bg-overlay: #432F3C;
-  --background: #241820; --surface: #33232D; --surface-muted: #190F16;
-}
-.dark[data-bg="smaragd"] {
-  --vibe-bg-base: #0C2620; --vibe-bg-elevated: #13362D; --vibe-bg-sunken: #081B16;
-  --vibe-bg-tinted: #194036; --vibe-bg-overlay: #1C463B;
-  --background: #0C2620; --surface: #13362D; --surface-muted: #081B16;
-}
-.dark[data-bg="kobalt"] {
-  --vibe-bg-base: #0E1A33; --vibe-bg-elevated: #172747; --vibe-bg-sunken: #0A1226;
-  --vibe-bg-tinted: #1E3158; --vibe-bg-overlay: #213560;
-  --background: #0E1A33; --surface: #172747; --surface-muted: #0A1226;
-}
-.dark[data-bg="pflaume"] {
-  --vibe-bg-base: #2A1133; --vibe-bg-elevated: #391A45; --vibe-bg-sunken: #1E0B26;
-  --vibe-bg-tinted: #441F52; --vibe-bg-overlay: #4A2259;
-  --background: #2A1133; --surface: #391A45; --surface-muted: #1E0B26;
-}
-.dark[data-bg="graphit"] {
-  --vibe-bg-base: #141A22; --vibe-bg-elevated: #1E2630; --vibe-bg-sunken: #0E131A;
-  --vibe-bg-tinted: #252F3B; --vibe-bg-overlay: #28333F;
-  --background: #141A22; --surface: #1E2630; --surface-muted: #0E131A;
-}
-.dark[data-bg="safran"] {
-  --vibe-bg-base: #271C0C; --vibe-bg-elevated: #362814; --vibe-bg-sunken: #1B1308;
-  --vibe-bg-tinted: #40301A; --vibe-bg-overlay: #46351D;
-  --background: #271C0C; --surface: #362814; --surface-muted: #1B1308;
-}
-
-/* ---- Light-Varianten (Tag) — passend abgestimmte Papiertöne ---- */
-:root:not(.dark)[data-bg="mitternacht"] {
-  --vibe-bg-base: #EEF1F7; --vibe-bg-elevated: #F8FAFD; --vibe-bg-sunken: #E1E6F0;
-  --vibe-bg-tinted: #E7ECF5;
-  --background: #EEF1F7; --surface: #F8FAFD; --surface-muted: #E1E6F0;
-}
-:root:not(.dark)[data-bg="aubergine"] {
-  --vibe-bg-base: #F3EEF6; --vibe-bg-elevated: #FBF8FD; --vibe-bg-sunken: #E8E0EE;
-  --vibe-bg-tinted: #EDE5F2;
-  --background: #F3EEF6; --surface: #FBF8FD; --surface-muted: #E8E0EE;
-}
-:root:not(.dark)[data-bg="espresso"] {
-  --vibe-bg-base: #F4EEE7; --vibe-bg-elevated: #FCF8F2; --vibe-bg-sunken: #E9E0D4;
-  --vibe-bg-tinted: #EFE6DA;
-  --background: #F4EEE7; --surface: #FCF8F2; --surface-muted: #E9E0D4;
-}
-:root:not(.dark)[data-bg="anthrazit"] {
-  --vibe-bg-base: #EEEFF1; --vibe-bg-elevated: #F9FAFB; --vibe-bg-sunken: #E2E4E7;
-  --vibe-bg-tinted: #E8EAED;
-  --background: #EEEFF1; --surface: #F9FAFB; --surface-muted: #E2E4E7;
-}
-:root:not(.dark)[data-bg="burgund"] {
-  --vibe-bg-base: #F6ECEE; --vibe-bg-elevated: #FDF7F8; --vibe-bg-sunken: #ECDDE0;
-  --vibe-bg-tinted: #F1E3E6;
-  --background: #F6ECEE; --surface: #FDF7F8; --surface-muted: #ECDDE0;
-}
-:root:not(.dark)[data-bg="petrol"] {
-  --vibe-bg-base: #E8F1F1; --vibe-bg-elevated: #F5FAFA; --vibe-bg-sunken: #DBE8E8;
-  --vibe-bg-tinted: #E2EDED;
-  --background: #E8F1F1; --surface: #F5FAFA; --surface-muted: #DBE8E8;
-}
-:root:not(.dark)[data-bg="rosenholz"] {
-  --vibe-bg-base: #F6EDF1; --vibe-bg-elevated: #FDF8FA; --vibe-bg-sunken: #ECDEE5;
-  --vibe-bg-tinted: #F1E4EA;
-  --background: #F6EDF1; --surface: #FDF8FA; --surface-muted: #ECDEE5;
-}
-:root:not(.dark)[data-bg="smaragd"] {
-  --vibe-bg-base: #E7F2EE; --vibe-bg-elevated: #F4FAF7; --vibe-bg-sunken: #DAE9E2;
-  --vibe-bg-tinted: #E1EDE8;
-  --background: #E7F2EE; --surface: #F4FAF7; --surface-muted: #DAE9E2;
-}
-:root:not(.dark)[data-bg="kobalt"] {
-  --vibe-bg-base: #EAEFF8; --vibe-bg-elevated: #F6F9FD; --vibe-bg-sunken: #DCE4F1;
-  --vibe-bg-tinted: #E3EAF5;
-  --background: #EAEFF8; --surface: #F6F9FD; --surface-muted: #DCE4F1;
-}
-:root:not(.dark)[data-bg="pflaume"] {
-  --vibe-bg-base: #F2EAF6; --vibe-bg-elevated: #FBF7FD; --vibe-bg-sunken: #E6DAEE;
-  --vibe-bg-tinted: #ECE2F2;
-  --background: #F2EAF6; --surface: #FBF7FD; --surface-muted: #E6DAEE;
-}
-:root:not(.dark)[data-bg="graphit"] {
-  --vibe-bg-base: #ECEEF1; --vibe-bg-elevated: #F8F9FB; --vibe-bg-sunken: #DFE3E8;
-  --vibe-bg-tinted: #E6E9ED;
-  --background: #ECEEF1; --surface: #F8F9FB; --surface-muted: #DFE3E8;
-}
-:root:not(.dark)[data-bg="safran"] {
-  --vibe-bg-base: #F5EEDF; --vibe-bg-elevated: #FCF8EE; --vibe-bg-sunken: #EAE0CB;
-  --vibe-bg-tinted: #F0E6D3;
-  --background: #F5EEDF; --surface: #FCF8EE; --surface-muted: #EAE0CB;
-}
-:root:not(.dark)[data-bg="rosa"] {
-  --vibe-bg-base: #FCE2EF; --vibe-bg-elevated: #FFF2F8; --vibe-bg-sunken: #F7CEE2;
-  --vibe-bg-tinted: #FBD8E9;
-  --background: #FCE2EF; --surface: #FFF2F8; --surface-muted: #F7CEE2;
 }

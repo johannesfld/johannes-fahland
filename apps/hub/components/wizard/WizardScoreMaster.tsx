@@ -314,9 +314,9 @@ export default function WizardScoreMaster() {
 
       <div className="relative flex min-h-0 flex-1 flex-col">
         {state.mainStage === "setup" && (
-          <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center overflow-hidden px-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pt-[max(0.75rem,env(safe-area-inset-top,0px))] sm:px-4 sm:py-4">
+          <div className="flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto px-3 pb-[calc(0.75rem+64px+env(safe-area-inset-bottom,0px))] pt-[max(0.75rem,env(safe-area-inset-top,0px))] sm:px-4 sm:pt-4 desk:pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
             <div
-              className={`${card} mx-auto w-full max-w-md space-y-4 p-4 sm:space-y-6 sm:p-6`}
+              className={`${card} mx-auto my-auto w-full max-w-md space-y-4 p-4 sm:space-y-6 sm:p-6`}
             >
               <div className="space-y-1 text-center sm:space-y-2">
                 <h1 className={titleClass}>WIZARD</h1>
@@ -817,9 +817,9 @@ export default function WizardScoreMaster() {
             )}
 
             {state.gamePhase === "scoreboard" && (
-              <div className="relative flex min-h-0 w-full flex-1 flex-col items-center justify-center overflow-hidden px-3 py-3 pb-16 sm:px-4 sm:py-4">
+              <div className="relative flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto px-3 pt-3 pb-[calc(0.75rem+64px+env(safe-area-inset-bottom,0px))] sm:px-4 sm:pt-4 desk:pb-4">
                 <CloseGameButton onClick={resetGame} />
-                <div className="mx-auto w-full max-w-md space-y-3 sm:space-y-4">
+                <div className="mx-auto my-auto w-full max-w-md space-y-3 sm:space-y-4">
                   <div className="py-2 text-center sm:py-3 app-page-enter">
                     <p className={`${labelMuted} mb-1`}>
                       Runde {state.roundNumber} abgeschlossen
@@ -949,8 +949,8 @@ export default function WizardScoreMaster() {
         )}
 
         {state.mainStage === "finished" && (
-          <div className="flex min-h-0 w-full flex-1 items-center justify-center px-3 py-3 sm:px-4 sm:py-4">
-            <div className="max-h-full w-full max-w-md space-y-3 overflow-hidden text-center sm:space-y-6 app-page-enter">
+          <div className="flex min-h-0 w-full flex-1 flex-col items-center overflow-y-auto px-3 pt-3 pb-[calc(0.75rem+64px+env(safe-area-inset-bottom,0px))] sm:px-4 sm:pt-4 desk:pb-4">
+            <div className="my-auto w-full max-w-md space-y-3 text-center sm:space-y-6 app-page-enter">
               <div className="space-y-1 sm:space-y-2">
                 <h2 className="font-display text-xl font-bold text-[var(--vibe-fg-base)] sm:text-2xl md:text-3xl">
                   Das Schicksal ist besiegelt!

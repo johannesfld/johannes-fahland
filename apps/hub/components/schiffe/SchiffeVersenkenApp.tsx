@@ -1086,7 +1086,9 @@ export function SchiffeVersenkenApp() {
                   />
                 </div>
               </div>
-              <div className="flex shrink-0 gap-2">
+              {/* Aktionsleiste: auf mobile sitzt darunter die fixe BottomNav (64px),
+                  daher Abstand, damit die Buttons nicht verdeckt werden. desk: Nav weg. */}
+              <div className="flex shrink-0 gap-2 pb-[calc(64px+env(safe-area-inset-bottom,0px))] desk:pb-0">
                 <button
                   type="button"
                   onClick={() => dispatch({ type: "PLACE_ALL_RANDOM" })}
@@ -1267,10 +1269,7 @@ export function SchiffeVersenkenApp() {
               </div>
 
               <div
-                className="shrink-0 rounded-[var(--vibe-r-lg)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/95 p-2 shadow-[var(--vibe-shadow-soft)]"
-                style={{
-                  paddingBottom: "max(0.5rem, env(safe-area-inset-bottom, 0px))",
-                }}
+                className="shrink-0 rounded-[var(--vibe-r-lg)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/95 p-2 shadow-[var(--vibe-shadow-soft)] mb-[calc(64px+env(safe-area-inset-bottom,0px))] desk:mb-0"
               >
                 {game.mode === "single" && game.single ? (
                   <div className="flex flex-wrap items-center gap-2">

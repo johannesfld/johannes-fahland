@@ -64,14 +64,6 @@ export function BottomNav({ pathname }: BottomNavProps) {
         {/* Scrollbare Spiele-Items */}
         <div className="relative min-w-0 flex-1">
           <div
-            aria-hidden
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-4 bg-gradient-to-r from-[var(--vibe-bg-elevated)] to-transparent"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-4 bg-gradient-to-l from-[var(--vibe-bg-elevated)] to-transparent"
-          />
-          <div
             ref={scrollerRef}
             className="flex items-stretch overflow-x-auto scrollbar-none snap-x snap-mandatory px-1"
             style={{ scrollPaddingInline: "1rem" }}
@@ -86,20 +78,20 @@ export function BottomNav({ pathname }: BottomNavProps) {
                     ref={active ? activeRef : undefined}
                     href={item.href}
                     aria-current={active ? "page" : undefined}
-                    data-tool={item.tool ?? undefined}
                     className={cn(
                       "relative flex shrink-0 snap-center flex-col items-center justify-center gap-1 py-2.5 text-center",
                       "w-[4.25rem]",
                       "transition-colors duration-[var(--vibe-dur-1)]",
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--brand-500)]",
                       "active:scale-95",
+                      // Minimalistisch: Marken-Pink für aktiv, keine Tool-Akzentfarben.
                       active
-                        ? "text-[var(--accent)]"
+                        ? "text-[var(--brand-500)]"
                         : "text-[var(--vibe-fg-faint)] hover:text-[var(--vibe-fg-muted)]",
                     )}
                   >
                     {active && (
-                      <span className="absolute -top-px left-1/2 h-[3px] w-7 -translate-x-1/2 rounded-b-full bg-[var(--accent)]" />
+                      <span className="absolute -top-px left-1/2 h-[3px] w-7 -translate-x-1/2 rounded-b-full bg-[var(--brand-500)]" />
                     )}
                     <item.icon
                       size={20}

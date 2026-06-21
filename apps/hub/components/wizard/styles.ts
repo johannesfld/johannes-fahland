@@ -25,4 +25,7 @@ export const stepperBtn =
 
 export const stageCenterWrap =
   "relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-y-auto px-4 py-4 " +
-  "pb-[max(1rem,env(safe-area-inset-bottom,0px))] pt-[max(1rem,env(safe-area-inset-top,0px))]";
+  // Platz für die fixe BottomNav (64px) auf mobile, damit der unterste Button nicht
+  // verdeckt wird; auf desk steht keine BottomNav → nur Standard-Abstand.
+  "pb-[calc(1rem+64px+env(safe-area-inset-bottom,0px))] desk:pb-[max(1rem,env(safe-area-inset-bottom,0px))] " +
+  "pt-[max(1rem,env(safe-area-inset-top,0px))]";

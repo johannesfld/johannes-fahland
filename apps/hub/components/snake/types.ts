@@ -14,4 +14,4 @@ export type GameState = {
 };
 
 export const GRID = 20;
-export const TICK_MS = 120;
+export const TICK_MS = 175;
