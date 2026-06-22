@@ -52,7 +52,8 @@ body {
 
 /* html trägt die Tisch-Farbe (vom themeInitScript live auf <html> gesetzt) →
    Notch-/Statusbar-Streifen oben und Home-Indicator-Streifen unten sind im
-   Browser eingefärbt statt schwarz. body deckt nur den sichtbaren dvh-Bereich. */
+   Browser eingefärbt statt schwarz. body deckt nur den sichtbaren dvh-Bereich.
+   Greift auch in iOS-Standalone, wo body position:fixed ist. */
 html {
   background: var(--background);
 }
