@@ -128,26 +128,26 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
 
   const statusToneClass =
     tournament.status === "active"
-      ? "border-emerald-400/60 bg-[#DAF7E9] text-[#1E5E3F] dark:border-[#8DC4AA]/40 dark:bg-[#1E5E3F]/50 dark:text-[#DAF7E9]"
+      ? "border-[var(--ok)]/40 bg-[var(--ok-soft)] text-[var(--ok-ink)]"
       : tournament.status === "paused"
-        ? "border-[#8DC4AA] bg-[#8DC4AA]/25 text-[#06331D] dark:border-[#4C9170]/50 dark:bg-[#4C9170]/20 dark:text-[#DAF7E9]"
+        ? "border-[var(--warn)]/40 bg-[var(--warn-soft)] text-[var(--warn-ink)]"
         : tournament.status === "finished"
-          ? "border-zinc-300 bg-zinc-100 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-200"
-          : "border-[#8DC4AA] bg-white text-[#1E5E3F] dark:border-[#4C9170]/40 dark:bg-[#06331D]/60 dark:text-[#8DC4AA]";
+          ? "border-[var(--vibe-line)] bg-[var(--neutral-soft)] text-[var(--neutral-ink)]"
+          : "border-[var(--accent-line)] bg-[var(--accent-soft)] text-[var(--accent)]";
 
   const showPauseOverlayOnContent =
     tournament.status === "paused" && (tab === "draw" || tab === "scores" || tab === "podium");
 
   return (
     <ToolShell className={turnierShell}>
-      <div className="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-4 px-4 pt-4 pb-8 sm:px-6 sm:pt-5 sm:pb-10 lg:px-8 lg:pt-6">
-        <header className="flex min-w-0 flex-col gap-3">
+      <div className="mx-auto flex w-full max-w-7xl min-w-0 flex-col gap-4 px-4 pt-4 pb-8 sm:px-6 sm:pt-5 sm:pb-10 lg:gap-5 lg:px-8 lg:pt-6">
+        <header className="sticky top-0 z-20 -mx-4 flex min-w-0 flex-col gap-3 border-b border-[var(--vibe-line)] bg-[var(--vibe-bg-base)]/95 px-4 pb-3 pt-[calc(env(safe-area-inset-top)+0.5rem)] backdrop-blur-md sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
           <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
-            <h1 className="mr-auto min-w-0 truncate text-2xl font-black tracking-tighter sm:text-3xl">
+            <h1 className="mr-auto min-w-0 truncate font-display text-2xl font-medium tracking-tight sm:text-3xl">
               {tournament.name}
             </h1>
             <span
-              className={`inline-flex shrink-0 items-center rounded-full border px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.22em] sm:text-xs sm:py-2 ${statusToneClass}`}
+              className={`inline-flex shrink-0 items-center rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] sm:text-xs sm:py-2 ${statusToneClass}`}
             >
               {statusLabel}
             </span>
@@ -177,30 +177,27 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
           </div>
 
           {partnerStats.needed > 0 ? (
-            <p className="text-xs text-zinc-600 dark:text-zinc-400">
-              <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+            <p className="text-xs text-[var(--vibe-fg-muted)]">
+              <span className="font-semibold text-[var(--vibe-fg-base)]">
                 {tournament.format === "doubles" ? "Partnerpaare" : "Gegnerpaare"}{" "}
                 {partnerStats.covered} / {partnerStats.needed}
               </span>
               {roundNumbers.length > 0 ? (
-                <span className="text-zinc-500 dark:text-zinc-400">
+                <span className="text-[var(--vibe-fg-faint)]">
                   {" "}
                   · ausgelost: Runde {latestRoundNumber} · geschätzt insgesamt ca.{" "}
                   {partnerStats.estimatedRoundsTotal} Runden für alle{" "}
                   {tournament.format === "doubles" ? "Partnerpaare" : "Gegnerpaare"}
                 </span>
               ) : (
-                <span className="text-zinc-500 dark:text-zinc-400">
+                <span className="text-[var(--vibe-fg-faint)]">
                   {" "}
                   · geschätzt ca. {partnerStats.estimatedRoundsTotal} Runden bis alle{" "}
                   {tournament.format === "doubles" ? "Partnerpaare" : "Gegnerpaare"}
                 </span>
               )}
               {partnerStats.complete ? (
-                <span className="font-semibold text-emerald-700 dark:text-emerald-400">
-                  {" "}
-                  – komplett
-                </span>
+                <span className="font-semibold text-[var(--ok)]"> – komplett</span>
               ) : null}
             </p>
           ) : null}
@@ -291,8 +288,8 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
         <nav
           className={
             tournament.status === "finished"
-              ? "grid min-w-0 grid-cols-2 gap-1 sm:grid-cols-3 sm:gap-2 lg:grid-cols-5"
-              : "grid min-w-0 grid-cols-2 gap-1 sm:grid-cols-4 sm:gap-2"
+              ? "grid min-w-0 grid-cols-3 gap-1.5 sm:grid-cols-5 sm:gap-2"
+              : "grid min-w-0 grid-cols-2 gap-1.5 sm:grid-cols-4 sm:gap-2"
           }
         >
           {tabs.map((entry) => {
@@ -304,7 +301,7 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
                 onClick={() => setTab(entry.id)}
                 disabled={!entry.enabled}
                 aria-pressed={isActive}
-                className={isActive ? actionBtn : subtleBtn}
+                className={`${isActive ? actionBtn : subtleBtn} truncate px-2 sm:px-4`}
               >
                 {entry.label}
               </button>

@@ -14,11 +14,11 @@ const STATUS_LABEL: Record<MatchStatus, string> = {
 
 const STATUS_TONE: Record<MatchStatus, string> = {
   pending:
-    "border-zinc-300 bg-zinc-100 text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-300",
+    "border-[var(--vibe-line)] bg-[var(--neutral-soft)] text-[var(--neutral-ink)]",
   playing:
-    "border-[#8DC4AA] bg-[#DAF7E9] text-[#1E5E3F] dark:border-[#4C9170]/50 dark:bg-[#1E5E3F]/40 dark:text-[#DAF7E9]",
+    "border-[var(--warn)]/40 bg-[var(--warn-soft)] text-[var(--warn-ink)]",
   completed:
-    "border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-300",
+    "border-[var(--ok)]/40 bg-[var(--ok-soft)] text-[var(--ok-ink)]",
 };
 
 export function MatchCard({ match, children }: MatchCardProps) {
@@ -28,41 +28,37 @@ export function MatchCard({ match, children }: MatchCardProps) {
   const team1Wins = match.winnerTeam === 1;
   const team2Wins = match.winnerTeam === 2;
 
-  const team1ToneBase =
+  const teamBase =
     "min-w-0 break-words rounded-xl p-3 text-sm font-semibold transition-colors duration-200 sm:text-base";
-  const team1Tone = isCompleted
-    ? team1Wins
-      ? "bg-[#DAF7E9] text-[#06331D] ring-2 ring-[#4C9170]/60 dark:bg-[#1E5E3F]/70 dark:text-[#DAF7E9]"
-      : "bg-[#DAF7E9]/50 text-[#1E5E3F]/70 opacity-70 dark:bg-[#06331D]/30 dark:text-[#8DC4AA]/70"
-    : "bg-[#DAF7E9]/90 text-[#1E5E3F] dark:bg-[#1E5E3F]/35 dark:text-[#DAF7E9]";
-  const team2ToneBase = team1ToneBase;
-  const team2Tone = isCompleted
-    ? team2Wins
-      ? "bg-[#8DC4AA] text-[#06331D] ring-2 ring-[#4C9170]/60 dark:bg-[#4C9170]/50 dark:text-[#06331D]"
-      : "bg-[#8DC4AA]/40 text-[#1E5E3F]/70 opacity-70 dark:bg-[#4C9170]/20 dark:text-[#DAF7E9]/70"
-    : "bg-[#8DC4AA]/50 text-[#06331D] dark:bg-[#4C9170]/30 dark:text-[#DAF7E9]";
+  // Sieger = Akzent-getönt, Verlierer = gedämpft, offen = neutrale Fläche.
+  const winnerTone =
+    "bg-[var(--accent-soft)] text-[var(--vibe-fg-base)] ring-2 ring-[var(--accent)]/50";
+  const loserTone = "bg-[var(--vibe-bg-sunken)] text-[var(--vibe-fg-muted)] opacity-70";
+  const openTone = "bg-[var(--vibe-bg-sunken)] text-[var(--vibe-fg-base)]";
+  const team1Tone = isCompleted ? (team1Wins ? winnerTone : loserTone) : openTone;
+  const team2Tone = isCompleted ? (team2Wins ? winnerTone : loserTone) : openTone;
 
   return (
     <article className={`${turnierCard} flex min-w-0 flex-col gap-3`}>
       <header className="flex items-center justify-between gap-2">
-        <p className="truncate text-xs font-black uppercase tracking-[0.22em] text-zinc-500">
+        <p className="truncate text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--vibe-fg-faint)]">
           Match {match.matchNumber}
         </p>
         <span
-          className={`shrink-0 rounded-full border px-2 py-1 text-[10px] font-black uppercase tracking-[0.2em] ${STATUS_TONE[match.status]}`}
+          className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${STATUS_TONE[match.status]}`}
         >
           {STATUS_LABEL[match.status]}
         </span>
       </header>
 
       <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 sm:gap-3">
-        <div className={`${team1ToneBase} ${team1Tone}`}>
+        <div className={`${teamBase} ${team1Tone}`}>
           {team1.map((player) => player.name).join(" / ") || "–"}
         </div>
-        <span className="text-center text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500 sm:text-xs">
+        <span className="text-center text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--vibe-fg-faint)] sm:text-xs">
           vs
         </span>
-        <div className={`${team2ToneBase} ${team2Tone}`}>
+        <div className={`${teamBase} ${team2Tone}`}>
           {team2.map((player) => player.name).join(" / ") || "–"}
         </div>
       </div>
@@ -75,16 +71,16 @@ export function MatchCard({ match, children }: MatchCardProps) {
             return (
               <span
                 key={setEntry.setNumber}
-                className="inline-flex items-center gap-1 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 font-mono text-[11px] text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950/60 dark:text-zinc-300"
+                className="inline-flex items-center gap-1 rounded-full border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] px-2.5 py-1 font-mono text-[11px] text-[var(--vibe-fg-muted)]"
               >
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">
+                <span className="text-[9px] font-semibold uppercase tracking-[0.12em] text-[var(--vibe-fg-faint)]">
                   S{setEntry.setNumber}
                 </span>
-                <span className={team1Won ? "font-black text-[#1E5E3F] dark:text-[#8DC4AA]" : ""}>
+                <span className={team1Won ? "font-bold text-[var(--accent)]" : ""}>
                   {setEntry.scoreTeam1}
                 </span>
-                <span className="text-zinc-400">:</span>
-                <span className={team2Won ? "font-black text-[#06331D] dark:text-[#DAF7E9]" : ""}>
+                <span className="text-[var(--vibe-fg-faint)]">:</span>
+                <span className={team2Won ? "font-bold text-[var(--accent)]" : ""}>
                   {setEntry.scoreTeam2}
                 </span>
               </span>

@@ -10,7 +10,6 @@ type ToolShellProps = {
 export function ToolShell({ fullBleed = false, className, style, children }: ToolShellProps) {
   return (
     <div
-      data-tool="turnier"
       style={style}
       className={cn(
         "flex min-h-0 flex-1 flex-col",

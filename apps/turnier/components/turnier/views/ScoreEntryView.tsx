@@ -40,7 +40,7 @@ export function ScoreEntryView({
   if (!round) {
     return (
       <section className={turnierCard}>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p className="text-sm text-[var(--vibe-fg-muted)]">
           Noch keine Runde ausgelost. Wechsle zur Auslosung, um zu starten.
         </p>
       </section>
@@ -52,18 +52,18 @@ export function ScoreEntryView({
 
   return (
     <section className={`${turnierCard} flex min-w-0 flex-col gap-4`}>
-      <div className="flex flex-wrap items-start justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <h2 className="truncate text-xl font-black tracking-tight">
+          <h2 className="font-display text-xl font-medium tracking-tight sm:truncate sm:text-2xl">
             Ergebnisse – Runde {round.roundNumber}
           </h2>
-          <p className="text-sm text-zinc-600 dark:text-zinc-300">
+          <p className="text-sm text-[var(--vibe-fg-muted)]">
             {completedMatches} von {totalMatches} Matches abgeschlossen · Best of {bestOf}
           </p>
         </div>
         <button
           type="button"
-          className={actionBtn}
+          className={`${actionBtn} w-full shrink-0 sm:w-auto`}
           disabled={isPending || !allMatchesDone || readOnly}
           onClick={() => onCompleteRound(round.id)}
         >
@@ -71,7 +71,7 @@ export function ScoreEntryView({
         </button>
       </div>
 
-      <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {round.matches.map((match) => {
           const mergedSets = Array.from(
             new Map(

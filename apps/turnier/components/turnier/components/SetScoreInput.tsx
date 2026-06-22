@@ -14,8 +14,8 @@ export function SetScoreInput({
   onChange,
 }: SetScoreInputProps) {
   return (
-    <div className="grid min-w-0 grid-cols-[2.25rem_minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 rounded-2xl border border-zinc-200 bg-white p-2 sm:p-3 dark:border-zinc-800 dark:bg-zinc-900">
-      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 sm:text-xs sm:tracking-[0.22em]">
+    <div className="grid min-w-0 grid-cols-[2.25rem_minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 rounded-2xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] p-2 sm:p-3">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--vibe-fg-faint)]">
         S{setNumber}
       </span>
       <input
@@ -27,9 +27,9 @@ export function SetScoreInput({
         placeholder="0"
         disabled={disabled}
         aria-label={`Satz ${setNumber} Team 1`}
-        className="min-h-12 w-full min-w-0 rounded-xl border border-zinc-300 bg-zinc-50 px-2 text-center text-lg font-bold text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4C9170]/60 disabled:opacity-40 disabled:pointer-events-none dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+        className="min-h-12 w-full min-w-0 rounded-xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] px-2 text-center font-mono text-lg font-bold text-[var(--vibe-fg-base)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 disabled:opacity-40 disabled:pointer-events-none"
       />
-      <span className="text-base font-black text-zinc-400">:</span>
+      <span className="font-mono text-base text-[var(--vibe-fg-faint)]">:</span>
       <input
         type="number"
         inputMode="numeric"
@@ -39,7 +39,7 @@ export function SetScoreInput({
         placeholder="0"
         disabled={disabled}
         aria-label={`Satz ${setNumber} Team 2`}
-        className="min-h-12 w-full min-w-0 rounded-xl border border-zinc-300 bg-zinc-50 px-2 text-center text-lg font-bold text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4C9170]/60 disabled:opacity-40 disabled:pointer-events-none dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+        className="min-h-12 w-full min-w-0 rounded-xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] px-2 text-center font-mono text-lg font-bold text-[var(--vibe-fg-base)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60 disabled:opacity-40 disabled:pointer-events-none"
       />
     </div>
   );

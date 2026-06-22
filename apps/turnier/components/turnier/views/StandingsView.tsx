@@ -28,8 +28,8 @@ export function StandingsView({
   return (
     <section className={`${turnierCard} flex min-w-0 flex-col gap-4`}>
       <div className="min-w-0 space-y-2">
-        <h2 className="truncate text-xl font-black tracking-tight">Tabelle</h2>
-        <p className="text-sm text-zinc-600 dark:text-zinc-300">
+        <h2 className="truncate font-display text-xl font-medium tracking-tight sm:text-2xl">Tabelle</h2>
+        <p className="text-sm text-[var(--vibe-fg-muted)]">
           {throughRound != null ? (
             <>
               Stand kumulativ bis einschließlich Runde {throughRound}
@@ -49,7 +49,7 @@ export function StandingsView({
       </div>
 
       {showHistoricalBanner ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#8DC4AA]/50 bg-[#DAF7E9]/80 px-3 py-2 text-xs text-[#1E5E3F] sm:px-4 sm:py-3 sm:text-sm dark:border-[#4C9170]/40 dark:bg-[#06331D]/60 dark:text-[#DAF7E9]">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--accent-line)] bg-[var(--accent-soft)] px-3 py-2 text-xs text-[var(--vibe-fg-base)] sm:px-4 sm:py-3 sm:text-sm">
           <p className="min-w-0 flex-1 font-semibold">
             <span className="hidden sm:inline">
               Du siehst den Stand einer früheren Runde. Neuere Ergebnisse sind in dieser Ansicht nicht

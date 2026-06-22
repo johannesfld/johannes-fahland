@@ -1,23 +1,25 @@
-import { Fraunces, Hanken_Grotesk, Spline_Sans_Mono } from "next/font/google";
+import { Newsreader, Public_Sans, Spline_Sans_Mono } from "next/font/google";
 
-// ⚠️ Fraunces ist variable mit axes — KEIN `weight` setzen (sonst Turbopack-Build-Fehler).
-export const fraunces = Fraunces({
-  variable: "--font-fraunces",
+// Editorial Serif — nur für Headlines. Variabel (opsz), kein fixes `weight`.
+export const serif = Newsreader({
+  variable: "--font-serif",
   subsets: ["latin"],
-  axes: ["opsz", "SOFT", "WONK"],
+  axes: ["opsz"],
   display: "swap",
   preload: true,
 });
 
-export const hankenGrotesk = Hanken_Grotesk({
-  variable: "--font-hanken",
+// Ruhige Grotesk — UI & Body.
+export const grotesk = Public_Sans({
+  variable: "--font-grotesk",
   subsets: ["latin"],
   display: "swap",
   preload: true,
 });
 
-export const splineSansMono = Spline_Sans_Mono({
-  variable: "--font-spline-mono",
+// Mono — Scores & Zahlen.
+export const mono = Spline_Sans_Mono({
+  variable: "--font-mono-spec",
   subsets: ["latin"],
   display: "swap",
   preload: false,

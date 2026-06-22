@@ -1,4 +1,4 @@
-const CACHE_NAME = "pasch-turnier-v1";
+const CACHE_NAME = "turnier-v1";
 
 const PRECACHE_URLS = [
   "/turnier-manifest.json",
