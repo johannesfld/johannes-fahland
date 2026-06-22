@@ -18,17 +18,15 @@ export default function OfflinePage() {
           </linearGradient>
         </defs>
         <rect width="512" height="512" rx="100" fill="url(#offline-grad)" />
-        <g transform="translate(256, 256)">
-          <path
-            d="M -80 -110 L 0 80 L 80 -110"
-            stroke="var(--brand-500)"
-            strokeWidth="22"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <circle cx="-120" cy="-40" r="14" fill="var(--brand-500)" opacity="0.8" />
-          <circle cx="120" cy="-40" r="14" fill="var(--brand-500)" opacity="0.8" />
+        <g transform="translate(256, 256) scale(3.4) translate(-32, -32)">
+          <g stroke="var(--accent)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" fill="none">
+            <path d="M14 50 L14 40 L32 40 L32 30" />
+            <path d="M50 50 L50 40 L32 40" />
+            <path d="M32 30 L32 18" />
+          </g>
+          <circle cx="14" cy="52" r="5" fill="var(--accent)" />
+          <circle cx="50" cy="52" r="5" fill="var(--accent)" />
+          <circle cx="32" cy="14" r="6" fill="var(--accent)" />
         </g>
       </svg>
 

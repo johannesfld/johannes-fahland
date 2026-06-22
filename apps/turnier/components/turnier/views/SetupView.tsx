@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { PlayerChip } from "@/components/turnier/components/PlayerChip";
-import { actionBtn, subtleBtn, turnierCard } from "@/components/turnier/styles";
+import { actionBtn, sectionLabel, subtleBtn, turnierCard } from "@/components/turnier/styles";
 import type { BestOf, TournamentDetail } from "@/components/turnier/types";
 
 type SetupViewProps = {
@@ -49,8 +49,8 @@ export function SetupView({
   return (
     <section className={`${turnierCard} flex min-w-0 flex-col gap-6`}>
       <div className="flex min-w-0 flex-col gap-1">
-        <h2 className="text-xl font-black tracking-tight">Setup</h2>
-        <p className="text-sm text-zinc-600 dark:text-zinc-300">
+        <h2 className="font-display text-2xl font-medium tracking-tight">Setup</h2>
+        <p className="text-sm text-[var(--vibe-fg-muted)]">
           {isPaused
             ? "Während der Pause kannst du Spieler ergänzen, entfernen oder reaktivieren."
             : showBestOfEditor
@@ -60,19 +60,15 @@ export function SetupView({
       </div>
 
       <div className="flex min-w-0 flex-col gap-2">
-        <p className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
-          Turnierformat
-        </p>
-        <p className="inline-flex min-h-11 w-fit items-center rounded-xl border border-zinc-300 bg-zinc-50 px-4 text-sm font-semibold text-zinc-800 dark:border-zinc-600 dark:bg-zinc-800/60 dark:text-zinc-100">
+        <p className={sectionLabel}>Turnierformat</p>
+        <p className="inline-flex min-h-11 w-fit items-center rounded-xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] px-4 text-sm font-semibold text-[var(--vibe-fg-base)]">
           {formatLabel}
         </p>
       </div>
 
       {showBestOfEditor ? (
         <div className="flex min-w-0 flex-col gap-2">
-          <p className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
-            Best-of pro Match
-          </p>
+          <p className={sectionLabel}>Best-of pro Match</p>
           <div className="flex flex-wrap gap-2">
             {[1, 3, 5].map((option) => (
               <button
@@ -96,23 +92,20 @@ export function SetupView({
           submitPlayer();
         }}
       >
-        <label
-          htmlFor="setup-player-name"
-          className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400"
-        >
+        <label htmlFor="setup-player-name" className={sectionLabel}>
           Spieler hinzufügen
         </label>
         <div className="flex min-w-0 flex-col gap-2 sm:flex-row">
           <input
             id="setup-player-name"
             ref={inputRef}
-            name="tischtennis-spielername"
+            name="spielername"
             value={nameInput}
             onChange={(event) => setNameInput(event.target.value)}
             placeholder="Spielername"
-            autoComplete="nickname"
+            autoComplete="off"
             enterKeyHint="done"
-            className="min-h-11 min-w-0 flex-1 rounded-xl border border-zinc-300 bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4C9170]/60 dark:border-zinc-700 dark:bg-zinc-950"
+            className="min-h-11 min-w-0 flex-1 rounded-xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] px-3 text-sm text-[var(--vibe-fg-base)] placeholder:text-[var(--vibe-fg-faint)] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60"
           />
           <button
             type="submit"
@@ -125,11 +118,9 @@ export function SetupView({
       </form>
 
       <div className="flex min-w-0 flex-col gap-2">
-        <p className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
-          Aktive Spieler ({activePlayers.length})
-        </p>
+        <p className={sectionLabel}>Aktive Spieler ({activePlayers.length})</p>
         {activePlayers.length === 0 ? (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="text-sm text-[var(--vibe-fg-muted)]">
             Noch keine aktiven Spieler. Mindestens {minPlayers} für den Start nötig.
           </p>
         ) : (
@@ -149,9 +140,7 @@ export function SetupView({
 
       {inactivePlayers.length > 0 ? (
         <div className="flex min-w-0 flex-col gap-2">
-          <p className="text-[10px] font-black uppercase tracking-[0.22em] text-zinc-500 dark:text-zinc-400">
-            Ausgeschiedene Spieler ({inactivePlayers.length})
-          </p>
+          <p className={sectionLabel}>Ausgeschiedene Spieler ({inactivePlayers.length})</p>
           <div className="flex flex-wrap gap-2">
             {inactivePlayers.map((player) => (
               <PlayerChip
@@ -169,11 +158,11 @@ export function SetupView({
       {canStart ? (
         <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           {!minPlayersReached ? (
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm text-[var(--vibe-fg-muted)]">
               Mindestens {minPlayers} aktive Spieler nötig, um das Turnier zu starten.
             </p>
           ) : (
-            <p className="text-sm text-emerald-700 dark:text-emerald-400">
+            <p className="text-sm font-medium text-[var(--ok)]">
               Bereit zum Start mit {activePlayers.length} Spielern.
             </p>
           )}
@@ -189,7 +178,7 @@ export function SetupView({
       ) : null}
 
       {isPaused ? (
-        <p className="rounded-2xl border border-[#8DC4AA]/50 bg-[#DAF7E9]/90 p-3 text-sm text-[#1E5E3F] dark:border-[#4C9170]/40 dark:bg-[#06331D]/70 dark:text-[#DAF7E9]">
+        <p className="rounded-2xl border border-[var(--accent-line)] bg-[var(--accent-soft)] p-3 text-sm text-[var(--vibe-fg-base)]">
           Nach dem Fortsetzen wird die nächste Auslosung mit den aktuellen aktiven Spielern berechnet.
         </p>
       ) : null}

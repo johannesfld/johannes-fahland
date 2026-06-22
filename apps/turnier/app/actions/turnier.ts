@@ -2,18 +2,20 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma, Prisma } from "@pasch/db";
-import { isCoverageCompletePrisma } from "@/lib/turnier/coverage";
-import { createRandomDoublesDraw, createRandomSinglesDraw } from "@/lib/turnier/draw";
 import { buildStandings } from "@/lib/turnier/standings";
 import { bestOfToWinsNeeded, validateSetScore } from "@/lib/turnier/validation";
+import { getEngine } from "@/lib/turnier/modes";
+import type { EngineRound } from "@/lib/turnier/modes";
 import type {
   BestOf,
   MatchEntry,
   MatchSet,
   RoundEntry,
+  TournamentConfig,
   TournamentDetail,
   TournamentFormat,
   TournamentListItem,
+  TournamentMode,
 } from "@/components/turnier/types";
 
 function toPrismaBestOf(bestOf: BestOf) {
@@ -38,6 +40,39 @@ function fromPrismaFormat(format: "SINGLES" | "DOUBLES"): TournamentFormat {
 
 function toPrismaFormat(format: TournamentFormat): "SINGLES" | "DOUBLES" {
   return format === "singles" ? "SINGLES" : "DOUBLES";
+}
+
+type PrismaMode = "ROUND_ROBIN" | "KNOCKOUT" | "SWISS" | "GROUPS_KO";
+
+function fromPrismaMode(mode: PrismaMode): TournamentMode {
+  switch (mode) {
+    case "KNOCKOUT":
+      return "knockout";
+    case "SWISS":
+      return "swiss";
+    case "GROUPS_KO":
+      return "groups_ko";
+    default:
+      return "round_robin";
+  }
+}
+
+function toPrismaMode(mode: TournamentMode): PrismaMode {
+  switch (mode) {
+    case "knockout":
+      return "KNOCKOUT";
+    case "swiss":
+      return "SWISS";
+    case "groups_ko":
+      return "GROUPS_KO";
+    default:
+      return "ROUND_ROBIN";
+  }
+}
+
+function parseConfig(value: unknown): TournamentConfig | null {
+  if (!value || typeof value !== "object") return null;
+  return value as TournamentConfig;
 }
 
 function computeMatchWinner(sets: MatchSet[], bestOf: BestOf): 1 | 2 | null {
@@ -101,6 +136,9 @@ function mapTournamentDetail(raw: TournamentRaw): TournamentDetail {
       matchNumber: match.matchNumber,
       status: match.status,
       winnerTeam: (match.winnerTeam as 1 | 2 | null) ?? null,
+      groupLabel: match.groupLabel ?? null,
+      bracketSlot: match.bracketSlot ?? null,
+      nextMatchId: match.nextMatchId ?? null,
       players: match.players.map((entry) => ({
         playerId: entry.playerId,
         name: entry.player.name,
@@ -116,6 +154,7 @@ function mapTournamentDetail(raw: TournamentRaw): TournamentDetail {
       id: round.id,
       roundNumber: round.roundNumber,
       status: round.status,
+      stageLabel: round.stageLabel ?? null,
       matches,
     };
   });
@@ -125,6 +164,8 @@ function mapTournamentDetail(raw: TournamentRaw): TournamentDetail {
     name: raw.name,
     status: fromPrismaStatus(raw.status),
     format: fromPrismaFormat(raw.format),
+    mode: fromPrismaMode(raw.mode as PrismaMode),
+    config: parseConfig(raw.config),
     bestOf: fromPrismaBestOf(raw.bestOf),
     winnerName: raw.winnerName,
     createdAt: raw.createdAt.toISOString(),
@@ -155,6 +196,7 @@ export async function getTournamentList(): Promise<TournamentListItem[]> {
     name: item.name,
     status: item.status,
     format: fromPrismaFormat(item.format),
+    mode: fromPrismaMode(item.mode as PrismaMode),
     bestOf: fromPrismaBestOf(item.bestOf),
     winnerName: item.winnerName,
     createdAt: item.createdAt.toISOString(),
@@ -169,15 +211,29 @@ export async function getTournamentById(tournamentId: string): Promise<Tournamen
   return mapTournamentDetail(raw);
 }
 
-export async function createTournament(name: string, bestOf: BestOf, format: TournamentFormat) {
+export async function createTournament(
+  name: string,
+  bestOf: BestOf,
+  format: TournamentFormat,
+  mode: TournamentMode = "round_robin",
+  config: TournamentConfig | null = null,
+) {
   const safeName = name.trim();
   if (!safeName) throw new Error("Bitte Turniername eingeben.");
+
+  // Modi außer Round-Robin sind aktuell Einzel-basiert.
+  const engine = getEngine(mode);
+  const effectiveFormat: TournamentFormat = engine.supportsFormats.includes(format)
+    ? format
+    : engine.supportsFormats[0];
 
   const created = await prisma.tournament.create({
     data: {
       name: safeName,
       bestOf: toPrismaBestOf(bestOf),
-      format: toPrismaFormat(format),
+      format: toPrismaFormat(effectiveFormat),
+      mode: toPrismaMode(mode),
+      config: config ? (config as Prisma.InputJsonValue) : Prisma.JsonNull,
     },
   });
 
@@ -283,6 +339,7 @@ export async function drawRound(tournamentId: string) {
           matches: {
             include: {
               players: true,
+              sets: true,
             },
           },
         },
@@ -292,177 +349,107 @@ export async function drawRound(tournamentId: string) {
   if (!tournament) throw new Error("Turnier nicht gefunden.");
 
   const format = fromPrismaFormat(tournament.format);
-  const activePlayerIds = tournament.players.map((p) => p.id);
+  const mode = fromPrismaMode(tournament.mode as PrismaMode);
+  const config = parseConfig(tournament.config);
+  const engine = getEngine(mode);
+  const activePlayers = tournament.players.map((p) => ({
+    id: p.id,
+    roundsPlayed: p.roundsPlayed,
+    roundsSatOut: p.roundsSatOut,
+  }));
 
-  if (format === "doubles") {
-    if (activePlayerIds.length < 4) {
-      throw new Error("Mindestens vier aktive Spieler sind nötig, um eine Runde auszulosen.");
-    }
-  } else if (activePlayerIds.length < 2) {
-    throw new Error("Mindestens zwei aktive Spieler sind nötig, um eine Runde auszulosen.");
-  }
-
-  if (isCoverageCompletePrisma(tournament.rounds, activePlayerIds, format)) {
+  const minPlayersNeeded = engine.minPlayers({
+    format,
+    config,
+    activePlayers,
+    rounds: [],
+  });
+  if (activePlayers.length < minPlayersNeeded) {
     throw new Error(
-      format === "doubles"
-        ? "Alle Partnerpaare sind durchgespielt. Eine weitere Auslosung ist nicht vorgesehen. Du kannst das Turnier beenden."
-        : "Alle Gegnerpaare sind durchgespielt. Eine weitere Auslosung ist nicht vorgesehen. Du kannst das Turnier beenden.",
+      `Mindestens ${minPlayersNeeded} aktive Spieler sind nötig, um eine Runde auszulosen.`,
     );
   }
 
-  const previousTeamPairings: Array<[string, string]> = [];
-  const previousMatchPairings: Array<[string, string, string, string]> = [];
-  const previousOpponentPairings: Array<[string, string]> = [];
-  for (const round of tournament.rounds) {
-    for (const match of round.matches) {
-      const team1 = match.players.filter((entry) => entry.team === 1).map((entry) => entry.playerId);
-      const team2 = match.players.filter((entry) => entry.team === 2).map((entry) => entry.playerId);
-      if (team1.length === 2) {
-        previousTeamPairings.push([team1[0], team1[1]]);
-      }
-      if (team2.length === 2) {
-        previousTeamPairings.push([team2[0], team2[1]]);
-      }
-      if (team1.length === 2 && team2.length === 2) {
-        previousMatchPairings.push([team1[0], team1[1], team2[0], team2[1]]);
-      }
-      if (team1.length === 1 && team2.length === 1) {
-        previousOpponentPairings.push([team1[0], team2[0]]);
-      }
-    }
+  const engineRounds: EngineRound[] = tournament.rounds.map((round) => ({
+    roundNumber: round.roundNumber,
+    status: round.status,
+    matches: round.matches.map((match) => ({
+      status: match.status,
+      winnerTeam: match.winnerTeam,
+      players: match.players.map((p) => ({ playerId: p.playerId, team: p.team })),
+      sets: match.sets.map((s) => ({ scoreTeam1: s.scoreTeam1, scoreTeam2: s.scoreTeam2 })),
+      // groupLabel über das Match getragen für Gruppen-Modus:
+      ...(match.groupLabel ? { groupLabel: match.groupLabel } : {}),
+    })),
+    ...(round.stageLabel ? { stageLabel: round.stageLabel } : {}),
+  }));
+
+  const ctx = { format, config, activePlayers, rounds: engineRounds };
+
+  if (engine.isComplete(ctx)) {
+    throw new Error(
+      "Das Turnier ist nach diesem Modus durchgespielt. Eine weitere Auslosung ist nicht vorgesehen. Du kannst das Turnier beenden.",
+    );
+  }
+
+  const outcome = engine.drawNextRound(ctx);
+  if (!outcome.ok) throw new Error(outcome.error);
+  const plan = outcome.plan;
+
+  if (plan.matches.length === 0) {
+    throw new Error("Auslosung ergab keine Matches. Bitte Spielerzahl prüfen.");
   }
 
   const nextRound = (tournament.rounds[0]?.roundNumber ?? 0) + 1;
-  const drawPlayers = tournament.players.map((player) => ({
-    id: player.id,
-    roundsPlayed: player.roundsPlayed,
-    roundsSatOut: player.roundsSatOut,
-  }));
 
-  if (format === "doubles") {
-    const draw = createRandomDoublesDraw(drawPlayers, {
-      previousTeamPairings,
-      previousMatchPairings,
+  await prisma.$transaction(async (tx) => {
+    const round = await tx.round.create({
+      data: {
+        tournamentId,
+        roundNumber: nextRound,
+        status: "drawn",
+        stageLabel: plan.stageLabel ?? null,
+      },
     });
 
-    if (draw.matches.length === 0) {
-      throw new Error("Auslosung ergab keine Matches. Bitte Spielerzahl prüfen.");
-    }
-
-    await prisma.$transaction(async (tx) => {
-      const round = await tx.round.create({
+    for (let i = 0; i < plan.matches.length; i += 1) {
+      const match = plan.matches[i];
+      const createdMatch = await tx.match.create({
         data: {
-          tournamentId,
-          roundNumber: nextRound,
-          status: "drawn",
+          roundId: round.id,
+          matchNumber: i + 1,
+          status: "pending",
+          groupLabel: match.groupLabel ?? null,
+          bracketSlot: match.bracketSlot ?? null,
         },
       });
 
-      for (let i = 0; i < draw.matches.length; i += 1) {
-        const match = draw.matches[i];
-        const createdMatch = await tx.match.create({
-          data: {
-            roundId: round.id,
-            matchNumber: i + 1,
-            status: "pending",
-          },
-        });
-
-        const players = [...match.team1, ...match.team2];
-        for (const player of players) {
-          const team = match.team1.some((entry) => entry.id === player.id) ? 1 : 2;
-          await tx.matchPlayer.create({
-            data: {
-              matchId: createdMatch.id,
-              playerId: player.id,
-              team,
-            },
-          });
-        }
-      }
-
-      const playedPlayerIds = draw.matches.flatMap((m) => [
-        m.team1[0].id,
-        m.team1[1].id,
-        m.team2[0].id,
-        m.team2[1].id,
-      ]);
-
-      if (playedPlayerIds.length > 0) {
-        await tx.tournamentPlayer.updateMany({
-          where: { id: { in: playedPlayerIds } },
-          data: { roundsPlayed: { increment: 1 } },
+      for (const playerId of match.team1) {
+        await tx.matchPlayer.create({
+          data: { matchId: createdMatch.id, playerId, team: 1 },
         });
       }
-
-      if (draw.benchedPlayerIds.length > 0) {
-        await tx.tournamentPlayer.updateMany({
-          where: { id: { in: draw.benchedPlayerIds } },
-          data: { roundsSatOut: { increment: 1 } },
+      for (const playerId of match.team2) {
+        await tx.matchPlayer.create({
+          data: { matchId: createdMatch.id, playerId, team: 2 },
         });
       }
-    });
-  } else {
-    const draw = createRandomSinglesDraw(drawPlayers, {
-      previousOpponentPairings,
-    });
-
-    if (draw.matches.length === 0) {
-      throw new Error("Auslosung ergab keine Matches. Bitte Spielerzahl prüfen.");
     }
 
-    await prisma.$transaction(async (tx) => {
-      const round = await tx.round.create({
-        data: {
-          tournamentId,
-          roundNumber: nextRound,
-          status: "drawn",
-        },
+    const playedPlayerIds = plan.matches.flatMap((m) => [...m.team1, ...m.team2]);
+    if (playedPlayerIds.length > 0) {
+      await tx.tournamentPlayer.updateMany({
+        where: { id: { in: playedPlayerIds } },
+        data: { roundsPlayed: { increment: 1 } },
       });
-
-      for (let i = 0; i < draw.matches.length; i += 1) {
-        const match = draw.matches[i];
-        const createdMatch = await tx.match.create({
-          data: {
-            roundId: round.id,
-            matchNumber: i + 1,
-            status: "pending",
-          },
-        });
-
-        await tx.matchPlayer.create({
-          data: {
-            matchId: createdMatch.id,
-            playerId: match.player1.id,
-            team: 1,
-          },
-        });
-        await tx.matchPlayer.create({
-          data: {
-            matchId: createdMatch.id,
-            playerId: match.player2.id,
-            team: 2,
-          },
-        });
-      }
-
-      const playedPlayerIds = draw.matches.flatMap((m) => [m.player1.id, m.player2.id]);
-
-      if (playedPlayerIds.length > 0) {
-        await tx.tournamentPlayer.updateMany({
-          where: { id: { in: playedPlayerIds } },
-          data: { roundsPlayed: { increment: 1 } },
-        });
-      }
-
-      if (draw.benchedPlayerIds.length > 0) {
-        await tx.tournamentPlayer.updateMany({
-          where: { id: { in: draw.benchedPlayerIds } },
-          data: { roundsSatOut: { increment: 1 } },
-        });
-      }
-    });
-  }
+    }
+    if (plan.benchedPlayerIds.length > 0) {
+      await tx.tournamentPlayer.updateMany({
+        where: { id: { in: plan.benchedPlayerIds } },
+        data: { roundsSatOut: { increment: 1 } },
+      });
+    }
+  });
 
   revalidatePath(`/${tournamentId}`);
 }
@@ -618,16 +605,37 @@ export async function completeRound(tournamentId: string, roundId: string) {
   ]);
 
   if (openRounds === 0 && tournament?.status === "active") {
-    const winner = tournament.players
-      .filter((player) => player.active)
-      .sort((a, b) => b.roundsPlayed - a.roundsPlayed)[0];
+    // Vorläufiger Zwischen-Sieger (echtes Finalergebnis erst bei finishTournament).
+    const raw = await getTournamentRaw(tournamentId);
+    const winnerName = raw ? computeWinnerName(raw) : null;
     await prisma.tournament.update({
       where: { id: tournamentId },
-      data: { winnerName: winner?.name ?? null },
+      data: { winnerName },
     });
   }
 
   revalidatePath(`/${tournamentId}`);
+}
+
+/** Sieger je Modus: K.o./Gruppe+K.o. = Sieger des Finales, sonst Tabellenführer. */
+function computeWinnerName(raw: TournamentRaw): string | null {
+  const detail = mapTournamentDetail(raw);
+  const mode = detail.mode;
+  if (mode === "knockout" || mode === "groups_ko") {
+    // Finale = letzte Runde mit genau einem Match.
+    const sorted = [...detail.rounds].sort((a, b) => a.roundNumber - b.roundNumber);
+    for (let i = sorted.length - 1; i >= 0; i -= 1) {
+      const round = sorted[i];
+      const koMatches =
+        mode === "groups_ko" ? round.matches.filter((m) => !m.groupLabel) : round.matches;
+      if (koMatches.length === 1 && koMatches[0].status === "completed" && koMatches[0].winnerTeam) {
+        const champ = koMatches[0].players.find((p) => p.team === koMatches[0].winnerTeam);
+        return champ?.name ?? null;
+      }
+    }
+  }
+  const standings = buildStandings(detail);
+  return standings[0]?.name ?? null;
 }
 
 export async function pauseTournament(tournamentId: string) {
@@ -649,12 +657,11 @@ export async function resumeTournament(tournamentId: string) {
 export async function finishTournament(tournamentId: string) {
   const raw = await getTournamentRaw(tournamentId);
   if (!raw) throw new Error("Turnier nicht gefunden.");
-  const standings = buildStandings(mapTournamentDetail(raw));
   await prisma.tournament.update({
     where: { id: tournamentId },
     data: {
       status: "finished",
-      winnerName: standings[0]?.name ?? null,
+      winnerName: computeWinnerName(raw),
     },
   });
   revalidatePath(`/${tournamentId}`);

@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@pasch/ui/tokens.css";
+@import "./turnier-tokens.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -12,9 +12,12 @@
   --color-accent-soft: var(--accent-soft);
   --color-accent-ink: var(--accent-ink);
   --color-brand: var(--brand-500);
-  --font-sans: var(--font-hanken);
-  --font-mono: var(--font-spline-mono);
-  --font-display: var(--font-fraunces);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-grotesk);
+  --font-mono: var(--font-mono-spec);
+  --font-display: var(--font-serif);
 }
 
 html, body {
@@ -26,16 +29,16 @@ html, body {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-grotesk), ui-sans-serif, system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
+/* Editorial Serif — ausschließlich für Headlines (Turniername, Seitentitel). */
 .font-display {
-  font-family: var(--font-fraunces), serif;
-  font-variation-settings: "SOFT" 0, "WONK" 0;
+  font-family: var(--font-serif), ui-serif, Georgia, serif;
 }
 
 @media (prefers-reduced-motion: reduce) {

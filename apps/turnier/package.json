@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@pasch/db": "workspace:*",
-    "@pasch/ui": "workspace:*",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.8.0",
     "next": "16.2.2",

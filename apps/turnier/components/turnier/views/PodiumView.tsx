@@ -31,32 +31,32 @@ export function PodiumView({ standings, onShowTable }: PodiumViewProps) {
   }, []);
 
   return (
-    <section className="relative flex min-h-0 flex-1 flex-col items-center justify-end overflow-hidden rounded-3xl border border-[#4C9170]/40 bg-gradient-to-b from-zinc-950 via-[#06331D] to-zinc-950 p-4 sm:p-6">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_10%,rgba(141,196,170,0.28),transparent_45%)]" />
-      <h2 className="absolute top-6 text-center text-xl font-black tracking-tighter text-[#DAF7E9] sm:text-3xl">
+    <section className="relative flex min-h-[26rem] flex-1 flex-col items-center justify-end overflow-hidden rounded-2xl border border-[var(--vibe-line-strong)] bg-gradient-to-b from-[#16110D] via-[#241A12] to-[#16110D] p-4 sm:p-6">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_8%,rgba(224,135,94,0.30),transparent_48%)]" />
+      <h2 className="absolute top-5 font-display text-2xl font-medium tracking-tight text-[#F3E9DC] sm:top-6 sm:text-4xl">
         Siegerehrung
       </h2>
 
       <div className="relative z-10 mt-auto grid w-full max-w-4xl grid-cols-3 items-end gap-2 sm:gap-4">
         <PodiumCard
           visible={step >= 1}
-          heightClass="h-28 sm:h-36"
-          tone="from-[#1E5E3F] to-[#06331D]"
+          heightClass="h-[clamp(4rem,14vh,9rem)]"
+          tone="from-[#9A6A3C] to-[#5E3F22]"
           place="3."
           name={third?.name ?? "-"}
         />
         <PodiumCard
           visible={step >= 3}
-          heightClass="h-40 sm:h-52"
-          tone="from-[#8DC4AA] to-[#4C9170]"
+          heightClass="h-[clamp(6rem,22vh,13rem)]"
+          tone="from-[#E7B84F] to-[#B07A14]"
           place="1."
           name={first?.name ?? "-"}
           champion
         />
         <PodiumCard
           visible={step >= 2}
-          heightClass="h-34 sm:h-44"
-          tone="from-zinc-300 to-zinc-500"
+          heightClass="h-[clamp(5rem,18vh,11rem)]"
+          tone="from-[#D7D2C6] to-[#9A958A]"
           place="2."
           name={second?.name ?? "-"}
         />
@@ -95,10 +95,12 @@ function PodiumCard({
           : { opacity: 0, y: 80, scale: 0.9 }
       }
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      className={`overflow-hidden rounded-t-3xl border border-white/15 bg-gradient-to-b ${tone} p-3 text-center shadow-xl`}
+      className={`overflow-hidden rounded-t-2xl border border-black/10 bg-gradient-to-b ${tone} p-3 text-center shadow-xl`}
     >
-      <p className="text-xs font-black uppercase tracking-[0.22em] text-white/80">{place} Platz</p>
-      <p className="mt-1 truncate text-sm font-black tracking-tight text-white sm:text-lg">{name}</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-black/70">{place} Platz</p>
+      <p className="mt-1 truncate font-display text-sm font-semibold tracking-tight text-black/90 sm:text-lg">
+        {name}
+      </p>
       <div className={`${heightClass} mt-2`} />
     </motion.div>
   );

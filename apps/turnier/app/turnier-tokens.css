@@ -1,0 +1,199 @@
+/* Turnier — eigenständige Design-Tokens (warm & editorial).
+   Souveräne Identität, KEIN Bezug mehr zu Pasch (Pink/Sommer/Fraunces).
+   Palette: warme Sand/Stein-Neutrale + EIN gedeckter Terracotta-Akzent.
+   Variablennamen bewusst identisch zu den früheren @pasch/ui-Tokens, damit
+   bestehende Klassen-Strings unverändert funktionieren — nur andere Werte.
+   :root = Light (Tag), .dark = Dark (Nacht). */
+
+/* Desk-Variante: Geräte ab 1024px UND mit echtem Pointer (Maus/Trackpad). */
+@custom-variant desk (@media (min-width: 1024px) and (hover: hover) and (pointer: fine));
+
+:root {
+  /* --- Legacy-Aliase (App-Code referenziert teils direkt) --- */
+  --background: #F4F1EA;
+  --foreground: #26221C;
+  --surface: #FBFAF6;
+  --surface-muted: #E9E4D8;
+  --border: rgba(38, 34, 28, 0.12);
+  --ring-focus: rgba(184, 92, 56, 0.55);
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: light;
+
+  /* --- Surfaces (warmes Papier/Sand) --- */
+  --vibe-bg-base:     #F4F1EA;  /* Sand */
+  --vibe-bg-elevated: #FBFAF6;  /* Sand hell */
+  --vibe-bg-sunken:   #E9E4D8;  /* Sand gedrückt */
+  --vibe-bg-tinted:   #EFE9DD;  /* Terracotta-Anklang */
+  --vibe-bg-overlay:  #FFFFFF;
+
+  /* --- Foreground (warmes Anthrazit) --- */
+  --vibe-fg-base:  #26221C;     /* Tinte */
+  --vibe-fg-muted: #5C5547;     /* Tinte verdünnt */
+  --vibe-fg-faint: #8A8270;     /* Bleistift */
+
+  /* --- Linien --- */
+  --vibe-line:        rgba(38, 34, 28, 0.12);
+  --vibe-line-strong: rgba(38, 34, 28, 0.22);
+  --vibe-line-brass:  rgba(184, 92, 56, 0.32);
+  --vibe-ring:        rgba(184, 92, 56, 0.55);
+  --vibe-edge:        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  /* --- Tischlicht (nur auf bg-base) --- */
+  --vibe-table-light: radial-gradient(120% 70% at 50% -10%, rgba(38, 34, 28, 0.04), transparent 60%);
+
+  /* --- Status-Semantik (gedeckt, warm-editorial) --- */
+  --ok:        #5B7B3E;   /* Olivgrün — aktiv/läuft */
+  --ok-soft:   #E5EAD6;
+  --ok-ink:    #3C5328;
+  --warn:      #B07A14;   /* Bernstein — pausiert */
+  --warn-soft: #F3E6C9;
+  --warn-ink:  #7A5309;
+  --danger:    #B23A2E;   /* gedämpftes Rot — gefahr/löschen */
+  --danger-soft: #F3DBD7;
+  --danger-ink:  #8A2A20;
+  --neutral-soft: #E9E4D8;
+  --neutral-ink:  #5C5547;
+
+  /* --- Motion --- */
+  --vibe-ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --vibe-ease-spring: cubic-bezier(0.3, 1.36, 0.64, 1);
+  --vibe-dur-1: 120ms;
+  --vibe-dur-2: 220ms;
+  --vibe-dur-3: 280ms;
+  --vibe-dur-4: 600ms;
+  --vibe-dur-5: 900ms;
+
+  /* --- Radii (ruhiger/editorial: etwas kleiner) --- */
+  --vibe-r-xs:      0.25rem;
+  --vibe-r-sm:      0.5rem;
+  --vibe-r-md:      0.625rem;
+  --vibe-r-lg:      0.875rem;
+  --vibe-r-xl:      1.125rem;
+  --vibe-r-2xl:     1.25rem;
+  --vibe-r-tight:   0.5rem;
+  --vibe-r-base:    0.625rem;
+  --vibe-r-soft:    0.875rem;
+  --vibe-r-pillow:  1.125rem;
+  --vibe-r-balloon: 1.25rem;
+
+  /* --- Shadows (warm, dezent) --- */
+  --vibe-shadow-flat:   0 1px 2px rgba(38, 34, 28, 0.06);
+  --vibe-shadow-soft:   0 2px 8px -2px rgba(38, 34, 28, 0.08), 0 8px 24px -8px rgba(38, 34, 28, 0.10);
+  --vibe-shadow-lifted: 0 8px 24px -6px rgba(38, 34, 28, 0.14), 0 24px 48px -16px rgba(38, 34, 28, 0.12);
+  --vibe-shadow-glow:   0 0 0 1px var(--vibe-ring) inset, 0 8px 30px -10px var(--vibe-ring);
+  --vibe-shadow-1: var(--vibe-shadow-flat);
+  --vibe-shadow-2: var(--vibe-shadow-soft);
+  --vibe-shadow-3: var(--vibe-shadow-lifted);
+
+  /* --- Spacing --- */
+  --vibe-gap-1: 0.25rem;
+  --vibe-gap-2: 0.5rem;
+  --vibe-gap-3: 0.75rem;
+  --vibe-gap-4: 1rem;
+  --vibe-gap-5: 1.5rem;
+  --vibe-pad-page: 1rem;
+  --vibe-pad-card: 1.25rem;
+
+  /* --- Brand-Skala: Terracotta (ersetzt Pasch-Pink). Reste die noch --brand-*
+         nutzen, werden so automatisch warm — danach auf --accent umgestellt. --- */
+  --brand-50:  #FBEEE7;
+  --brand-100: #F5DBCE;
+  --brand-200: #EBBBA3;
+  --brand-300: #DD9676;
+  --brand-400: #CB7350;
+  --brand-500: #B85C38;   /* Terracotta */
+  --brand-600: #9F4B2C;
+  --brand-700: #823C24;
+  --brand-800: #642F1E;
+  --brand-900: #452117;
+  --brand-950: #2A140E;
+
+  /* --- Akzent = Terracotta, dunkel genug für Text auf Sand (4.5:1+) --- */
+  --accent:       #9F4B2C;   /* Terracotta, AA auf hellem Grund */
+  --accent-soft:  #F3E0D5;
+  --accent-ink:   #FFFFFF;
+  --accent-line:  rgba(184, 92, 56, 0.28);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(184, 92, 56, 0.14) 0%, transparent 70%);
+  --tool-surface: #F3E0D5;
+}
+
+/* --- Dark Mode: warmes Nacht-Holz --- */
+.dark {
+  --background: #1A1714;
+  --foreground: #F0EADD;
+  --surface: #231F1A;
+  --surface-muted: #13110E;
+  --border: rgba(240, 234, 221, 0.10);
+  --ring-focus: rgba(224, 135, 94, 0.55);
+  color-scheme: dark;
+
+  --vibe-bg-base:     #1A1714;  /* dunkles Holz */
+  --vibe-bg-elevated: #231F1A;
+  --vibe-bg-sunken:   #13110E;
+  --vibe-bg-tinted:   #2A231C;
+  --vibe-bg-overlay:  #2C2620;
+
+  --vibe-fg-base:  #F0EADD;     /* warmes Elfenbein */
+  --vibe-fg-muted: #BBB3A2;
+  --vibe-fg-faint: #867E6D;
+
+  --vibe-line:        rgba(240, 234, 221, 0.10);
+  --vibe-line-strong: rgba(240, 234, 221, 0.18);
+  --vibe-line-brass:  rgba(224, 135, 94, 0.34);
+  --vibe-ring:        rgba(224, 135, 94, 0.55);
+  --vibe-edge:        inset 0 1px 0 rgba(240, 234, 221, 0.06);
+
+  --vibe-table-light: radial-gradient(120% 70% at 50% -10%, rgba(240, 234, 221, 0.05), transparent 60%);
+
+  /* Status (Dark) */
+  --ok:        #9FBE6F;
+  --ok-soft:   #2A331C;
+  --ok-ink:    #DCEBC2;
+  --warn:      #E0B45C;
+  --warn-soft: #382B12;
+  --warn-ink:  #F6E6C4;
+  --danger:    #E0786A;
+  --danger-soft: #3A1C18;
+  --danger-ink:  #F8D8D1;
+  --neutral-soft: #2A231C;
+  --neutral-ink:  #BBB3A2;
+
+  --vibe-shadow-flat:   0 1px 2px rgba(0, 0, 0, 0.50);
+  --vibe-shadow-soft:   0 2px 8px -2px rgba(0, 0, 0, 0.45), 0 8px 24px -8px rgba(0, 0, 0, 0.55);
+  --vibe-shadow-lifted: 0 8px 24px -6px rgba(0, 0, 0, 0.60), 0 24px 48px -16px rgba(0, 0, 0, 0.50);
+  --vibe-shadow-glow:   0 0 0 1px var(--vibe-ring) inset, 0 8px 30px -10px var(--vibe-ring);
+  --vibe-shadow-1: var(--vibe-shadow-flat);
+  --vibe-shadow-2: var(--vibe-shadow-soft);
+  --vibe-shadow-3: var(--vibe-shadow-lifted);
+
+  /* Brand-Dark: Terracotta-Skala invertiert für dunklen Grund */
+  --brand-50:  #2A140E;
+  --brand-100: #452117;
+  --brand-200: #642F1E;
+  --brand-300: #823C24;
+  --brand-400: #9F4B2C;
+  --brand-500: #B85C38;
+  --brand-600: #CB7350;
+  --brand-700: #DD9676;
+  --brand-800: #EBBBA3;
+  --brand-900: #F5DBCE;
+  --brand-950: #FBEEE7;
+
+  --accent:       #E0875E;   /* helles Terracotta, leuchtet auf dunklem Grund */
+  --accent-soft:  #3A241A;
+  --accent-ink:   #1A1714;
+  --accent-line:  rgba(224, 135, 94, 0.34);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(224, 135, 94, 0.18) 0%, transparent 70%);
+  --tool-surface: #3A241A;
+}
+
+/* --- Messing-/Akzent-Haarlinie als Utility (Trenner, Tabellenlinien) --- */
+.rule-brass {
+  border-color: var(--vibe-line-brass);
+}
+
+/* --- Globaler Fokus-Ring (Akzent) --- */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}

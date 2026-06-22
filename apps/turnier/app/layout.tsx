@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import { InstallPrompt, PWAInstaller } from "@pasch/ui";
-import { fraunces, hankenGrotesk, splineSansMono } from "./fonts";
+import { InstallPrompt } from "@/components/ui/InstallPrompt";
+import { PWAInstaller } from "@/components/ui/PWAInstaller";
+import { grotesk, mono, serif } from "./fonts";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -9,23 +10,23 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F5F0E1" },
-    { media: "(prefers-color-scheme: dark)", color: "#0B1F17" },
+    { media: "(prefers-color-scheme: light)", color: "#F4F1EA" },
+    { media: "(prefers-color-scheme: dark)", color: "#1A1714" },
   ],
   viewportFit: "cover",
   interactiveWidget: "resizes-content",
 };
 
 export const metadata: Metadata = {
-  title: "Pasch Turnierleitung",
-  description: "Pasch Turnierleitung — Tischtennis-Turniere: Reihum-Doppel, Standings, TV-View.",
+  title: "Turnier",
+  description: "Turnierleitung für Tischtennis & mehr — Auslosung, Ergebnisse, Tabelle, TV-Ansicht.",
   creator: "Johannes Fahland",
   authors: [{ name: "Johannes Fahland" }],
   manifest: "/turnier-manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Pasch Turnier",
+    title: "Turnier",
   },
   formatDetection: {
     telephone: false,
@@ -46,7 +47,7 @@ const themeInitScript = `
   try {
     var t = localStorage.getItem('theme');
     var sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    var dark = t === 'light' ? false : t === 'system' ? sysDark : true;
+    var dark = t === 'light' ? false : t === 'system' ? sysDark : t === 'dark' ? true : sysDark;
     var r = document.documentElement;
     r.classList.toggle('dark', dark);
     r.style.colorScheme = dark ? 'dark' : 'light';
@@ -62,8 +63,7 @@ export default function RootLayout({
     <html
       lang="de"
       suppressHydrationWarning
-      data-tool="turnier"
-      className={`${fraunces.variable} ${hankenGrotesk.variable} ${splineSansMono.variable} h-full antialiased`}
+      className={`${serif.variable} ${grotesk.variable} ${mono.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
@@ -76,7 +76,7 @@ export default function RootLayout({
       </head>
       <body className="h-dvh min-h-dvh overflow-hidden overscroll-none bg-[var(--vibe-bg-base)] text-[var(--vibe-fg-base)]">
         <PWAInstaller />
-        <InstallPrompt appName="Pasch Turnierleitung" />
+        <InstallPrompt appName="Turnier" />
         {children}
       </body>
     </html>
