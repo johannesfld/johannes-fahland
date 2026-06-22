@@ -62,9 +62,14 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
     () => tournament.players.filter((p) => p.active).map((p) => p.id),
     [tournament.players],
   );
+  // Coverage (Partner-/Gegnerpaare) ist nur im Reihum-Modus sinnvoll.
+  const isRoundRobin = tournament.mode === "round_robin";
   const partnerStats = useMemo(
-    () => getCoverageStats(tournament.rounds, activePlayerIds, tournament.format),
-    [tournament.rounds, activePlayerIds, tournament.format],
+    () =>
+      isRoundRobin
+        ? getCoverageStats(tournament.rounds, activePlayerIds, tournament.format)
+        : { activeCount: activePlayerIds.length, covered: 0, needed: 0, complete: false, estimatedRoundsTotal: 0 },
+    [isRoundRobin, tournament.rounds, activePlayerIds, tournament.format],
   );
 
   const roundNumbers = useMemo(
@@ -328,6 +333,7 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
             <DrawView
               round={selectedRound}
               format={tournament.format}
+              mode={tournament.mode}
               isPending={actions.isPending}
               readOnly={!canEditTournament}
               isViewingLatestRound={isViewingLatestRound}

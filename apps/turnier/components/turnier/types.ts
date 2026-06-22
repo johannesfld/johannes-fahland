@@ -4,6 +4,26 @@ export type MatchStatus = "pending" | "playing" | "completed";
 export type BestOf = 1 | 3 | 5;
 export type TournamentFormat = "singles" | "doubles";
 
+// Turnierform. Spielart (Einzel/Doppel) bleibt in `format`.
+export type TournamentMode = "round_robin" | "knockout" | "swiss" | "groups_ko";
+
+// Modusspezifische Parameter, in Tournament.config (JSON) gespeichert.
+export type TournamentConfig = {
+  /** Swiss: feste Rundenzahl. */
+  swissRounds?: number;
+  /** Gruppe+K.o.: Anzahl Gruppen. */
+  groupCount?: number;
+  /** Gruppe+K.o.: wie viele pro Gruppe in die K.o.-Phase. */
+  advancePerGroup?: number;
+};
+
+export const MODE_LABELS: Record<TournamentMode, string> = {
+  round_robin: "Jeder gegen jeden",
+  knockout: "K.-o.-System",
+  swiss: "Schweizer System",
+  groups_ko: "Gruppen + K.-o.",
+};
+
 export type TournamentPlayer = {
   id: string;
   name: string;
@@ -31,6 +51,9 @@ export type MatchEntry = {
   matchNumber: number;
   status: MatchStatus;
   winnerTeam: 1 | 2 | null;
+  groupLabel: string | null;
+  bracketSlot: number | null;
+  nextMatchId: string | null;
   players: MatchPlayer[];
   sets: MatchSet[];
 };
@@ -39,6 +62,7 @@ export type RoundEntry = {
   id: string;
   roundNumber: number;
   status: RoundStatus;
+  stageLabel: string | null;
   matches: MatchEntry[];
 };
 
@@ -47,6 +71,8 @@ export type TournamentDetail = {
   name: string;
   status: TournamentStatus;
   format: TournamentFormat;
+  mode: TournamentMode;
+  config: TournamentConfig | null;
   bestOf: BestOf;
   winnerName: string | null;
   createdAt: string;
@@ -60,6 +86,7 @@ export type TournamentListItem = {
   name: string;
   status: TournamentStatus;
   format: TournamentFormat;
+  mode: TournamentMode;
   bestOf: BestOf;
   winnerName: string | null;
   createdAt: string;

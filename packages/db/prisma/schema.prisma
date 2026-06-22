@@ -36,11 +36,22 @@ enum TournamentFormat {
   DOUBLES
 }
 
+// Turnierform (Modus). Spielart bleibt in `format` (Einzel/Doppel).
+// ROUND_ROBIN ist Default, damit bestehende Turniere unverändert weiterlaufen.
+enum TournamentMode {
+  ROUND_ROBIN
+  KNOCKOUT
+  SWISS
+  GROUPS_KO
+}
+
 model Tournament {
   id          String             @id @default(cuid())
   name        String
   bestOf      TournamentBestOf   @default(THREE)
   format      TournamentFormat   @default(DOUBLES)
+  mode        TournamentMode     @default(ROUND_ROBIN)
+  config      Json?
   status      TournamentStatus   @default(setup)
   winnerName  String?
   createdAt   DateTime           @default(now())
@@ -73,6 +84,7 @@ model Round {
   tournamentId String
   roundNumber  Int
   status       RoundStatus @default(drawn)
+  stageLabel   String?
   createdAt    DateTime    @default(now())
   tournament   Tournament  @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
   matches      Match[]
@@ -87,6 +99,10 @@ model Match {
   matchNumber Int
   status      MatchStatus  @default(pending)
   winnerTeam  Int?
+  // Bracket-Progression (K.o./Gruppe+K.o.): Sieger rückt in nextMatch/Slot vor.
+  nextMatchId String?
+  bracketSlot Int?
+  groupLabel  String?
   createdAt   DateTime     @default(now())
   round       Round        @relation(fields: [roundId], references: [id], onDelete: Cascade)
   players     MatchPlayer[]

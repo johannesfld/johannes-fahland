@@ -14,7 +14,30 @@ import {
   turnierCard,
 } from "@/components/turnier/styles";
 import { ToolShell } from "@/components/tool-shell/ToolShell";
-import type { BestOf, TournamentFormat, TournamentListItem } from "@/components/turnier/types";
+import {
+  MODE_LABELS,
+  type BestOf,
+  type TournamentFormat,
+  type TournamentListItem,
+  type TournamentMode,
+} from "@/components/turnier/types";
+
+const MODE_ORDER: TournamentMode[] = ["round_robin", "knockout", "swiss", "groups_ko"];
+
+// Modi außer Round-Robin sind aktuell Einzel-basiert.
+const MODE_SUPPORTS_DOUBLES: Record<TournamentMode, boolean> = {
+  round_robin: true,
+  knockout: false,
+  swiss: false,
+  groups_ko: false,
+};
+
+const MODE_HINTS: Record<TournamentMode, string> = {
+  round_robin: "Jeder spielt reihum gegen alle (bzw. mit allen als Partner). Faire Rotation.",
+  knockout: "K.-o.-Baum: Verlierer scheidet aus, Sieger steigt auf bis zum Finale. Nur Einzel.",
+  swiss: "Feste Rundenzahl, Paarung nach Punktstand, keine Wiederholungen. Nur Einzel.",
+  groups_ko: "Erst Gruppen (jeder gegen jeden), dann K.-o.-Finalrunde. Nur Einzel.",
+};
 
 function tournamentListStatusLabel(item: TournamentListItem): string {
   switch (item.status) {
@@ -40,8 +63,17 @@ export function TurnierList({ initialItems }: TurnierListProps) {
   const [name, setName] = useState("");
   const [bestOf, setBestOf] = useState<BestOf>(3);
   const [format, setFormat] = useState<TournamentFormat>("doubles");
+  const [mode, setMode] = useState<TournamentMode>("round_robin");
   const [isPending, startTransition] = useTransition();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const doublesAllowed = MODE_SUPPORTS_DOUBLES[mode];
+  const effectiveFormat: TournamentFormat = doublesAllowed ? format : "singles";
+
+  function selectMode(next: TournamentMode) {
+    setMode(next);
+    if (!MODE_SUPPORTS_DOUBLES[next]) setFormat("singles");
+  }
 
   return (
     <ToolShell>
@@ -61,24 +93,43 @@ export function TurnierList({ initialItems }: TurnierListProps) {
         <h1 className="font-display text-3xl font-medium tracking-tight">Deine Turniere</h1>
         <div className="flex min-w-0 flex-col gap-4">
           <div className="flex min-w-0 flex-col gap-2">
-            <p className={sectionLabel}>Format</p>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                className={format === "doubles" ? actionBtn : subtleBtn}
-                onClick={() => setFormat("doubles")}
-              >
-                Doppel
-              </button>
-              <button
-                type="button"
-                className={format === "singles" ? actionBtn : subtleBtn}
-                onClick={() => setFormat("singles")}
-              >
-                Einzel
-              </button>
+            <p className={sectionLabel}>Modus</p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {MODE_ORDER.map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  className={`${mode === m ? actionBtn : subtleBtn} truncate px-2 sm:px-4`}
+                  onClick={() => selectMode(m)}
+                >
+                  {MODE_LABELS[m]}
+                </button>
+              ))}
             </div>
+            <p className="text-xs text-[var(--vibe-fg-faint)]">{MODE_HINTS[mode]}</p>
           </div>
+
+          {doublesAllowed ? (
+            <div className="flex min-w-0 flex-col gap-2">
+              <p className={sectionLabel}>Format</p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className={format === "doubles" ? actionBtn : subtleBtn}
+                  onClick={() => setFormat("doubles")}
+                >
+                  Doppel
+                </button>
+                <button
+                  type="button"
+                  className={format === "singles" ? actionBtn : subtleBtn}
+                  onClick={() => setFormat("singles")}
+                >
+                  Einzel
+                </button>
+              </div>
+            </div>
+          ) : null}
           <div className="flex min-w-0 flex-col gap-2 sm:flex-row">
             <input
               value={name}
@@ -103,13 +154,14 @@ export function TurnierList({ initialItems }: TurnierListProps) {
               onClick={() =>
                 startTransition(() => {
                   if (!name.trim()) return;
-                  void createTournament(name, bestOf, format).then((id) => {
+                  void createTournament(name, bestOf, effectiveFormat, mode).then((id) => {
                     setItems((prev) => [
                       {
                         id,
                         name,
                         status: "setup",
-                        format,
+                        format: effectiveFormat,
+                        mode,
                         bestOf,
                         winnerName: null,
                         createdAt: new Date().toISOString(),
@@ -157,8 +209,8 @@ export function TurnierList({ initialItems }: TurnierListProps) {
               </p>
               <h2 className="truncate font-display text-lg font-medium tracking-tight">{item.name}</h2>
               <p className="text-sm text-[var(--vibe-fg-muted)]">
-                {item.playerCount} Spieler · {item.format === "doubles" ? "Doppel" : "Einzel"} · Best of{" "}
-                {item.bestOf}
+                {item.playerCount} Spieler · {MODE_LABELS[item.mode]} ·{" "}
+                {item.format === "doubles" ? "Doppel" : "Einzel"} · Best of {item.bestOf}
               </p>
               {item.status === "finished" && item.winnerName ? (
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--accent)]">

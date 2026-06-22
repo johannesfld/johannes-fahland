@@ -3,11 +3,12 @@
 import { motion } from "framer-motion";
 import { MatchCard } from "@/components/turnier/components/MatchCard";
 import { actionBtn, subtleBtn, turnierCard } from "@/components/turnier/styles";
-import type { RoundEntry, TournamentFormat } from "@/components/turnier/types";
+import type { RoundEntry, TournamentFormat, TournamentMode } from "@/components/turnier/types";
 
 type DrawViewProps = {
   round: RoundEntry | null;
   format: TournamentFormat;
+  mode: TournamentMode;
   isPending: boolean;
   readOnly: boolean;
   isViewingLatestRound: boolean;
@@ -24,6 +25,7 @@ type DrawViewProps = {
 export function DrawView({
   round,
   format,
+  mode,
   isPending,
   readOnly,
   isViewingLatestRound,
@@ -40,7 +42,18 @@ export function DrawView({
   const drawDisabled =
     isPending || readOnly || !isViewingLatestRound || coverageComplete;
 
+  const isRoundRobin = mode === "round_robin";
   const isDoubles = format === "doubles";
+  const headingBase = round
+    ? round.stageLabel ?? `Runde ${round.roundNumber}`
+    : "Auslosung";
+  const heading = round && !isRoundRobin ? headingBase : round ? `Auslosung – Runde ${round.roundNumber}` : "Auslosung";
+  const introNonRR: Record<Exclude<TournamentMode, "round_robin">, string> = {
+    knockout: "K.-o.-Runde: Sieger steigt auf, Verlierer scheidet aus. Beim Auslosen springt die Ansicht zur neuen Runde.",
+    swiss: "Schweizer Paarung nach aktuellem Punktstand. Beim Auslosen springt die Ansicht zur neuen Runde.",
+    groups_ko: "Gruppen- bzw. Finalrunde wird ausgelost. Beim Auslosen springt die Ansicht zur neuen Runde.",
+  };
+  const drawLabelNonRR = hasRounds ? "Nächste Runde auslosen" : "Auslosen & starten";
   const pairLabel = isDoubles ? "Partnerpaare" : "Gegnerpaare";
   const introDesktop = isDoubles
     ? "Zufällige Teams und zufällige Gegnerpaare. Beim Auslosen wird automatisch zur neuen Runde gesprungen."
@@ -66,12 +79,20 @@ export function DrawView({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1 space-y-2">
           <h2 className="font-display text-xl font-medium tracking-tight sm:truncate sm:text-2xl">
-            {round ? `Auslosung – Runde ${round.roundNumber}` : "Auslosung"}
+            {heading}
           </h2>
-          <p className="hidden text-xs text-[var(--vibe-fg-muted)] sm:block sm:text-sm">
-            {introDesktop}
-          </p>
-          <p className="text-xs text-[var(--vibe-fg-muted)] sm:hidden">{introMobile}</p>
+          {isRoundRobin ? (
+            <>
+              <p className="hidden text-xs text-[var(--vibe-fg-muted)] sm:block sm:text-sm">
+                {introDesktop}
+              </p>
+              <p className="text-xs text-[var(--vibe-fg-muted)] sm:hidden">{introMobile}</p>
+            </>
+          ) : (
+            <p className="text-xs text-[var(--vibe-fg-muted)] sm:text-sm">
+              {introNonRR[mode as Exclude<TournamentMode, "round_robin">]}
+            </p>
+          )}
           {pairNeeded > 0 ? (
             <div className="flex min-w-0 flex-col gap-1 rounded-2xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] px-3 py-2 text-xs text-[var(--vibe-fg-muted)]">
               <p className="font-semibold text-[var(--vibe-fg-base)]">
@@ -95,7 +116,11 @@ export function DrawView({
           disabled={drawDisabled}
           onClick={onDrawRound}
         >
-          {hasRounds ? "Nächste Runde auslosen" : "Erste Runde auslosen"}
+          {isRoundRobin
+            ? hasRounds
+              ? "Nächste Runde auslosen"
+              : "Erste Runde auslosen"
+            : drawLabelNonRR}
         </button>
       </div>
 
