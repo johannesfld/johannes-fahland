@@ -1,7 +1,9 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
+import { cn } from "@/components/ui/styles";
 import type {
   MatchEntry,
   RoundEntry,
@@ -28,7 +30,14 @@ type PlayerMatchEntry = {
 // Spalten-Layout: kompakt auf Mobile (Rang/Name/S/N/Quote),
 // volle Statspalten ab md. Gemeinsames Grid-Template für Header + Zeilen.
 const GRID_COLS =
-  "grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(3,minmax(2.5rem,1fr))] md:grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(6,minmax(2.5rem,1fr))]";
+  "grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(3,minmax(2.5rem,1fr))_1.75rem] md:grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(6,minmax(2.5rem,1fr))_1.75rem]";
+
+// Medaillen-Tönung für Rang 1–3 (Gold/Silber/Bronze als Clay-Chip).
+const MEDAL_TONE: Record<number, string> = {
+  1: "bg-[var(--warn-soft)] text-[var(--warn-ink)] ring-1 ring-[var(--warn)]/40",
+  2: "bg-[var(--neutral-soft)] text-[var(--neutral-ink)] ring-1 ring-[var(--vibe-line-strong)]",
+  3: "bg-[var(--accent-soft)] text-[var(--accent)] ring-1 ring-[var(--accent-line)]",
+};
 
 function collectPlayerMatches(
   rounds: RoundEntry[],
@@ -97,6 +106,7 @@ export function StandingsTable({
           <span className="hidden md:block">Sp</span>
           <span className="hidden md:block">Sätze</span>
           <span className="hidden md:block">Punkte</span>
+          <span aria-hidden />
         </div>
         <div className="min-w-0">
           {rows.length === 0 ? (
@@ -119,12 +129,23 @@ export function StandingsTable({
                       current === row.playerId ? null : row.playerId,
                     )
                   }
-                  className={`grid w-full ${GRID_COLS} items-center gap-2 px-3 py-3 text-left text-sm leading-relaxed transition-colors duration-150 [@media(hover:hover)]:hover:bg-[var(--vibe-bg-sunken)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]/60 ${
+                  className={`grid w-full min-h-[3rem] ${GRID_COLS} items-center gap-2 px-3 py-3 text-left text-sm leading-relaxed transition-colors duration-150 [@media(hover:hover)]:hover:bg-[var(--vibe-bg-sunken)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--accent)]/60 ${
                     expanded ? "bg-[var(--accent-soft)]" : ""
                   }`}
                   aria-expanded={expanded}
                 >
-                  <span className="font-bold text-[var(--vibe-fg-base)]">{rankLabel}</span>
+                  {MEDAL_TONE[row.rank] ? (
+                    <span
+                      className={cn(
+                        "inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-extrabold",
+                        MEDAL_TONE[row.rank],
+                      )}
+                    >
+                      {rankLabel}
+                    </span>
+                  ) : (
+                    <span className="font-bold text-[var(--vibe-fg-base)]">{rankLabel}</span>
+                  )}
                   <span
                     className={
                       row.active
@@ -146,6 +167,14 @@ export function StandingsTable({
                   <span className="hidden text-[var(--vibe-fg-muted)] md:block">
                     {row.pointDiff > 0 ? `+${row.pointDiff}` : row.pointDiff}
                   </span>
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 justify-self-end text-[var(--vibe-fg-faint)] transition-transform duration-200",
+                      expanded ? "rotate-180 text-[var(--accent)]" : "",
+                    )}
+                    strokeWidth={2.5}
+                    aria-hidden
+                  />
                 </motion.button>
                 <AnimatePresence initial={false}>
                   {expanded ? (

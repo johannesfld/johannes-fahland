@@ -1,85 +1,93 @@
-/* Turnier — eigenständige Design-Tokens (warm & editorial).
-   Souveräne Identität, KEIN Bezug mehr zu Pasch (Pink/Sommer/Fraunces).
-   Palette: warme Sand/Stein-Neutrale + EIN gedeckter Terracotta-Akzent.
-   Variablennamen bewusst identisch zu den früheren @pasch/ui-Tokens, damit
-   bestehende Klassen-Strings unverändert funktionieren — nur andere Werte.
-   :root = Light (Tag), .dark = Dark (Nacht). */
+/* Turnier — eigenständige Design-Tokens „Clay / Soft Play".
+   Zart & pastellig: Cream-Surfaces, softes Coral als Akzent, Mint/Sky sekundär,
+   sehr weiche doppelte Schatten (Claymorphism), dicke Radien, bouncy Motion.
+   Variablennamen bewusst identisch zu früher — bestehende Klassen-Strings
+   funktionieren unverändert, nur die Werte sind neu.
+   :root = Light (Tag), .dark = Dark (warmes Nacht-Clay). */
 
 /* Desk-Variante: Geräte ab 1024px UND mit echtem Pointer (Maus/Trackpad). */
 @custom-variant desk (@media (min-width: 1024px) and (hover: hover) and (pointer: fine));
 
 :root {
   /* --- Legacy-Aliase (App-Code referenziert teils direkt) --- */
-  --background: #F4F1EA;
-  --foreground: #26221C;
-  --surface: #FBFAF6;
-  --surface-muted: #E9E4D8;
-  --border: rgba(38, 34, 28, 0.12);
-  --ring-focus: rgba(184, 92, 56, 0.55);
+  --background: #FBF7F0;
+  --foreground: #44403C;
+  --surface: #FFFFFF;
+  --surface-muted: #F3EDE3;
+  --border: rgba(68, 64, 60, 0.10);
+  --ring-focus: rgba(240, 106, 87, 0.55);
   --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
   color-scheme: light;
 
-  /* --- Surfaces (warmes Papier/Sand) --- */
-  --vibe-bg-base:     #F4F1EA;  /* Sand */
-  --vibe-bg-elevated: #FBFAF6;  /* Sand hell */
-  --vibe-bg-sunken:   #E9E4D8;  /* Sand gedrückt */
-  --vibe-bg-tinted:   #EFE9DD;  /* Terracotta-Anklang */
+  /* --- Surfaces (zartes Cream / Clay) --- */
+  --vibe-bg-base:     #FBF7F0;  /* Cream */
+  --vibe-bg-elevated: #FFFFFF;  /* reine Clay-Karte */
+  --vibe-bg-sunken:   #F3EDE3;  /* sanft gedrückt */
+  --vibe-bg-tinted:   #FFF1EE;  /* Coral-Anklang */
   --vibe-bg-overlay:  #FFFFFF;
 
-  /* --- Foreground (warmes Anthrazit) --- */
-  --vibe-fg-base:  #26221C;     /* Tinte */
-  --vibe-fg-muted: #5C5547;     /* Tinte verdünnt */
-  --vibe-fg-faint: #8A8270;     /* Bleistift */
+  /* --- Foreground (warme Tinte, weicher als Schwarz) --- */
+  --vibe-fg-base:  #44403C;     /* warme Tinte */
+  --vibe-fg-muted: #78716C;     /* Tinte verdünnt */
+  --vibe-fg-faint: #A8A29E;     /* Bleistift */
 
-  /* --- Linien --- */
-  --vibe-line:        rgba(38, 34, 28, 0.12);
-  --vibe-line-strong: rgba(38, 34, 28, 0.22);
-  --vibe-line-brass:  rgba(184, 92, 56, 0.32);
-  --vibe-ring:        rgba(184, 92, 56, 0.55);
-  --vibe-edge:        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  /* --- Linien (sehr zart) --- */
+  --vibe-line:        rgba(68, 64, 60, 0.10);
+  --vibe-line-strong: rgba(68, 64, 60, 0.18);
+  --vibe-line-brass:  rgba(240, 106, 87, 0.28);
+  --vibe-ring:        rgba(240, 106, 87, 0.55);
+  --vibe-edge:        inset 0 1px 0 rgba(255, 255, 255, 0.7);
 
-  /* --- Tischlicht (nur auf bg-base) --- */
-  --vibe-table-light: radial-gradient(120% 70% at 50% -10%, rgba(38, 34, 28, 0.04), transparent 60%);
+  /* --- Tischlicht (nur auf bg-base) — warmer Coral-Schimmer --- */
+  --vibe-table-light: radial-gradient(120% 80% at 50% -10%, rgba(240, 106, 87, 0.05), transparent 62%);
 
-  /* --- Status-Semantik (gedeckt, warm-editorial) --- */
-  --ok:        #5B7B3E;   /* Olivgrün — aktiv/läuft */
-  --ok-soft:   #E5EAD6;
-  --ok-ink:    #3C5328;
-  --warn:      #B07A14;   /* Bernstein — pausiert */
-  --warn-soft: #F3E6C9;
-  --warn-ink:  #7A5309;
-  --danger:    #B23A2E;   /* gedämpftes Rot — gefahr/löschen */
-  --danger-soft: #F3DBD7;
-  --danger-ink:  #8A2A20;
-  --neutral-soft: #E9E4D8;
-  --neutral-ink:  #5C5547;
+  /* --- Status-Semantik (pastellig, AA) --- */
+  --ok:        #2BB673;   /* Mint — aktiv/läuft */
+  --ok-soft:   #D7F5E6;
+  --ok-ink:    #137A4B;
+  --warn:      #E8A33D;   /* Bernstein — pausiert */
+  --warn-soft: #FBEFD6;
+  --warn-ink:  #9A6612;
+  --danger:    #E5605A;   /* softes Rot — gefahr/löschen */
+  --danger-soft: #FBE0DE;
+  --danger-ink:  #A6322D;
+  --neutral-soft: #F3EDE3;
+  --neutral-ink:  #78716C;
 
-  /* --- Motion --- */
+  /* --- Sekundärakzente --- */
+  --sky:       #4CB7E8;
+  --sky-soft:  #DDF1FB;
+  --mint:      #2BB673;
+  --mint-soft: #D7F5E6;
+
+  /* --- Motion (bouncy / Spring-Overshoot) --- */
   --vibe-ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
-  --vibe-ease-spring: cubic-bezier(0.3, 1.36, 0.64, 1);
+  --vibe-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);  /* overshoot */
   --vibe-dur-1: 120ms;
   --vibe-dur-2: 220ms;
   --vibe-dur-3: 280ms;
   --vibe-dur-4: 600ms;
   --vibe-dur-5: 900ms;
 
-  /* --- Radii (ruhiger/editorial: etwas kleiner) --- */
-  --vibe-r-xs:      0.25rem;
-  --vibe-r-sm:      0.5rem;
-  --vibe-r-md:      0.625rem;
-  --vibe-r-lg:      0.875rem;
-  --vibe-r-xl:      1.125rem;
-  --vibe-r-2xl:     1.25rem;
-  --vibe-r-tight:   0.5rem;
-  --vibe-r-base:    0.625rem;
-  --vibe-r-soft:    0.875rem;
-  --vibe-r-pillow:  1.125rem;
-  --vibe-r-balloon: 1.25rem;
+  /* --- Radii (dick & soft) --- */
+  --vibe-r-xs:      0.375rem;
+  --vibe-r-sm:      0.625rem;
+  --vibe-r-md:      0.875rem;
+  --vibe-r-lg:      1rem;
+  --vibe-r-xl:      1.375rem;
+  --vibe-r-2xl:     1.75rem;
+  --vibe-r-3xl:     2.25rem;
+  --vibe-r-tight:   0.625rem;
+  --vibe-r-base:    0.875rem;
+  --vibe-r-soft:    1.125rem;
+  --vibe-r-pillow:  1.375rem;
+  --vibe-r-balloon: 1.75rem;
 
-  /* --- Shadows (warm, dezent) --- */
-  --vibe-shadow-flat:   0 1px 2px rgba(38, 34, 28, 0.06);
-  --vibe-shadow-soft:   0 2px 8px -2px rgba(38, 34, 28, 0.08), 0 8px 24px -8px rgba(38, 34, 28, 0.10);
-  --vibe-shadow-lifted: 0 8px 24px -6px rgba(38, 34, 28, 0.14), 0 24px 48px -16px rgba(38, 34, 28, 0.12);
+  /* --- Shadows (Clay: weich, doppelt, Highlight-Kante) --- */
+  --vibe-shadow-flat:   0 1px 2px rgba(68, 64, 60, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --vibe-shadow-soft:   0 1px 2px rgba(68, 64, 60, 0.04), 0 8px 20px -8px rgba(240, 106, 87, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --vibe-shadow-lifted: 0 12px 30px -10px rgba(68, 64, 60, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  --vibe-shadow-clay:   0 10px 24px -10px rgba(68, 64, 60, 0.18), inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -3px 6px rgba(68, 64, 60, 0.05);
   --vibe-shadow-glow:   0 0 0 1px var(--vibe-ring) inset, 0 8px 30px -10px var(--vibe-ring);
   --vibe-shadow-1: var(--vibe-shadow-flat);
   --vibe-shadow-2: var(--vibe-shadow-soft);
@@ -94,100 +102,106 @@
   --vibe-pad-page: 1rem;
   --vibe-pad-card: 1.25rem;
 
-  /* --- Brand-Skala: Terracotta (ersetzt Pasch-Pink). Reste die noch --brand-*
-         nutzen, werden so automatisch warm — danach auf --accent umgestellt. --- */
-  --brand-50:  #FBEEE7;
-  --brand-100: #F5DBCE;
-  --brand-200: #EBBBA3;
-  --brand-300: #DD9676;
-  --brand-400: #CB7350;
-  --brand-500: #B85C38;   /* Terracotta */
-  --brand-600: #9F4B2C;
-  --brand-700: #823C24;
-  --brand-800: #642F1E;
-  --brand-900: #452117;
-  --brand-950: #2A140E;
+  /* --- Brand-Skala: softes Coral (ersetzt Terracotta). Reste die noch
+         --brand-* nutzen, werden so automatisch warm-coral. --- */
+  --brand-50:  #FFF1EE;
+  --brand-100: #FFE4DE;
+  --brand-200: #FFCABF;
+  --brand-300: #FFA99E;
+  --brand-400: #F98978;
+  --brand-500: #F06A57;   /* softes Coral */
+  --brand-600: #DB4F3C;
+  --brand-700: #B83D2D;
+  --brand-800: #903024;
+  --brand-900: #66231B;
+  --brand-950: #3D1410;
 
-  /* --- Akzent = Terracotta, dunkel genug für Text auf Sand (4.5:1+) --- */
-  --accent:       #9F4B2C;   /* Terracotta, AA auf hellem Grund */
-  --accent-soft:  #F3E0D5;
+  /* --- Akzent = softes Coral, dunkel genug für Text auf Cream (AA) --- */
+  --accent:       #F06A57;
+  --accent-soft:  #FFE4DE;
   --accent-ink:   #FFFFFF;
-  --accent-line:  rgba(184, 92, 56, 0.28);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(184, 92, 56, 0.14) 0%, transparent 70%);
-  --tool-surface: #F3E0D5;
+  --accent-line:  rgba(240, 106, 87, 0.30);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(240, 106, 87, 0.16) 0%, transparent 70%);
+  --tool-surface: #FFE4DE;
 }
 
-/* --- Dark Mode: warmes Nacht-Holz --- */
+/* --- Dark Mode: warmes weiches Nacht-Clay (kein hartes Schwarz) --- */
 .dark {
-  --background: #1A1714;
-  --foreground: #F0EADD;
-  --surface: #231F1A;
-  --surface-muted: #13110E;
-  --border: rgba(240, 234, 221, 0.10);
-  --ring-focus: rgba(224, 135, 94, 0.55);
+  --background: #26211D;
+  --foreground: #F5EEE6;
+  --surface: #322B26;
+  --surface-muted: #1C1814;
+  --border: rgba(245, 238, 230, 0.10);
+  --ring-focus: rgba(255, 158, 140, 0.55);
   color-scheme: dark;
 
-  --vibe-bg-base:     #1A1714;  /* dunkles Holz */
-  --vibe-bg-elevated: #231F1A;
-  --vibe-bg-sunken:   #13110E;
-  --vibe-bg-tinted:   #2A231C;
-  --vibe-bg-overlay:  #2C2620;
+  --vibe-bg-base:     #26211D;  /* warmes Nacht-Clay */
+  --vibe-bg-elevated: #322B26;
+  --vibe-bg-sunken:   #1C1814;
+  --vibe-bg-tinted:   #3A2A26;
+  --vibe-bg-overlay:  #3A322C;
 
-  --vibe-fg-base:  #F0EADD;     /* warmes Elfenbein */
-  --vibe-fg-muted: #BBB3A2;
-  --vibe-fg-faint: #867E6D;
+  --vibe-fg-base:  #F5EEE6;     /* warmes Elfenbein */
+  --vibe-fg-muted: #C4B8AC;
+  --vibe-fg-faint: #8A7E72;
 
-  --vibe-line:        rgba(240, 234, 221, 0.10);
-  --vibe-line-strong: rgba(240, 234, 221, 0.18);
-  --vibe-line-brass:  rgba(224, 135, 94, 0.34);
-  --vibe-ring:        rgba(224, 135, 94, 0.55);
-  --vibe-edge:        inset 0 1px 0 rgba(240, 234, 221, 0.06);
+  --vibe-line:        rgba(245, 238, 230, 0.10);
+  --vibe-line-strong: rgba(245, 238, 230, 0.18);
+  --vibe-line-brass:  rgba(255, 158, 140, 0.32);
+  --vibe-ring:        rgba(255, 158, 140, 0.55);
+  --vibe-edge:        inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
-  --vibe-table-light: radial-gradient(120% 70% at 50% -10%, rgba(240, 234, 221, 0.05), transparent 60%);
+  --vibe-table-light: radial-gradient(120% 80% at 50% -10%, rgba(255, 158, 140, 0.06), transparent 62%);
 
-  /* Status (Dark) */
-  --ok:        #9FBE6F;
-  --ok-soft:   #2A331C;
-  --ok-ink:    #DCEBC2;
-  --warn:      #E0B45C;
-  --warn-soft: #382B12;
-  --warn-ink:  #F6E6C4;
-  --danger:    #E0786A;
-  --danger-soft: #3A1C18;
-  --danger-ink:  #F8D8D1;
-  --neutral-soft: #2A231C;
-  --neutral-ink:  #BBB3A2;
+  /* Status (Dark) — Mint/OK NUR als Fläche/Pip, nicht als Fließtextfarbe */
+  --ok:        #5BD99B;
+  --ok-soft:   #1F3A2C;
+  --ok-ink:    #BDF2D6;
+  --warn:      #F0C06A;
+  --warn-soft: #3A2E15;
+  --warn-ink:  #F8E4BC;
+  --danger:    #FF8C82;
+  --danger-soft: #3D1F1B;
+  --danger-ink:  #FBD3CE;
+  --neutral-soft: #322B26;
+  --neutral-ink:  #C4B8AC;
 
-  --vibe-shadow-flat:   0 1px 2px rgba(0, 0, 0, 0.50);
-  --vibe-shadow-soft:   0 2px 8px -2px rgba(0, 0, 0, 0.45), 0 8px 24px -8px rgba(0, 0, 0, 0.55);
-  --vibe-shadow-lifted: 0 8px 24px -6px rgba(0, 0, 0, 0.60), 0 24px 48px -16px rgba(0, 0, 0, 0.50);
+  --sky:       #7FD0F2;
+  --sky-soft:  #1E3540;
+  --mint:      #5BD99B;
+  --mint-soft: #1F3A2C;
+
+  --vibe-shadow-flat:   0 1px 2px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --vibe-shadow-soft:   0 2px 8px -2px rgba(0, 0, 0, 0.45), 0 10px 24px -10px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --vibe-shadow-lifted: 0 14px 34px -10px rgba(0, 0, 0, 0.60), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --vibe-shadow-clay:   0 12px 28px -12px rgba(0, 0, 0, 0.55), inset 0 2px 4px rgba(255, 255, 255, 0.05), inset 0 -3px 6px rgba(0, 0, 0, 0.30);
   --vibe-shadow-glow:   0 0 0 1px var(--vibe-ring) inset, 0 8px 30px -10px var(--vibe-ring);
   --vibe-shadow-1: var(--vibe-shadow-flat);
   --vibe-shadow-2: var(--vibe-shadow-soft);
   --vibe-shadow-3: var(--vibe-shadow-lifted);
 
-  /* Brand-Dark: Terracotta-Skala invertiert für dunklen Grund */
-  --brand-50:  #2A140E;
-  --brand-100: #452117;
-  --brand-200: #642F1E;
-  --brand-300: #823C24;
-  --brand-400: #9F4B2C;
-  --brand-500: #B85C38;
-  --brand-600: #CB7350;
-  --brand-700: #DD9676;
-  --brand-800: #EBBBA3;
-  --brand-900: #F5DBCE;
-  --brand-950: #FBEEE7;
+  /* Brand-Dark: Coral-Skala invertiert für dunklen Grund */
+  --brand-50:  #3D1410;
+  --brand-100: #66231B;
+  --brand-200: #903024;
+  --brand-300: #B83D2D;
+  --brand-400: #DB4F3C;
+  --brand-500: #F06A57;
+  --brand-600: #F98978;
+  --brand-700: #FFA99E;
+  --brand-800: #FFCABF;
+  --brand-900: #FFE4DE;
+  --brand-950: #FFF1EE;
 
-  --accent:       #E0875E;   /* helles Terracotta, leuchtet auf dunklem Grund */
-  --accent-soft:  #3A241A;
-  --accent-ink:   #1A1714;
-  --accent-line:  rgba(224, 135, 94, 0.34);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(224, 135, 94, 0.18) 0%, transparent 70%);
-  --tool-surface: #3A241A;
+  --accent:       #FF9E8C;   /* leuchtendes Coral auf dunklem Grund */
+  --accent-soft:  #4A2E28;
+  --accent-ink:   #26211D;
+  --accent-line:  rgba(255, 158, 140, 0.34);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(255, 158, 140, 0.18) 0%, transparent 70%);
+  --tool-surface: #4A2E28;
 }
 
-/* --- Messing-/Akzent-Haarlinie als Utility (Trenner, Tabellenlinien) --- */
+/* --- Akzent-Haarlinie als Utility (Trenner, Tabellenlinien) --- */
 .rule-brass {
   border-color: var(--vibe-line-brass);
 }

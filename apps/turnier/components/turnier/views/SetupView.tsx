@@ -2,7 +2,8 @@
 
 import { useRef, useState } from "react";
 import { PlayerChip } from "@/components/turnier/components/PlayerChip";
-import { actionBtn, sectionLabel, subtleBtn, turnierCard } from "@/components/turnier/styles";
+import { actionBtn, pillToggle, sectionLabel, turnierCard } from "@/components/turnier/styles";
+import { cn } from "@/components/ui/styles";
 import type { BestOf, TournamentDetail } from "@/components/turnier/types";
 
 type SetupViewProps = {
@@ -49,7 +50,7 @@ export function SetupView({
   return (
     <section className={`${turnierCard} flex min-w-0 flex-col gap-6`}>
       <div className="flex min-w-0 flex-col gap-1">
-        <h2 className="font-display text-2xl font-medium tracking-tight">Setup</h2>
+        <h2 className="font-display text-2xl font-extrabold tracking-tight">Setup</h2>
         <p className="text-sm text-[var(--vibe-fg-muted)]">
           {isPaused
             ? "Während der Pause kannst du Spieler ergänzen, entfernen oder reaktivieren."
@@ -69,17 +70,25 @@ export function SetupView({
       {showBestOfEditor ? (
         <div className="flex min-w-0 flex-col gap-2">
           <p className={sectionLabel}>Best-of pro Match</p>
-          <div className="flex flex-wrap gap-2">
-            {[1, 3, 5].map((option) => (
-              <button
-                key={option}
-                type="button"
-                className={tournament.bestOf === option ? actionBtn : subtleBtn}
-                onClick={() => onBestOfChange(option as BestOf)}
-              >
-                Best of {option}
-              </button>
-            ))}
+          <div className="inline-flex w-fit gap-1 rounded-full border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] p-1">
+            {[1, 3, 5].map((option) => {
+              const active = tournament.bestOf === option;
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  className={cn(
+                    pillToggle,
+                    active
+                      ? "bg-[var(--accent)] text-[var(--accent-ink)] shadow-[var(--vibe-shadow-clay)]"
+                      : "text-[var(--vibe-fg-muted)] [@media(hover:hover)]:hover:text-[var(--vibe-fg-base)]",
+                  )}
+                  onClick={() => onBestOfChange(option as BestOf)}
+                >
+                  Best of {option}
+                </button>
+              );
+            })}
           </div>
         </div>
       ) : null}

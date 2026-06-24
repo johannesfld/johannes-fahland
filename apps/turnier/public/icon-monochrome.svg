@@ -1,11 +1,9 @@
 <svg width="512" height="512" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-  <path
-    fill="currentColor"
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M20 8 H44 A12 12 0 0 1 56 20 V44 A12 12 0 0 1 44 56 H20 A12 12 0 0 1 8 44 V20 A12 12 0 0 1 20 8 Z
-       M13.5 32 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0 Z
-       M38.5 32 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0 Z
-       M30.75 19.25 a1.25 1.25 0 0 1 2.5 0 v25.5 a1.25 1.25 0 0 1 -2.5 0 Z"
-  />
+  <g fill="currentColor">
+    <rect x="10" y="12" width="34" height="11" rx="5.5"/>
+    <rect x="21.5" y="18" width="11" height="36" rx="5.5"/>
+    <path d="M40 17.5 H47 a4.5 4.5 0 0 1 4.5 4.5 V30 a4.5 4.5 0 0 0 4.5 4.5" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M40 51 H47 a4.5 4.5 0 0 0 4.5 -4.5 V39 a4.5 4.5 0 0 1 4.5 -4.5" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <circle cx="56" cy="34.5" r="6.5"/>
+  </g>
 </svg>

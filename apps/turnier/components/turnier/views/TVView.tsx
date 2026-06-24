@@ -21,45 +21,53 @@ export function TVView({ tournament }: TVViewProps) {
   }, []);
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-1 flex-col gap-4 overflow-hidden bg-gradient-to-b from-[#16110D] to-[#241A12] p-4 text-[#F3E9DC] md:gap-6 md:p-8 lg:p-10">
-      <header className="flex items-center justify-between gap-4">
-        <h1 className="font-display text-2xl font-medium tracking-tight md:text-4xl xl:text-5xl">
+    <div className="dark relative flex h-full min-h-0 w-full flex-1 flex-col gap-4 overflow-hidden bg-[var(--vibe-bg-base)] p-4 text-[var(--vibe-fg-base)] md:gap-6 md:p-8 lg:p-10">
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: "var(--vibe-table-light)" }}
+        aria-hidden
+      />
+      <header className="relative flex items-center justify-between gap-4">
+        <h1 className="font-display text-2xl font-extrabold tracking-tight md:text-4xl xl:text-5xl">
           {tournament.name}
         </h1>
-        <span className="rounded-full border border-[#E0875E]/50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#E0875E] md:text-sm">
+        <span className="rounded-full border border-[var(--accent-line)] bg-[var(--accent-soft)] px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--accent)] md:text-sm">
           TV Modus
         </span>
       </header>
 
       {showStandings ? (
-        <div className="grid min-h-0 gap-2 overflow-y-auto md:gap-3">
+        <div className="relative grid min-h-0 gap-2 overflow-y-auto md:gap-3">
           {standings.slice(0, 12).map((row) => (
             <div
               key={row.playerId}
-              className="grid grid-cols-[3rem_1fr_5rem_5rem_5rem] items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.04] p-3 md:grid-cols-[5rem_1fr_8rem_8rem_8rem] md:gap-3 md:p-4"
+              className="grid grid-cols-[3rem_1fr_5rem_5rem_5rem] items-center gap-2 rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] p-3 shadow-[var(--vibe-shadow-soft)] md:grid-cols-[5rem_1fr_8rem_8rem_8rem] md:gap-3 md:p-4"
             >
-              <span className="font-mono text-2xl font-bold text-[#E0875E] md:text-4xl">{row.rank}</span>
+              <span className="font-mono text-2xl font-bold text-[var(--accent)] md:text-4xl">{row.rank}</span>
               <span className="truncate text-lg font-semibold md:text-3xl">{row.name}</span>
-              <span className="font-mono text-base font-bold text-[#9FBE6F] md:text-2xl">S {row.wins}</span>
-              <span className="font-mono text-base font-bold text-[#E0786A] md:text-2xl">N {row.losses}</span>
-              <span className="font-mono text-base font-bold text-[#F3E9DC] md:text-2xl">
+              <span className="font-mono text-base font-bold text-[var(--mint)] md:text-2xl">S {row.wins}</span>
+              <span className="font-mono text-base font-bold text-[var(--danger)] md:text-2xl">N {row.losses}</span>
+              <span className="font-mono text-base font-bold text-[var(--vibe-fg-base)] md:text-2xl">
                 {Math.round(row.winRate * 100)}%
               </span>
             </div>
           ))}
         </div>
       ) : (
-        <div className="grid min-h-0 grid-cols-1 gap-3 overflow-y-auto md:grid-cols-2 2xl:grid-cols-3">
+        <div className="relative grid min-h-0 grid-cols-1 gap-3 overflow-y-auto md:grid-cols-2 2xl:grid-cols-3">
           {latestRound?.matches.map((match) => (
-            <div key={match.id} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-              <p className="mb-2 text-sm font-semibold uppercase tracking-[0.16em] text-[#E0875E]">
+            <div
+              key={match.id}
+              className="rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] p-4 shadow-[var(--vibe-shadow-soft)]"
+            >
+              <p className="mb-2 text-sm font-bold uppercase tracking-[0.16em] text-[var(--accent)]">
                 Match {match.matchNumber}
               </p>
-              <p className="text-2xl font-bold text-[#F3E9DC]">
+              <p className="text-2xl font-bold text-[var(--vibe-fg-base)]">
                 {match.players.filter((player) => player.team === 1).map((player) => player.name).join(" / ")}
               </p>
-              <p className="my-1 text-base font-semibold uppercase tracking-[0.16em] text-[#E0875E]/80">VS</p>
-              <p className="text-2xl font-bold text-[#E0875E]">
+              <p className="my-1 text-base font-bold uppercase tracking-[0.16em] text-[var(--vibe-fg-faint)]">VS</p>
+              <p className="text-2xl font-bold text-[var(--accent)]">
                 {match.players.filter((player) => player.team === 2).map((player) => player.name).join(" / ")}
               </p>
             </div>
@@ -67,7 +75,7 @@ export function TVView({ tournament }: TVViewProps) {
         </div>
       )}
 
-      <footer className="mt-auto text-xs uppercase tracking-[0.16em] text-[#E0875E]/70">
+      <footer className="relative mt-auto text-xs font-semibold uppercase tracking-[0.16em] text-[var(--vibe-fg-faint)]">
         Teilen: /{tournament.id}
       </footer>
     </div>

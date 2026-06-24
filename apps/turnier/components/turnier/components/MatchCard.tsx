@@ -29,7 +29,7 @@ export function MatchCard({ match, children }: MatchCardProps) {
   const team2Wins = match.winnerTeam === 2;
 
   const teamBase =
-    "min-w-0 break-words rounded-xl p-3 text-sm font-semibold transition-colors duration-200 sm:text-base";
+    "min-w-0 break-words rounded-[var(--vibe-r-lg)] p-3 text-sm font-semibold transition-colors duration-200 sm:text-base";
   // Sieger = Akzent-getönt, Verlierer = gedämpft, offen = neutrale Fläche.
   const winnerTone =
     "bg-[var(--accent-soft)] text-[var(--vibe-fg-base)] ring-2 ring-[var(--accent)]/50";

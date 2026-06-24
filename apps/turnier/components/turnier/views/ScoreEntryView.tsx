@@ -49,12 +49,13 @@ export function ScoreEntryView({
 
   const completedMatches = round.matches.filter((match) => match.status === "completed").length;
   const totalMatches = round.matches.length;
+  const progressPct = totalMatches > 0 ? Math.round((completedMatches / totalMatches) * 100) : 0;
 
   return (
     <section className={`${turnierCard} flex min-w-0 flex-col gap-4`}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <h2 className="font-display text-xl font-medium tracking-tight sm:truncate sm:text-2xl">
+          <h2 className="font-display text-xl font-extrabold tracking-tight sm:truncate sm:text-2xl">
             Ergebnisse – Runde {round.roundNumber}
           </h2>
           <p className="text-sm text-[var(--vibe-fg-muted)]">
@@ -69,6 +70,20 @@ export function ScoreEntryView({
         >
           Runde abschließen
         </button>
+      </div>
+
+      <div
+        className="h-2.5 w-full overflow-hidden rounded-full bg-[var(--vibe-bg-sunken)]"
+        role="progressbar"
+        aria-valuenow={progressPct}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Fortschritt der Runde"
+      >
+        <div
+          className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-500 [transition-timing-function:var(--vibe-ease-spring)]"
+          style={{ width: `${progressPct}%` }}
+        />
       </div>
 
       <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
