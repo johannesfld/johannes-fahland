@@ -28,7 +28,7 @@ export function StandingsView({
   return (
     <section className={`${turnierCard} flex min-w-0 flex-col gap-4`}>
       <div className="min-w-0 space-y-2">
-        <h2 className="truncate font-display text-xl font-medium tracking-tight sm:text-2xl">Tabelle</h2>
+        <h2 className="truncate font-display text-xl font-extrabold tracking-tight sm:text-2xl">Tabelle</h2>
         <p className="text-sm text-[var(--vibe-fg-muted)]">
           {throughRound != null ? (
             <>

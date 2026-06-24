@@ -1,18 +1,20 @@
-import { Newsreader, Public_Sans, Spline_Sans_Mono } from "next/font/google";
+import { Plus_Jakarta_Sans, Spline_Sans_Mono } from "next/font/google";
 
-// Editorial Serif — nur für Headlines. Variabel (opsz), kein fixes `weight`.
-export const serif = Newsreader({
-  variable: "--font-serif",
+// Display — runde, freundliche Headlines (Clay/Soft Play). Bold/Extrabold.
+// Export-Name `serif` bleibt aus Kompatibilität, zeigt jetzt auf Jakarta.
+export const serif = Plus_Jakarta_Sans({
+  variable: "--font-display-spec",
   subsets: ["latin"],
-  axes: ["opsz"],
+  weight: ["700", "800"],
   display: "swap",
   preload: true,
 });
 
-// Ruhige Grotesk — UI & Body.
-export const grotesk = Public_Sans({
+// UI & Body — dieselbe Familie in leichteren Schnitten, für ein kohärentes Clay-Gefühl.
+export const grotesk = Plus_Jakarta_Sans({
   variable: "--font-grotesk",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
   preload: true,
 });

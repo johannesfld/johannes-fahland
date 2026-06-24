@@ -17,7 +17,7 @@
   --color-danger: var(--danger);
   --font-sans: var(--font-grotesk);
   --font-mono: var(--font-mono-spec);
-  --font-display: var(--font-serif);
+  --font-display: var(--font-display-spec);
 }
 
 html, body {
@@ -43,9 +43,31 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Editorial Serif — ausschließlich für Headlines (Turniername, Seitentitel). */
+/* Display — runde Sans (Plus Jakarta) für Headlines (Turniername, Seitentitel).
+   Gewicht steuern die Utility-Klassen (font-bold/font-extrabold); Jakarta lädt
+   400–800, daher Headlines in Komponenten auf font-bold/extrabold setzen. */
 .font-display {
-  font-family: var(--font-serif), ui-serif, Georgia, serif;
+  font-family: var(--font-display-spec), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Clay-Skeleton-Puls (sanft pulsierende Ladefläche). */
+@keyframes turnier-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* Bouncy Pop-in für Onboarding/Modals/Confetti (Spring-Overshoot). */
+@keyframes turnier-pop-in {
+  0% { opacity: 0; transform: scale(0.92) translateY(8px); }
+  60% { opacity: 1; transform: scale(1.02) translateY(0); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes turnier-confetti-fall {
+  0% { opacity: 0; transform: translateY(-12px) rotate(0deg); }
+  10% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(85vh) rotate(540deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {

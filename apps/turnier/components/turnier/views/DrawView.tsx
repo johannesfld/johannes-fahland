@@ -78,7 +78,7 @@ export function DrawView({
     <section className={`${turnierCard} flex min-w-0 flex-col gap-4`}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1 space-y-2">
-          <h2 className="font-display text-xl font-medium tracking-tight sm:truncate sm:text-2xl">
+          <h2 className="font-display text-xl font-extrabold tracking-tight sm:truncate sm:text-2xl">
             {heading}
           </h2>
           {isRoundRobin ? (
@@ -142,15 +142,31 @@ export function DrawView({
         </div>
       ) : null}
 
-      {round ? (
+      {isPending && !round ? (
+        <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <p className="col-span-full text-sm font-semibold text-[var(--vibe-fg-muted)]">
+            Lose werden gezogen…
+          </p>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex flex-col gap-3 rounded-[var(--vibe-r-2xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] p-4 shadow-[var(--vibe-shadow-soft)]"
+            >
+              <div className="h-3 w-16 animate-[turnier-pulse_1.6s_ease-in-out_infinite] rounded-full bg-[var(--vibe-bg-sunken)]" />
+              <div className="h-10 w-full animate-[turnier-pulse_1.6s_ease-in-out_infinite] rounded-[var(--vibe-r-lg)] bg-[var(--vibe-bg-sunken)]" />
+              <div className="h-10 w-full animate-[turnier-pulse_1.6s_ease-in-out_infinite] rounded-[var(--vibe-r-lg)] bg-[var(--vibe-bg-sunken)]" />
+            </div>
+          ))}
+        </div>
+      ) : round ? (
         <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {round.matches.map((match, index) => (
             <motion.div
               key={match.id}
               className="min-w-0"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05, duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 14, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: index * 0.06, type: "spring", stiffness: 320, damping: 18, mass: 0.7 }}
             >
               <MatchCard match={match} />
             </motion.div>

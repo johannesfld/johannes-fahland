@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { InstallPrompt } from "@/components/ui/InstallPrompt";
+import { Onboarding } from "@/components/ui/Onboarding";
 import { PWAInstaller } from "@/components/ui/PWAInstaller";
 import { grotesk, mono, serif } from "./fonts";
 import "./globals.css";
@@ -10,8 +11,8 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F4F1EA" },
-    { media: "(prefers-color-scheme: dark)", color: "#1A1714" },
+    { media: "(prefers-color-scheme: light)", color: "#FBF7F0" },
+    { media: "(prefers-color-scheme: dark)", color: "#26211D" },
   ],
   viewportFit: "cover",
   interactiveWidget: "resizes-content",
@@ -77,6 +78,7 @@ export default function RootLayout({
       <body className="h-dvh min-h-dvh overflow-hidden overscroll-none bg-[var(--vibe-bg-base)] text-[var(--vibe-fg-base)]">
         <PWAInstaller />
         <InstallPrompt appName="Turnier" />
+        <Onboarding />
         {children}
       </body>
     </html>
