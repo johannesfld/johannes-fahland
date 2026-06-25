@@ -75,7 +75,7 @@ export default function RootLayout({
         />
         <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
       </head>
-      <body className="h-dvh min-h-dvh overflow-hidden overscroll-none bg-[var(--vibe-bg-base)] text-[var(--vibe-fg-base)]">
+      <body className="flex h-dvh min-h-dvh flex-col overflow-hidden overscroll-none bg-[var(--vibe-bg-base)] text-[var(--vibe-fg-base)]">
         <PWAInstaller />
         <InstallPrompt appName="Turnier" />
         <Onboarding />
