@@ -327,30 +327,61 @@ export default function WizardScoreMaster() {
                 <div className="space-y-3 sm:space-y-4">
                   <div className="block text-center">
                     <span className={labelMuted}>Anzahl der Spieler</span>
-                    <div className="mx-auto mt-2 grid w-full max-w-[18rem] grid-cols-5 gap-2 sm:mt-3 sm:max-w-xs sm:gap-3">
-                      {[2, 3, 4, 5, 6].map((n) => (
-                        <button
-                          key={n}
-                          type="button"
-                          onClick={() => {
-                            setSetupPlayerCount(n);
-                            setPlayerNames((prev) =>
-                              Array.from({ length: n }, (_, i) =>
-                                prev[i] ?? "",
-                              ),
-                            );
-                            setError(null);
-                          }}
-                          className={
-                            `flex aspect-square w-full max-h-14 shrink-0 items-center justify-center rounded-full border-2 font-display text-base transition-colors sm:max-h-16 sm:text-lg touch-manipulation ` +
-                            (setupPlayerCount === n
-                              ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
-                              : "border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/60 text-[var(--vibe-fg-muted)] hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)]")
-                          }
-                        >
-                          {n}
-                        </button>
-                      ))}
+                    <div className="mx-auto mt-2 w-full max-w-xs sm:mt-3">
+                      <div className="grid grid-cols-5 gap-2 sm:gap-3">
+                        {[2, 3, 4, 5, 6].map((n) => (
+                          <button
+                            key={n}
+                            type="button"
+                            onClick={() => {
+                              setSetupPlayerCount(n);
+                              setPlayerNames((prev) =>
+                                Array.from({ length: n }, (_, i) =>
+                                  prev[i] ?? "",
+                                ),
+                              );
+                              setError(null);
+                            }}
+                            className={
+                              `flex aspect-square w-full max-h-14 shrink-0 items-center justify-center rounded-full border-2 font-display text-base transition-colors sm:max-h-16 sm:text-lg touch-manipulation ` +
+                              (setupPlayerCount === n
+                                ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
+                                : "border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/60 text-[var(--vibe-fg-muted)] hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)]")
+                            }
+                          >
+                            {n}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="mt-2 grid grid-cols-4 gap-2 sm:gap-3">
+                        {[7, 8, 9, 10].map((n) => (
+                          <button
+                            key={n}
+                            type="button"
+                            onClick={() => {
+                              setSetupPlayerCount(n);
+                              setPlayerNames((prev) =>
+                                Array.from({ length: n }, (_, i) =>
+                                  prev[i] ?? "",
+                                ),
+                              );
+                              setError(null);
+                            }}
+                            className={
+                              `flex aspect-square w-full max-h-14 shrink-0 items-center justify-center rounded-full border-2 font-display text-base transition-colors sm:max-h-16 sm:text-lg touch-manipulation ` +
+                              (setupPlayerCount === n
+                                ? "border-[var(--accent)] bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_0_16px_color-mix(in_srgb,var(--accent)_35%,transparent)]"
+                                : "border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)]/60 text-[var(--vibe-fg-muted)] hover:bg-[color-mix(in_srgb,var(--accent)_8%,transparent)]")
+                            }
+                          >
+                            {n}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="mt-2 text-center text-[10px] text-[var(--vibe-fg-faint)]">
+                        {setupPlayerCount <= 3 && `${getRoundCount(setupPlayerCount === 2 ? 3 : setupPlayerCount)} Runden`}
+                        {setupPlayerCount >= 4 && `${getRoundCount(setupPlayerCount)} Runden`}
+                      </p>
                     </div>
                   </div>
 
