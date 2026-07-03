@@ -15,7 +15,7 @@
   --surface: #FFFFFF;
   --surface-muted: #F3EDE3;
   --border: rgba(68, 64, 60, 0.10);
-  --ring-focus: rgba(240, 106, 87, 0.55);
+  --ring-focus: rgba(37, 99, 235, 0.55);
   --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
   color-scheme: light;
 
@@ -23,7 +23,7 @@
   --vibe-bg-base:     #FBF7F0;  /* Cream */
   --vibe-bg-elevated: #FFFFFF;  /* reine Clay-Karte */
   --vibe-bg-sunken:   #F3EDE3;  /* sanft gedrückt */
-  --vibe-bg-tinted:   #FFF1EE;  /* Coral-Anklang */
+  --vibe-bg-tinted:   #EFF4FF;  /* Blau-Anklang */
   --vibe-bg-overlay:  #FFFFFF;
 
   /* --- Foreground (warme Tinte, weicher als Schwarz) --- */
@@ -34,12 +34,12 @@
   /* --- Linien (sehr zart) --- */
   --vibe-line:        rgba(68, 64, 60, 0.10);
   --vibe-line-strong: rgba(68, 64, 60, 0.18);
-  --vibe-line-brass:  rgba(240, 106, 87, 0.28);
-  --vibe-ring:        rgba(240, 106, 87, 0.55);
+  --vibe-line-brass:  rgba(37, 99, 235, 0.28);
+  --vibe-ring:        rgba(37, 99, 235, 0.55);
   --vibe-edge:        inset 0 1px 0 rgba(255, 255, 255, 0.7);
 
-  /* --- Tischlicht (nur auf bg-base) — warmer Coral-Schimmer --- */
-  --vibe-table-light: radial-gradient(120% 80% at 50% -10%, rgba(240, 106, 87, 0.05), transparent 62%);
+  /* --- Tischlicht (nur auf bg-base) — kühler Blau-Schimmer --- */
+  --vibe-table-light: radial-gradient(120% 80% at 50% -10%, rgba(37, 99, 235, 0.05), transparent 62%);
 
   /* --- Status-Semantik (pastellig, AA) --- */
   --ok:        #2BB673;   /* Mint — aktiv/läuft */
@@ -85,7 +85,7 @@
 
   /* --- Shadows (Clay: weich, doppelt, Highlight-Kante) --- */
   --vibe-shadow-flat:   0 1px 2px rgba(68, 64, 60, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  --vibe-shadow-soft:   0 1px 2px rgba(68, 64, 60, 0.04), 0 8px 20px -8px rgba(240, 106, 87, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --vibe-shadow-soft:   0 1px 2px rgba(68, 64, 60, 0.04), 0 8px 20px -8px rgba(37, 99, 235, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7);
   --vibe-shadow-lifted: 0 12px 30px -10px rgba(68, 64, 60, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   --vibe-shadow-clay:   0 10px 24px -10px rgba(68, 64, 60, 0.18), inset 0 2px 4px rgba(255, 255, 255, 0.6), inset 0 -3px 6px rgba(68, 64, 60, 0.05);
   --vibe-shadow-glow:   0 0 0 1px var(--vibe-ring) inset, 0 8px 30px -10px var(--vibe-ring);
@@ -102,27 +102,27 @@
   --vibe-pad-page: 1rem;
   --vibe-pad-card: 1.25rem;
 
-  /* --- Brand-Skala: softes Coral (ersetzt Terracotta). Reste die noch
-         --brand-* nutzen, werden so automatisch warm-coral. --- */
-  --brand-50:  #FFF1EE;
-  --brand-100: #FFE4DE;
-  --brand-200: #FFCABF;
-  --brand-300: #FFA99E;
-  --brand-400: #F98978;
-  --brand-500: #F06A57;   /* softes Coral */
-  --brand-600: #DB4F3C;
-  --brand-700: #B83D2D;
-  --brand-800: #903024;
-  --brand-900: #66231B;
-  --brand-950: #3D1410;
+  /* --- Brand-Skala: kräftiges Blau (ersetzt Coral). Reste die noch
+         --brand-* nutzen, werden so automatisch blau. --- */
+  --brand-50:  #EFF4FF;
+  --brand-100: #DBE7FF;
+  --brand-200: #BFD3FF;
+  --brand-300: #93B4FF;
+  --brand-400: #5E8CF7;
+  --brand-500: #2563EB;   /* kräftiges Blau */
+  --brand-600: #1D4ED8;
+  --brand-700: #1E40AF;
+  --brand-800: #1E3A8A;
+  --brand-900: #172554;
+  --brand-950: #101E44;
 
-  /* --- Akzent = softes Coral, dunkel genug für Text auf Cream (AA) --- */
-  --accent:       #F06A57;
-  --accent-soft:  #FFE4DE;
+  /* --- Akzent = kräftiges Blau, kontraststark auf Cream (AA) --- */
+  --accent:       #2563EB;
+  --accent-soft:  #DBE7FF;
   --accent-ink:   #FFFFFF;
-  --accent-line:  rgba(240, 106, 87, 0.30);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(240, 106, 87, 0.16) 0%, transparent 70%);
-  --tool-surface: #FFE4DE;
+  --accent-line:  rgba(37, 99, 235, 0.30);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(37, 99, 235, 0.16) 0%, transparent 70%);
+  --tool-surface: #DBE7FF;
 }
 
 /* --- Dark Mode: warmes weiches Nacht-Clay (kein hartes Schwarz) --- */
@@ -132,13 +132,13 @@
   --surface: #322B26;
   --surface-muted: #1C1814;
   --border: rgba(245, 238, 230, 0.10);
-  --ring-focus: rgba(255, 158, 140, 0.55);
+  --ring-focus: rgba(122, 162, 255, 0.55);
   color-scheme: dark;
 
   --vibe-bg-base:     #26211D;  /* warmes Nacht-Clay */
   --vibe-bg-elevated: #322B26;
   --vibe-bg-sunken:   #1C1814;
-  --vibe-bg-tinted:   #3A2A26;
+  --vibe-bg-tinted:   #26314A;
   --vibe-bg-overlay:  #3A322C;
 
   --vibe-fg-base:  #F5EEE6;     /* warmes Elfenbein */
@@ -147,11 +147,11 @@
 
   --vibe-line:        rgba(245, 238, 230, 0.10);
   --vibe-line-strong: rgba(245, 238, 230, 0.18);
-  --vibe-line-brass:  rgba(255, 158, 140, 0.32);
-  --vibe-ring:        rgba(255, 158, 140, 0.55);
+  --vibe-line-brass:  rgba(122, 162, 255, 0.32);
+  --vibe-ring:        rgba(122, 162, 255, 0.55);
   --vibe-edge:        inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
-  --vibe-table-light: radial-gradient(120% 80% at 50% -10%, rgba(255, 158, 140, 0.06), transparent 62%);
+  --vibe-table-light: radial-gradient(120% 80% at 50% -10%, rgba(122, 162, 255, 0.07), transparent 62%);
 
   /* Status (Dark) — Mint/OK NUR als Fläche/Pip, nicht als Fließtextfarbe */
   --ok:        #5BD99B;
@@ -180,25 +180,25 @@
   --vibe-shadow-2: var(--vibe-shadow-soft);
   --vibe-shadow-3: var(--vibe-shadow-lifted);
 
-  /* Brand-Dark: Coral-Skala invertiert für dunklen Grund */
-  --brand-50:  #3D1410;
-  --brand-100: #66231B;
-  --brand-200: #903024;
-  --brand-300: #B83D2D;
-  --brand-400: #DB4F3C;
-  --brand-500: #F06A57;
-  --brand-600: #F98978;
-  --brand-700: #FFA99E;
-  --brand-800: #FFCABF;
-  --brand-900: #FFE4DE;
-  --brand-950: #FFF1EE;
+  /* Brand-Dark: Blau-Skala invertiert für dunklen Grund */
+  --brand-50:  #101E44;
+  --brand-100: #172554;
+  --brand-200: #1E3A8A;
+  --brand-300: #1E40AF;
+  --brand-400: #1D4ED8;
+  --brand-500: #2563EB;
+  --brand-600: #5E8CF7;
+  --brand-700: #93B4FF;
+  --brand-800: #BFD3FF;
+  --brand-900: #DBE7FF;
+  --brand-950: #EFF4FF;
 
-  --accent:       #FF9E8C;   /* leuchtendes Coral auf dunklem Grund */
-  --accent-soft:  #4A2E28;
-  --accent-ink:   #26211D;
-  --accent-line:  rgba(255, 158, 140, 0.34);
-  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(255, 158, 140, 0.18) 0%, transparent 70%);
-  --tool-surface: #4A2E28;
+  --accent:       #7AA2FF;   /* leuchtendes Blau auf dunklem Grund */
+  --accent-soft:  #26314A;
+  --accent-ink:   #101E44;
+  --accent-line:  rgba(122, 162, 255, 0.34);
+  --accent-glow:  radial-gradient(ellipse at 50% 0%, rgba(122, 162, 255, 0.18) 0%, transparent 70%);
+  --tool-surface: #26314A;
 }
 
 /* --- Akzent-Haarlinie als Utility (Trenner, Tabellenlinien) --- */

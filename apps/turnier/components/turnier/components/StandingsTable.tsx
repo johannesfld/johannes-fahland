@@ -94,7 +94,7 @@ export function StandingsTable({
 
   return (
     <div className="min-w-0 overflow-x-auto rounded-2xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] shadow-[var(--vibe-shadow-soft)]">
-      <div className="flex min-w-[20rem] flex-col">
+      <div className="flex min-w-[16rem] flex-col">
         <div
           className={`grid shrink-0 ${GRID_COLS} gap-2 border-b border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--vibe-fg-faint)]`}
         >

@@ -39,8 +39,11 @@ export function PodiumView({ standings, onShowTable }: PodiumViewProps) {
   const finished = step >= 4;
 
   return (
-    <section className="relative flex min-h-[26rem] flex-1 flex-col items-center justify-end overflow-hidden rounded-[var(--vibe-r-2xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-tinted)] p-4 shadow-[var(--vibe-shadow-clay)] sm:p-6">
-      <div className="pointer-events-none absolute inset-0" style={{ background: "var(--accent-glow)" }} />
+    <section className="relative flex min-h-[min(26rem,70vh)] flex-1 flex-col items-center justify-end rounded-[var(--vibe-r-2xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-tinted)] p-4 shadow-[var(--vibe-shadow-clay)] sm:p-6">
+      {/* Glow/Konfetti clippen wir separat, nicht die ganze Sektion → nichts wird abgeschnitten */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[var(--vibe-r-2xl)]">
+        <div className="absolute inset-0" style={{ background: "var(--accent-glow)" }} />
+      </div>
 
       {/* Konfetti (reines CSS) — nur wenn fertig & Motion erlaubt */}
       {finished && !reduce ? <Confetti /> : null}
@@ -167,7 +170,7 @@ function Confetti() {
   const colors = ["var(--accent)", "var(--mint)", "var(--sky)", "var(--warn)"];
   const pieces = Array.from({ length: 28 }, (_, i) => i);
   return (
-    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-[var(--vibe-r-2xl)]" aria-hidden>
       {pieces.map((i) => {
         const left = (i * 37) % 100;
         const delay = (i % 7) * 0.18;
