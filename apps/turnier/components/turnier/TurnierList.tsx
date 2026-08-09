@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Trash2, Repeat, Zap, Layers, Grid3x3, Plus } from "lucide-react";
 import { Brandmark, Wordmark } from "@/components/ui/Brandmark";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { Toast } from "@/components/ui/Toast";
 import { createTournament, deleteTournament } from "@/app/actions/turnier";
 import {
   actionBtn,
@@ -74,14 +75,16 @@ type TurnierListProps = {
   initialItems: TournamentListItem[];
 };
 
+/** Optimistisch angelegt – hat noch keine echte Turnier-ID vom Server. */
+type ListEntry = TournamentListItem & { pending?: boolean };
+
 export function TurnierList({ initialItems }: TurnierListProps) {
-  const [items, setItems] = useState(initialItems);
+  const [items, setItems] = useState<ListEntry[]>(initialItems);
   const [name, setName] = useState("");
   const [bestOf, setBestOf] = useState<BestOf>(3);
   const [format, setFormat] = useState<TournamentFormat>("doubles");
   const [mode, setMode] = useState<TournamentMode>("round_robin");
-  const [isPending, startTransition] = useTransition();
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<TournamentListItem | null>(null);
 
   const doublesAllowed = MODE_SUPPORTS_DOUBLES[mode];
@@ -92,23 +95,76 @@ export function TurnierList({ initialItems }: TurnierListProps) {
     if (!MODE_SUPPORTS_DOUBLES[next]) setFormat("singles");
   }
 
+  /**
+   * Karte erscheint sofort mit Platzhalter-ID; sobald der Server die echte ID
+   * liefert, wird sie ersetzt und die Karte anklickbar. Bei Fehlschlag
+   * verschwindet sie wieder und der Name steht zum Korrigieren zurück im Feld.
+   */
+  function submitCreate() {
+    const safeName = name.trim();
+    if (!safeName) return;
+    const tempId = `optimistic-${Date.now()}`;
+    const now = new Date().toISOString();
+    setItems((prev) => [
+      {
+        id: tempId,
+        name: safeName,
+        status: "setup",
+        format: effectiveFormat,
+        mode,
+        bestOf,
+        winnerName: null,
+        createdAt: now,
+        updatedAt: now,
+        playerCount: 0,
+        pending: true,
+      },
+      ...prev,
+    ]);
+    setName("");
+
+    const undo = (message: string) => {
+      setItems((prev) => prev.filter((entry) => entry.id !== tempId));
+      setName((current) => current || safeName);
+      setError(message);
+    };
+
+    void createTournament(safeName, bestOf, effectiveFormat, mode)
+      .then((result) => {
+        if (!result.ok) return undo(result.error);
+        setItems((prev) =>
+          prev.map((entry) =>
+            entry.id === tempId ? { ...entry, id: result.id, pending: false } : entry,
+          ),
+        );
+      })
+      .catch(() => undo("Keine Verbindung – das Turnier wurde nicht angelegt."));
+  }
+
+  // Karte sofort entfernen; scheitert das Löschen serverseitig, kommt sie
+  // zurück und der Grund erscheint als Hinweis.
   function confirmDelete() {
     const item = pendingDelete;
     if (!item) return;
     setPendingDelete(null);
-    setDeletingId(item.id);
-    startTransition(() => {
-      void deleteTournament(item.id)
-        .then(() => {
-          setItems((prev) => prev.filter((entry) => entry.id !== item.id));
-        })
-        .catch((error) => {
-          window.alert(
-            error instanceof Error ? error.message : "Turnier konnte nicht gelöscht werden.",
-          );
-        })
-        .finally(() => setDeletingId(null));
-    });
+    const index = items.findIndex((entry) => entry.id === item.id);
+    setItems((prev) => prev.filter((entry) => entry.id !== item.id));
+
+    const restore = (message: string) => {
+      setItems((prev) => {
+        if (prev.some((entry) => entry.id === item.id)) return prev;
+        const next = [...prev];
+        next.splice(Math.max(0, index), 0, item);
+        return next;
+      });
+      setError(message);
+    };
+
+    void deleteTournament(item.id)
+      .then((result) => {
+        if (!result.ok) restore(result.error);
+      })
+      .catch(() => restore("Keine Verbindung – das Turnier wurde nicht gelöscht."));
   }
 
   return (
@@ -229,30 +285,8 @@ export function TurnierList({ initialItems }: TurnierListProps) {
               <button
                 type="button"
                 className={cn(actionBtn, "gap-1.5")}
-                disabled={isPending || !name.trim()}
-                onClick={() =>
-                  startTransition(() => {
-                    if (!name.trim()) return;
-                    void createTournament(name, bestOf, effectiveFormat, mode).then((id) => {
-                      setItems((prev) => [
-                        {
-                          id,
-                          name,
-                          status: "setup",
-                          format: effectiveFormat,
-                          mode,
-                          bestOf,
-                          winnerName: null,
-                          createdAt: new Date().toISOString(),
-                          updatedAt: new Date().toISOString(),
-                          playerCount: 0,
-                        },
-                        ...prev,
-                      ]);
-                      setName("");
-                    });
-                  })
-                }
+                disabled={!name.trim()}
+                onClick={submitCreate}
               >
                 <Plus className="h-4 w-4" strokeWidth={2.6} />
                 Anlegen
@@ -288,10 +322,9 @@ export function TurnierList({ initialItems }: TurnierListProps) {
                 key={item.id}
                 className="group relative flex min-w-0 flex-col gap-2 overflow-hidden rounded-[var(--vibe-r-2xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] p-4 shadow-[var(--vibe-shadow-clay)] transition-transform duration-200 [transition-timing-function:var(--vibe-ease-spring)] [@media(hover:hover)]:hover:-translate-y-1"
               >
-                <Link
-                  href={`/${item.id}`}
-                  className="flex min-w-0 flex-col gap-2 pr-12 focus-visible:outline-none"
-                >
+                {/* Solange die echte ID fehlt, führt der Link ins Leere -> als
+                    Div rendern; das Anlegen dauert im Hintergrund nur Momente. */}
+                <CardBody pending={item.pending} href={`/${item.id}`}>
                   <span
                     className={cn(
                       "inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.12em]",
@@ -338,11 +371,10 @@ export function TurnierList({ initialItems }: TurnierListProps) {
                       🏆 {item.winnerName}
                     </p>
                   ) : null}
-                </Link>
+                </CardBody>
                 <button
                   type="button"
                   aria-label={`Turnier ${item.name} löschen`}
-                  disabled={deletingId === item.id}
                   onClick={() => setPendingDelete(item)}
                   className="absolute right-3 top-3 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--vibe-line)] bg-[var(--vibe-bg-base)] text-[var(--vibe-fg-faint)] shadow-[var(--vibe-shadow-soft)] transition-[transform,color,border-color] duration-200 [transition-timing-function:var(--vibe-ease-spring)] [@media(hover:hover)]:hover:border-[var(--danger)] [@media(hover:hover)]:hover:text-[var(--danger)] active:scale-[0.9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--danger)]/60 disabled:opacity-40 disabled:pointer-events-none"
                 >
@@ -366,6 +398,8 @@ export function TurnierList({ initialItems }: TurnierListProps) {
         </footer>
       </div>
 
+      <Toast message={error} onDismiss={() => setError(null)} />
+
       <ConfirmModal
         open={pendingDelete != null}
         title="Turnier löschen?"
@@ -381,5 +415,25 @@ export function TurnierList({ initialItems }: TurnierListProps) {
         onCancel={() => setPendingDelete(null)}
       />
     </ToolShell>
+  );
+}
+
+function CardBody({
+  pending,
+  href,
+  children,
+}: {
+  pending?: boolean;
+  href: string;
+  children: React.ReactNode;
+}) {
+  const className = "flex min-w-0 flex-col gap-2 pr-12 focus-visible:outline-none";
+  if (pending) {
+    return <div className={className}>{children}</div>;
+  }
+  return (
+    <Link href={href} className={className}>
+      {children}
+    </Link>
   );
 }

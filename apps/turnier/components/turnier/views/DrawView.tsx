@@ -9,7 +9,8 @@ type DrawViewProps = {
   round: RoundEntry | null;
   format: TournamentFormat;
   mode: TournamentMode;
-  isPending: boolean;
+  /** Auslosung läuft serverseitig – Platzhalter statt fingiertem Ergebnis. */
+  isDrawing: boolean;
   readOnly: boolean;
   isViewingLatestRound: boolean;
   hasRounds: boolean;
@@ -26,7 +27,7 @@ export function DrawView({
   round,
   format,
   mode,
-  isPending,
+  isDrawing,
   readOnly,
   isViewingLatestRound,
   hasRounds,
@@ -39,15 +40,25 @@ export function DrawView({
   onJumpToLatest,
 }: DrawViewProps) {
   const showHistoricalBanner = hasRounds && !isViewingLatestRound;
+  // isDrawing sperrt nur die Auslosung selbst (verhindert Doppel-Auslosung),
+  // nicht die übrige Bedienung.
   const drawDisabled =
-    isPending || readOnly || !isViewingLatestRound || coverageComplete;
+    isDrawing || readOnly || !isViewingLatestRound || coverageComplete;
 
   const isRoundRobin = mode === "round_robin";
   const isDoubles = format === "doubles";
   const headingBase = round
     ? round.stageLabel ?? `Runde ${round.roundNumber}`
     : "Auslosung";
-  const heading = round && !isRoundRobin ? headingBase : round ? `Auslosung – Runde ${round.roundNumber}` : "Auslosung";
+  // Während der Auslosung sofort auf die neue Rundennummer springen – der
+  // Nutzer soll direkt sehen, dass seine Aktion angekommen ist.
+  const heading = isDrawing
+    ? `Auslosung – Runde ${(round?.roundNumber ?? 0) + 1}`
+    : round && !isRoundRobin
+      ? headingBase
+      : round
+        ? `Auslosung – Runde ${round.roundNumber}`
+        : "Auslosung";
   const introNonRR: Record<Exclude<TournamentMode, "round_robin">, string> = {
     knockout: "K.-o.-Runde: Sieger steigt auf, Verlierer scheidet aus. Beim Auslosen springt die Ansicht zur neuen Runde.",
     swiss: "Schweizer Paarung nach aktuellem Punktstand. Beim Auslosen springt die Ansicht zur neuen Runde.",
@@ -142,7 +153,7 @@ export function DrawView({
         </div>
       ) : null}
 
-      {isPending && !round ? (
+      {isDrawing ? (
         <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           <p className="col-span-full text-sm font-semibold text-[var(--vibe-fg-muted)]">
             Lose werden gezogen…

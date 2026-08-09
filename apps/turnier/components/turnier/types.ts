@@ -115,3 +115,10 @@ export type ApiEnvelope<T> = {
   data: T;
   updatedAt: string;
 };
+
+/**
+ * Ergebnis einer Server-Action. Erwartete Fehler kommen als Wert zurück, nicht
+ * als Exception – geworfene Fehler verlieren im Production-Build ihre Meldung.
+ */
+export type ActionResult = { ok: true } | { ok: false; error: string };
+export type CreateResult = { ok: true; id: string } | { ok: false; error: string };

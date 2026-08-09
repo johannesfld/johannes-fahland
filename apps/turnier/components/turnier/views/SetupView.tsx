@@ -8,7 +8,6 @@ import type { BestOf, TournamentDetail } from "@/components/turnier/types";
 
 type SetupViewProps = {
   tournament: TournamentDetail;
-  isPending: boolean;
   isPaused: boolean;
   onAddPlayer: (name: string) => void;
   onRemovePlayer: (playerId: string) => void;
@@ -19,7 +18,6 @@ type SetupViewProps = {
 
 export function SetupView({
   tournament,
-  isPending,
   isPaused,
   onAddPlayer,
   onRemovePlayer,
@@ -116,11 +114,7 @@ export function SetupView({
             enterKeyHint="done"
             className="min-h-11 min-w-0 flex-1 rounded-xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] px-3 text-sm text-[var(--vibe-fg-base)] placeholder:text-[var(--vibe-fg-faint)] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60"
           />
-          <button
-            type="submit"
-            className={actionBtn}
-            disabled={isPending || !nameInput.trim()}
-          >
+          <button type="submit" className={actionBtn} disabled={!nameInput.trim()}>
             Hinzufügen
           </button>
         </div>
@@ -177,7 +171,7 @@ export function SetupView({
           )}
           <button
             type="button"
-            disabled={isPending || !minPlayersReached}
+            disabled={!minPlayersReached}
             onClick={onStartTournament}
             className={actionBtn}
           >

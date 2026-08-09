@@ -11,7 +11,6 @@ import { bestOfToWinsNeeded } from "@/lib/turnier/validation";
 type ScoreEntryViewProps = {
   round: RoundEntry | null;
   bestOf: BestOf;
-  isPending: boolean;
   readOnly: boolean;
   onSaveAndCompleteMatch: (
     matchId: string,
@@ -25,7 +24,6 @@ type DraftScores = Record<string, Record<number, { scoreTeam1?: number; scoreTea
 export function ScoreEntryView({
   round,
   bestOf,
-  isPending,
   readOnly,
   onSaveAndCompleteMatch,
   onCompleteRound,
@@ -65,7 +63,7 @@ export function ScoreEntryView({
         <button
           type="button"
           className={`${actionBtn} w-full shrink-0 sm:w-auto`}
-          disabled={isPending || !allMatchesDone || readOnly}
+          disabled={!allMatchesDone || readOnly}
           onClick={() => onCompleteRound(round.id)}
         >
           Runde abschließen
@@ -148,7 +146,7 @@ export function ScoreEntryView({
               <div className="mt-2 flex flex-wrap gap-2">
                 <button
                   type="button"
-                  disabled={!matchCanClose || readOnly || isPending}
+                  disabled={!matchCanClose || readOnly}
                   className={actionBtn}
                   onClick={() =>
                     onSaveAndCompleteMatch(

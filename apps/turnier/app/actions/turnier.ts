@@ -7,7 +7,9 @@ import { bestOfToWinsNeeded, validateSetScore } from "@/lib/turnier/validation";
 import { getEngine } from "@/lib/turnier/modes";
 import type { EngineRound } from "@/lib/turnier/modes";
 import type {
+  ActionResult,
   BestOf,
+  CreateResult,
   MatchEntry,
   MatchSet,
   RoundEntry,
@@ -17,6 +19,36 @@ import type {
   TournamentListItem,
   TournamentMode,
 } from "@/components/turnier/types";
+
+/** Fehler, dessen Text bewusst für den Nutzer bestimmt ist. */
+class UserError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "UserError";
+  }
+}
+
+/**
+ * Erwartete Fehler werden zurückgegeben statt geworfen: Next.js ersetzt die
+ * Meldung geworfener Server-Action-Fehler im Production-Build durch
+ * "The specific message is omitted in production builds…". Rückgabewerte
+ * überstehen die Grenze unverändert, sodass der Nutzer den echten Grund sieht.
+ * Unerwartete Fehler (DB o.ä.) werden serverseitig geloggt und nach außen
+ * bewusst generisch gehalten.
+ */
+async function guarded(run: () => Promise<void>): Promise<ActionResult> {
+  try {
+    await run();
+    return { ok: true };
+  } catch (error) {
+    if (error instanceof UserError) return { ok: false, error: error.message };
+    console.error("[turnier] Unerwarteter Fehler in Server-Action:", error);
+    return {
+      ok: false,
+      error: "Die Aktion konnte nicht ausgeführt werden. Bitte erneut versuchen.",
+    };
+  }
+}
 
 function toPrismaBestOf(bestOf: BestOf) {
   if (bestOf === 1) return "ONE";
@@ -93,12 +125,12 @@ async function assertTournamentWritable(tournamentId: string) {
     where: { id: tournamentId },
     select: { status: true },
   });
-  if (!tournament) throw new Error("Turnier nicht gefunden.");
+  if (!tournament) throw new UserError("Turnier nicht gefunden.");
   if (tournament.status === "paused") {
-    throw new Error("Während der Turnierpause sind keine Eintragungen erlaubt.");
+    throw new UserError("Während der Turnierpause sind keine Eintragungen erlaubt.");
   }
   if (tournament.status === "finished") {
-    throw new Error("Das Turnier ist bereits beendet.");
+    throw new UserError("Das Turnier ist bereits beendet.");
   }
 }
 
@@ -211,7 +243,7 @@ export async function getTournamentById(tournamentId: string): Promise<Tournamen
   return mapTournamentDetail(raw);
 }
 
-export async function createTournament(
+async function createTournamentImpl(
   name: string,
   bestOf: BestOf,
   format: TournamentFormat,
@@ -219,7 +251,7 @@ export async function createTournament(
   config: TournamentConfig | null = null,
 ) {
   const safeName = name.trim();
-  if (!safeName) throw new Error("Bitte Turniername eingeben.");
+  if (!safeName) throw new UserError("Bitte Turniername eingeben.");
 
   // Modi außer Round-Robin sind aktuell Einzel-basiert.
   const engine = getEngine(mode);
@@ -241,9 +273,9 @@ export async function createTournament(
   return created.id;
 }
 
-export async function addPlayer(tournamentId: string, name: string) {
+async function addPlayerImpl(tournamentId: string, name: string) {
   const safeName = name.trim();
-  if (!safeName) throw new Error("Bitte Spielernamen eingeben.");
+  if (!safeName) throw new UserError("Bitte Spielernamen eingeben.");
 
   const existing = await prisma.tournamentPlayer.findFirst({
     where: {
@@ -272,14 +304,14 @@ export async function addPlayer(tournamentId: string, name: string) {
   revalidatePath(`/${tournamentId}`);
 }
 
-export async function updateBestOf(tournamentId: string, bestOf: BestOf) {
+async function updateBestOfImpl(tournamentId: string, bestOf: BestOf) {
   const existing = await prisma.tournament.findUnique({
     where: { id: tournamentId },
     select: { status: true },
   });
-  if (!existing) throw new Error("Turnier nicht gefunden.");
+  if (!existing) throw new UserError("Turnier nicht gefunden.");
   if (existing.status !== "setup") {
-    throw new Error("Best-of kann nur vor dem Turnierstart geändert werden.");
+    throw new UserError("Best-of kann nur vor dem Turnierstart geändert werden.");
   }
 
   await prisma.tournament.update({
@@ -289,7 +321,7 @@ export async function updateBestOf(tournamentId: string, bestOf: BestOf) {
   revalidatePath(`/${tournamentId}`);
 }
 
-export async function removePlayer(tournamentId: string, playerId: string) {
+async function removePlayerImpl(tournamentId: string, playerId: string) {
   const tournament = await prisma.tournament.findUnique({
     where: { id: tournamentId },
     select: { rounds: { select: { roundNumber: true }, orderBy: { roundNumber: "desc" }, take: 1 } },
@@ -307,7 +339,7 @@ export async function removePlayer(tournamentId: string, playerId: string) {
   revalidatePath(`/${tournamentId}`);
 }
 
-export async function reactivatePlayer(tournamentId: string, playerId: string) {
+async function reactivatePlayerImpl(tournamentId: string, playerId: string) {
   await prisma.tournamentPlayer.update({
     where: { id: playerId },
     data: {
@@ -318,7 +350,7 @@ export async function reactivatePlayer(tournamentId: string, playerId: string) {
   revalidatePath(`/${tournamentId}`);
 }
 
-export async function startTournament(tournamentId: string) {
+async function startTournamentImpl(tournamentId: string) {
   await prisma.tournament.update({
     where: { id: tournamentId },
     data: { status: "active" },
@@ -326,7 +358,7 @@ export async function startTournament(tournamentId: string) {
   revalidatePath(`/${tournamentId}`);
 }
 
-export async function drawRound(tournamentId: string) {
+async function drawRoundImpl(tournamentId: string) {
   await assertTournamentWritable(tournamentId);
 
   const tournament = await prisma.tournament.findUnique({
@@ -346,7 +378,7 @@ export async function drawRound(tournamentId: string) {
       },
     },
   });
-  if (!tournament) throw new Error("Turnier nicht gefunden.");
+  if (!tournament) throw new UserError("Turnier nicht gefunden.");
 
   const format = fromPrismaFormat(tournament.format);
   const mode = fromPrismaMode(tournament.mode as PrismaMode);
@@ -365,7 +397,7 @@ export async function drawRound(tournamentId: string) {
     rounds: [],
   });
   if (activePlayers.length < minPlayersNeeded) {
-    throw new Error(
+    throw new UserError(
       `Mindestens ${minPlayersNeeded} aktive Spieler sind nötig, um eine Runde auszulosen.`,
     );
   }
@@ -387,17 +419,17 @@ export async function drawRound(tournamentId: string) {
   const ctx = { format, config, activePlayers, rounds: engineRounds };
 
   if (engine.isComplete(ctx)) {
-    throw new Error(
+    throw new UserError(
       "Das Turnier ist nach diesem Modus durchgespielt. Eine weitere Auslosung ist nicht vorgesehen. Du kannst das Turnier beenden.",
     );
   }
 
   const outcome = engine.drawNextRound(ctx);
-  if (!outcome.ok) throw new Error(outcome.error);
+  if (!outcome.ok) throw new UserError(outcome.error);
   const plan = outcome.plan;
 
   if (plan.matches.length === 0) {
-    throw new Error("Auslosung ergab keine Matches. Bitte Spielerzahl prüfen.");
+    throw new UserError("Auslosung ergab keine Matches. Bitte Spielerzahl prüfen.");
   }
 
   const nextRound = (tournament.rounds[0]?.roundNumber ?? 0) + 1;
@@ -454,7 +486,7 @@ export async function drawRound(tournamentId: string) {
   revalidatePath(`/${tournamentId}`);
 }
 
-export async function submitSetScore(
+async function submitSetScoreImpl(
   tournamentId: string,
   matchId: string,
   setNumber: number,
@@ -464,7 +496,7 @@ export async function submitSetScore(
   await assertTournamentWritable(tournamentId);
 
   const valid = validateSetScore(scoreTeam1, scoreTeam2);
-  if (!valid.ok) throw new Error(valid.error);
+  if (!valid.ok) throw new UserError(valid.error);
 
   await prisma.matchSet.upsert({
     where: {
@@ -493,14 +525,14 @@ export async function submitSetScore(
   revalidatePath(`/${tournamentId}`);
 }
 
-export async function completeMatch(tournamentId: string, matchId: string) {
+async function completeMatchImpl(tournamentId: string, matchId: string) {
   await assertTournamentWritable(tournamentId);
 
   const match = await prisma.match.findUnique({
     where: { id: matchId },
     include: { round: { include: { tournament: true } }, sets: { orderBy: { setNumber: "asc" } } },
   });
-  if (!match) throw new Error("Match nicht gefunden.");
+  if (!match) throw new UserError("Match nicht gefunden.");
 
   const winnerTeam = computeMatchWinner(
     match.sets.map((setEntry) => ({
@@ -511,7 +543,7 @@ export async function completeMatch(tournamentId: string, matchId: string) {
     fromPrismaBestOf(match.round.tournament.bestOf),
   );
 
-  if (!winnerTeam) throw new Error("Noch kein gültiger Match-Sieger vorhanden.");
+  if (!winnerTeam) throw new UserError("Noch kein gültiger Match-Sieger vorhanden.");
 
   await prisma.match.update({
     where: { id: matchId },
@@ -530,7 +562,7 @@ type MatchScoreDraft = {
   scoreTeam2: number;
 };
 
-export async function saveAndCompleteMatch(
+async function saveAndCompleteMatchImpl(
   tournamentId: string,
   matchId: string,
   draftSets: MatchScoreDraft[],
@@ -565,7 +597,7 @@ export async function saveAndCompleteMatch(
       where: { id: matchId },
       include: { round: { include: { tournament: true } }, sets: { orderBy: { setNumber: "asc" } } },
     });
-    if (!match) throw new Error("Match nicht gefunden.");
+    if (!match) throw new UserError("Match nicht gefunden.");
 
     const winnerTeam = computeMatchWinner(
       match.sets.map((setEntry) => ({
@@ -575,7 +607,7 @@ export async function saveAndCompleteMatch(
       })),
       fromPrismaBestOf(match.round.tournament.bestOf),
     );
-    if (!winnerTeam) throw new Error("Noch kein gültiger Match-Sieger vorhanden.");
+    if (!winnerTeam) throw new UserError("Noch kein gültiger Match-Sieger vorhanden.");
 
     await tx.match.update({
       where: { id: matchId },
@@ -589,7 +621,7 @@ export async function saveAndCompleteMatch(
   revalidatePath(`/${tournamentId}`);
 }
 
-export async function completeRound(tournamentId: string, roundId: string) {
+async function completeRoundImpl(tournamentId: string, roundId: string) {
   await assertTournamentWritable(tournamentId);
 
   await prisma.round.update({
@@ -638,7 +670,7 @@ function computeWinnerName(raw: TournamentRaw): string | null {
   return standings[0]?.name ?? null;
 }
 
-export async function pauseTournament(tournamentId: string) {
+async function pauseTournamentImpl(tournamentId: string) {
   await prisma.tournament.update({
     where: { id: tournamentId },
     data: { status: "paused" },
@@ -646,7 +678,7 @@ export async function pauseTournament(tournamentId: string) {
   revalidatePath(`/${tournamentId}`);
 }
 
-export async function resumeTournament(tournamentId: string) {
+async function resumeTournamentImpl(tournamentId: string) {
   await prisma.tournament.update({
     where: { id: tournamentId },
     data: { status: "active" },
@@ -654,9 +686,9 @@ export async function resumeTournament(tournamentId: string) {
   revalidatePath(`/${tournamentId}`);
 }
 
-export async function finishTournament(tournamentId: string) {
+async function finishTournamentImpl(tournamentId: string) {
   const raw = await getTournamentRaw(tournamentId);
-  if (!raw) throw new Error("Turnier nicht gefunden.");
+  if (!raw) throw new UserError("Turnier nicht gefunden.");
   await prisma.tournament.update({
     where: { id: tournamentId },
     data: {
@@ -667,13 +699,112 @@ export async function finishTournament(tournamentId: string) {
   revalidatePath(`/${tournamentId}`);
 }
 
-export async function deleteTournament(tournamentId: string) {
+async function deleteTournamentImpl(tournamentId: string) {
   const tournament = await prisma.tournament.findUnique({
     where: { id: tournamentId },
     select: { id: true },
   });
-  if (!tournament) throw new Error("Turnier nicht gefunden.");
+  if (!tournament) throw new UserError("Turnier nicht gefunden.");
 
   await prisma.tournament.delete({ where: { id: tournamentId } });
   revalidatePath("/");
+}
+
+/* ------------------------------------------------------------------------- *
+ * Öffentliche Server-Actions.
+ * Alle liefern ein ActionResult, statt Fehler zu werfen – siehe guarded().
+ * ------------------------------------------------------------------------- */
+
+export async function createTournament(
+  name: string,
+  bestOf: BestOf,
+  format: TournamentFormat,
+  mode: TournamentMode = "round_robin",
+  config: TournamentConfig | null = null,
+): Promise<CreateResult> {
+  try {
+    const id = await createTournamentImpl(name, bestOf, format, mode, config);
+    return { ok: true, id };
+  } catch (error) {
+    if (error instanceof UserError) return { ok: false, error: error.message };
+    console.error("[turnier] Unerwarteter Fehler in createTournament:", error);
+    return { ok: false, error: "Turnier konnte nicht angelegt werden. Bitte erneut versuchen." };
+  }
+}
+
+export async function addPlayer(tournamentId: string, name: string): Promise<ActionResult> {
+  return guarded(() => addPlayerImpl(tournamentId, name));
+}
+
+export async function updateBestOf(tournamentId: string, bestOf: BestOf): Promise<ActionResult> {
+  return guarded(() => updateBestOfImpl(tournamentId, bestOf));
+}
+
+export async function removePlayer(tournamentId: string, playerId: string): Promise<ActionResult> {
+  return guarded(() => removePlayerImpl(tournamentId, playerId));
+}
+
+export async function reactivatePlayer(
+  tournamentId: string,
+  playerId: string,
+): Promise<ActionResult> {
+  return guarded(() => reactivatePlayerImpl(tournamentId, playerId));
+}
+
+export async function startTournament(tournamentId: string): Promise<ActionResult> {
+  return guarded(() => startTournamentImpl(tournamentId));
+}
+
+export async function drawRound(tournamentId: string): Promise<ActionResult> {
+  return guarded(() => drawRoundImpl(tournamentId));
+}
+
+export async function submitSetScore(
+  tournamentId: string,
+  matchId: string,
+  setNumber: number,
+  scoreTeam1: unknown,
+  scoreTeam2: unknown,
+): Promise<ActionResult> {
+  return guarded(() =>
+    submitSetScoreImpl(tournamentId, matchId, setNumber, scoreTeam1, scoreTeam2),
+  );
+}
+
+export async function completeMatch(
+  tournamentId: string,
+  matchId: string,
+): Promise<ActionResult> {
+  return guarded(() => completeMatchImpl(tournamentId, matchId));
+}
+
+export async function saveAndCompleteMatch(
+  tournamentId: string,
+  matchId: string,
+  draftSets: MatchScoreDraft[],
+): Promise<ActionResult> {
+  return guarded(() => saveAndCompleteMatchImpl(tournamentId, matchId, draftSets));
+}
+
+export async function completeRound(
+  tournamentId: string,
+  roundId: string,
+): Promise<ActionResult> {
+  return guarded(() => completeRoundImpl(tournamentId, roundId));
+}
+
+export async function pauseTournament(tournamentId: string): Promise<ActionResult> {
+  return guarded(() => pauseTournamentImpl(tournamentId));
+}
+
+export async function resumeTournament(tournamentId: string): Promise<ActionResult> {
+  return guarded(() => resumeTournamentImpl(tournamentId));
+}
+
+export async function finishTournament(tournamentId: string): Promise<ActionResult> {
+  return guarded(() => finishTournamentImpl(tournamentId));
+}
+
+export async function deleteTournament(tournamentId: string): Promise<ActionResult> {
+  return guarded(() => deleteTournamentImpl(tournamentId));
 }

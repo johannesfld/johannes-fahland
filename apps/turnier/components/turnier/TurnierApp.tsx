@@ -20,10 +20,11 @@ import {
 } from "lucide-react";
 import { Brandmark } from "@/components/ui/Brandmark";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { Toast } from "@/components/ui/Toast";
 import { OPEN_INSTALL_GUIDE_EVENT } from "@/components/ui/Onboarding";
 import { PausedScreenBanner } from "@/components/turnier/components/PausedScreenBanner";
 import { RoundNavigator } from "@/components/turnier/components/RoundNavigator";
-import { useTournamentActions, useTournamentSync } from "@/components/turnier/hooks";
+import { useTournament } from "@/components/turnier/hooks";
 import { standingsForTournament } from "@/components/turnier/logic";
 import { turnierShell } from "@/components/turnier/styles";
 import { cn } from "@/components/ui/styles";
@@ -92,8 +93,10 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
   const [confirmFinish, setConfirmFinish] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const { tournament, refresh } = useTournamentSync(initialTournament.id, initialTournament);
-  const actions = useTournamentActions(tournament.id, refresh);
+  const { tournament, actions, error, dismissError, isDrawing } = useTournament(
+    initialTournament.id,
+    initialTournament,
+  );
   const standings = useMemo(() => standingsForTournament(tournament), [tournament]);
   const canEditTournament = tournament.status === "active";
 
@@ -359,7 +362,6 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
         {step === "setup" ? (
           <SetupView
             tournament={tournament}
-            isPending={actions.isPending}
             isPaused={tournament.status === "paused"}
             onAddPlayer={actions.addPlayer}
             onRemovePlayer={actions.removePlayer}
@@ -376,7 +378,7 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
               round={selectedRound}
               format={tournament.format}
               mode={tournament.mode}
-              isPending={actions.isPending}
+              isDrawing={isDrawing}
               readOnly={!canEditTournament}
               isViewingLatestRound={isViewingLatestRound}
               hasRounds={roundNumbers.length > 0}
@@ -441,7 +443,6 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
             <ScoreEntryView
               round={selectedRound}
               bestOf={tournament.bestOf}
-              isPending={actions.isPending}
               readOnly={!canEditTournament || selectedRound?.status === "completed"}
               onSaveAndCompleteMatch={actions.saveAndCompleteMatch}
               onCompleteRound={actions.completeRound}
@@ -548,6 +549,10 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
         {tableStep.label}
       </button>
 
+      {/* Aktionen laufen optimistisch; schlägt eine serverseitig fehl, wird der
+          Zustand zurückgerollt und der Grund hier gemeldet. */}
+      <Toast message={error} onDismiss={dismissError} />
+
       <ConfirmModal
         open={confirmFinish}
         title="Turnier beenden?"
@@ -558,6 +563,9 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
         onConfirm={() => {
           actions.finishTournament();
           setConfirmFinish(false);
+          // Direkt zur Siegerehrung springen – Ergebnis der Aktion sofort sichtbar,
+          // statt auf der vorherigen Ansicht stehen zu bleiben.
+          setStep("podium");
         }}
         onCancel={() => setConfirmFinish(false)}
       />
