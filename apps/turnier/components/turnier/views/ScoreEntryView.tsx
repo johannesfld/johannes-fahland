@@ -86,13 +86,23 @@ export function ScoreEntryView({
 
       <div className="grid min-w-0 grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {round.matches.map((match) => {
+          // Ein Entwurf enthält nur das geänderte Team. Ohne Rückfall auf den
+          // gespeicherten Wert des anderen Teams fiele der ganze Satz aus der
+          // Auswertung – ein bereits eingetragenes Ergebnis ging beim Korrigieren
+          // eines einzelnen Werts verloren.
+          const savedBySetNumber = new Map(match.sets.map((s) => [s.setNumber, s]));
+          const draftSets = Object.entries(draft[match.id] ?? {}).map(([setNumber, values]) => {
+            const number = Number(setNumber);
+            const saved = savedBySetNumber.get(number);
+            return {
+              setNumber: number,
+              scoreTeam1: values.scoreTeam1 ?? saved?.scoreTeam1 ?? -1,
+              scoreTeam2: values.scoreTeam2 ?? saved?.scoreTeam2 ?? -1,
+            };
+          });
           const mergedSets = Array.from(
             new Map(
-              [...match.sets, ...Object.entries(draft[match.id] ?? {}).map(([setNumber, values]) => ({
-                setNumber: Number(setNumber),
-                scoreTeam1: values.scoreTeam1 ?? -1,
-                scoreTeam2: values.scoreTeam2 ?? -1,
-              }))].map((setEntry) => [setEntry.setNumber, setEntry]),
+              [...match.sets, ...draftSets].map((setEntry) => [setEntry.setNumber, setEntry]),
             ).values(),
           )
             .filter((setEntry) => setEntry.scoreTeam1 >= 0 && setEntry.scoreTeam2 >= 0)
@@ -102,6 +112,21 @@ export function ScoreEntryView({
           const winsNeeded = bestOfToWinsNeeded(bestOf);
           const wins = getWinsPerTeam(mergedSets);
           const matchCanClose = wins.team1 >= winsNeeded || wins.team2 >= winsNeeded;
+          // Bei einem fertigen Match nur dann einen Button zeigen, wenn sich
+          // gegenüber dem gespeicherten Stand wirklich etwas geändert hat.
+          const isDirty =
+            mergedSets.length !== match.sets.length ||
+            mergedSets.some((entry, i) => {
+              const saved = match.sets[i];
+              return (
+                !saved ||
+                saved.setNumber !== entry.setNumber ||
+                saved.scoreTeam1 !== entry.scoreTeam1 ||
+                saved.scoreTeam2 !== entry.scoreTeam2
+              );
+            });
+          const showSaveButton =
+            !readOnly && matchCanClose && (match.status !== "completed" || isDirty);
           const teamName = (team: 1 | 2) =>
             match.players
               .filter((player) => player.team === team)
@@ -143,25 +168,26 @@ export function ScoreEntryView({
                   );
                 })}
               </div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  disabled={!matchCanClose || readOnly}
-                  className={actionBtn}
-                  onClick={() =>
-                    onSaveAndCompleteMatch(
-                      match.id,
-                      mergedSets.map((setEntry) => ({
-                        setNumber: setEntry.setNumber,
-                        scoreTeam1: setEntry.scoreTeam1,
-                        scoreTeam2: setEntry.scoreTeam2,
-                      })),
-                    )
-                  }
-                >
-                  {match.status === "completed" ? "Match aktualisieren" : "Match abschließen"}
-                </button>
-              </div>
+              {showSaveButton ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className={actionBtn}
+                    onClick={() =>
+                      onSaveAndCompleteMatch(
+                        match.id,
+                        mergedSets.map((setEntry) => ({
+                          setNumber: setEntry.setNumber,
+                          scoreTeam1: setEntry.scoreTeam1,
+                          scoreTeam2: setEntry.scoreTeam2,
+                        })),
+                      )
+                    }
+                  >
+                    {match.status === "completed" ? "Match aktualisieren" : "Match abschließen"}
+                  </button>
+                </div>
+              ) : null}
             </MatchCard>
           );
         })}

@@ -27,10 +27,11 @@ type PlayerMatchEntry = {
   result: "won" | "lost" | "open";
 };
 
-// Spalten-Layout: kompakt auf Mobile (Rang/Name/S/N/Quote),
-// volle Statspalten ab md. Gemeinsames Grid-Template für Header + Zeilen.
+// Spalten-Layout: kompakt auf Mobile (Rang/Name/S/N/Quote), volle Statspalten
+// ab 640px. Bewusst sm statt md, damit ein quer gedrehtes Handy die zusätzlichen
+// Spalten tatsächlich erreicht – darauf weist die Tabellenansicht hin.
 const GRID_COLS =
-  "grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(3,minmax(2.5rem,1fr))_1.75rem] md:grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(6,minmax(2.5rem,1fr))_1.75rem]";
+  "grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(3,minmax(2.5rem,1fr))_1.75rem] sm:grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(6,minmax(2.5rem,1fr))_1.75rem]";
 
 // Medaillen-Tönung für Rang 1–3 (Gold/Silber/Bronze als Clay-Chip).
 const MEDAL_TONE: Record<number, string> = {
@@ -103,9 +104,9 @@ export function StandingsTable({
           <span>S</span>
           <span>N</span>
           <span>Quote</span>
-          <span className="hidden md:block">Sp</span>
-          <span className="hidden md:block">Sätze</span>
-          <span className="hidden md:block">Punkte</span>
+          <span className="hidden sm:block">Sp</span>
+          <span className="hidden sm:block">Sätze</span>
+          <span className="hidden sm:block">Punkte</span>
           <span aria-hidden />
         </div>
         <div className="min-w-0">

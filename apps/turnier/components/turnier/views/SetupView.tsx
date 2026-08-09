@@ -47,22 +47,11 @@ export function SetupView({
 
   return (
     <section className={`${turnierCard} flex min-w-0 flex-col gap-6`}>
-      <div className="flex min-w-0 flex-col gap-1">
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
         <h2 className="font-display text-2xl font-extrabold tracking-tight">Setup</h2>
-        <p className="text-sm text-[var(--vibe-fg-muted)]">
-          {isPaused
-            ? "Während der Pause kannst du Spieler ergänzen, entfernen oder reaktivieren."
-            : showBestOfEditor
-              ? "Spieler verwalten und Best-of festlegen, dann das Turnier starten."
-              : "Spieler verwalten. Best-of und Format sind nach dem Start fest."}
-        </p>
-      </div>
-
-      <div className="flex min-w-0 flex-col gap-2">
-        <p className={sectionLabel}>Turnierformat</p>
-        <p className="inline-flex min-h-11 w-fit items-center rounded-xl border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] px-4 text-sm font-semibold text-[var(--vibe-fg-base)]">
+        <span className="inline-flex items-center rounded-full border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] px-3 py-1 text-xs font-semibold text-[var(--vibe-fg-muted)]">
           {formatLabel}
-        </p>
+        </span>
       </div>
 
       {showBestOfEditor ? (
@@ -180,11 +169,6 @@ export function SetupView({
         </div>
       ) : null}
 
-      {isPaused ? (
-        <p className="rounded-2xl border border-[var(--accent-line)] bg-[var(--accent-soft)] p-3 text-sm text-[var(--vibe-fg-base)]">
-          Nach dem Fortsetzen wird die nächste Auslosung mit den aktuellen aktiven Spielern berechnet.
-        </p>
-      ) : null}
     </section>
   );
 }

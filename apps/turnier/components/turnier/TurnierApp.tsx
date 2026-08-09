@@ -60,7 +60,9 @@ type StepSpec = {
  * Enabled-Logik bleibt statusabhängig (identisch zur bisherigen buildTabs-Regel).
  */
 function buildSteps(status: TournamentStatus): StepSpec[] {
-  const setupEnabled = status === "setup" || status === "paused";
+  // Setup ist auch im laufenden Turnier erreichbar – der Wechsel fragt dann,
+  // ob pausiert werden soll (siehe goToStep).
+  const setupEnabled = status !== "finished";
   const playEnabled = status === "active" || status === "paused" || status === "finished";
   return [
     { id: "setup", marker: "1", label: "Setup", icon: Users, enabled: setupEnabled, inFlow: true },
@@ -91,6 +93,7 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
         : "draw",
   );
   const [confirmFinish, setConfirmFinish] = useState(false);
+  const [confirmPauseForSetup, setConfirmPauseForSetup] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const { tournament, actions, error, dismissError, isDrawing } = useTournament(
@@ -198,6 +201,19 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
 
   const partnerLabel = tournament.format === "doubles" ? "Partnerpaare" : "Gegnerpaare";
   const tableStep = steps.find((s) => s.id === "table")!;
+  const canTogglePause = tournament.status === "active" || tournament.status === "paused";
+
+  /**
+   * Setup während eines laufenden Turniers erfordert eine Pause – sonst würde
+   * eine Auslosung auf einem sich ändernden Teilnehmerfeld stattfinden.
+   */
+  const goToStep = (id: TurnierStep) => {
+    if (id === "setup" && tournament.status === "active") {
+      setConfirmPauseForSetup(true);
+      return;
+    }
+    setStep(id);
+  };
 
   return (
     <ToolShell className={turnierShell}>
@@ -218,15 +234,42 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
             <h1 className="mr-auto min-w-0 truncate font-display text-xl font-extrabold tracking-tight sm:text-2xl">
               {tournament.name}
             </h1>
+            {/* Badge weicht auf schmalen Geräten dem Pause-Button – dessen Icon
+                zeigt den Zustand ohnehin an. */}
             <span
               className={cn(
-                "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.1em]",
+                "shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.1em]",
+                canTogglePause ? "hidden sm:inline-flex" : "inline-flex",
                 statusToneClass,
               )}
             >
               <span className={cn("h-1.5 w-1.5 rounded-full", statusDotClass)} />
               {statusLabel}
             </span>
+
+            {canTogglePause ? (
+              <button
+                type="button"
+                onClick={() =>
+                  tournament.status === "paused"
+                    ? actions.resumeTournament()
+                    : actions.pauseTournament()
+                }
+                aria-label={tournament.status === "paused" ? "Turnier fortsetzen" : "Turnier pausieren"}
+                className={cn(
+                  "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border shadow-[var(--vibe-shadow-soft)] transition-transform duration-200 [transition-timing-function:var(--vibe-ease-spring)] active:scale-[0.92] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60",
+                  tournament.status === "paused"
+                    ? "border-transparent bg-[var(--accent)] text-[var(--accent-ink)]"
+                    : "border-[var(--warn)]/40 bg-[var(--warn-soft)] text-[var(--warn-ink)]",
+                )}
+              >
+                {tournament.status === "paused" ? (
+                  <Play className="h-5 w-5" strokeWidth={2.4} />
+                ) : (
+                  <Pause className="h-5 w-5" strokeWidth={2.4} />
+                )}
+              </button>
+            ) : null}
 
             {/* Overflow-Menü */}
             <div className="relative shrink-0">
@@ -256,28 +299,7 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
                       transition={{ duration: 0.18, ease: [0.34, 1.56, 0.64, 1] }}
                       className="absolute right-0 top-[calc(100%+0.5rem)] z-50 flex w-56 flex-col gap-1 rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-overlay)] p-2 shadow-[var(--vibe-shadow-lifted)]"
                     >
-                      {tournament.status !== "finished" ? (
-                        tournament.status !== "paused" ? (
-                          <MenuItem
-                            icon={Pause}
-                            label="Pausieren"
-                            onClick={() => {
-                              actions.pauseTournament();
-                              setMenuOpen(false);
-                            }}
-                          />
-                        ) : (
-                          <MenuItem
-                            icon={Play}
-                            label="Fortsetzen"
-                            accent
-                            onClick={() => {
-                              actions.resumeTournament();
-                              setMenuOpen(false);
-                            }}
-                          />
-                        )
-                      ) : null}
+                      {/* Pausieren/Fortsetzen liegt jetzt direkt im Header. */}
                       {tournament.status !== "finished" ? (
                         <MenuItem
                           icon={Flag}
@@ -307,8 +329,9 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
           </div>
         </header>
 
-        {/* --- Fortschritts-Stepper (EINE Nav-Quelle, Flow + Sprung-Nav) --- */}
-        <nav aria-label="Turnier-Fortschritt" className="min-w-0">
+        {/* --- Fortschritts-Stepper: nur auf Desktop, wo es keine Bottom-Nav gibt.
+               Auf Mobile wäre er eine zweite, redundante Navigationsleiste. --- */}
+        <nav aria-label="Turnier-Fortschritt" className="hidden min-w-0 desk:block">
           <ol className="flex min-w-0 items-stretch gap-1.5 sm:gap-2">
             {flowSteps.map((entry, index) => {
               const isActive = step === entry.id;
@@ -318,7 +341,7 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
                 <li key={entry.id} className="flex min-w-0 flex-1 items-center">
                   <button
                     type="button"
-                    onClick={() => entry.enabled && setStep(entry.id)}
+                    onClick={() => entry.enabled && goToStep(entry.id)}
                     disabled={!entry.enabled}
                     aria-current={isActive ? "step" : undefined}
                     className={cn(
@@ -386,7 +409,6 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
               pairCovered={partnerStats.covered}
               pairNeeded={partnerStats.needed}
               estimatedRoundsTotal={partnerStats.estimatedRoundsTotal}
-              currentRoundNumber={latestRoundNumber}
               onDrawRound={actions.drawRound}
               onJumpToLatest={() =>
                 latestRoundNumber != null ? setViewedRoundNumber(latestRoundNumber) : null
@@ -481,7 +503,6 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
               rows={tableStandings}
               tournament={tournament}
               viewedRoundNumber={viewedRoundNumber}
-              latestRoundNumber={latestRoundNumber}
               isViewingLatestRound={isViewingLatestRound}
               hasRounds={roundNumbers.length > 0}
               onJumpToLatest={() =>
@@ -509,7 +530,7 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
               <button
                 key={entry.id}
                 type="button"
-                onClick={() => entry.enabled && setStep(entry.id)}
+                onClick={() => entry.enabled && goToStep(entry.id)}
                 disabled={!entry.enabled}
                 aria-current={isActive ? "step" : undefined}
                 aria-label={entry.label}
@@ -552,6 +573,20 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
       {/* Aktionen laufen optimistisch; schlägt eine serverseitig fehl, wird der
           Zustand zurückgerollt und der Grund hier gemeldet. */}
       <Toast message={error} onDismiss={dismissError} />
+
+      <ConfirmModal
+        open={confirmPauseForSetup}
+        title="Turnier pausieren?"
+        body="Zum Bearbeiten der Spieler wird das Turnier pausiert. Du kannst es danach oben im Header fortsetzen."
+        confirmLabel="Pausieren & bearbeiten"
+        cancelLabel="Abbrechen"
+        onConfirm={() => {
+          actions.pauseTournament();
+          setConfirmPauseForSetup(false);
+          setStep("setup");
+        }}
+        onCancel={() => setConfirmPauseForSetup(false)}
+      />
 
       <ConfirmModal
         open={confirmFinish}
