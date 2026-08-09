@@ -41,7 +41,9 @@ export function TVView({ tournament }: TVViewProps) {
           {standings.slice(0, 12).map((row) => (
             <div
               key={row.playerId}
-              className="grid grid-cols-[3rem_1fr_5rem_5rem_5rem] items-center gap-2 rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] p-3 shadow-[var(--vibe-shadow-soft)] md:grid-cols-[5rem_1fr_8rem_8rem_8rem] md:gap-3 md:p-4"
+              /* Statspalten auf schmalen Geräten inhaltsbreit (auto) statt fix –
+                 sonst bleibt für die Namensspalte 0px übrig. */
+              className="grid grid-cols-[2.5rem_minmax(0,1fr)_auto_auto_auto] items-center gap-2 rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] p-3 shadow-[var(--vibe-shadow-soft)] md:grid-cols-[5rem_minmax(0,1fr)_8rem_8rem_8rem] md:gap-3 md:p-4"
             >
               <span className="font-mono text-2xl font-bold text-[var(--accent)] md:text-4xl">{row.rank}</span>
               <span className="truncate text-lg font-semibold md:text-3xl">{row.name}</span>

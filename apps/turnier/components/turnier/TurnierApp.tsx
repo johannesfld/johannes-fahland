@@ -200,12 +200,15 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
     <ToolShell className={turnierShell}>
       <div className="mx-auto flex w-full max-w-5xl min-w-0 flex-col gap-4 px-4 pt-4 pb-[calc(env(safe-area-inset-bottom)+6rem)] sm:px-6 sm:pt-5 lg:gap-5 lg:px-8 lg:pt-6 desk:pb-10">
         {/* --- Sticky-Header (saubere Full-Width-Bar, kein -mx-Bleed) --- */}
-        <header className="sticky top-0 z-30 min-w-0 border-b border-[var(--vibe-line)] bg-[var(--vibe-bg-base)]/90 pb-3 pt-[calc(env(safe-area-inset-top)+0.5rem)] backdrop-blur-md">
+        {/* z-40 > Bottom-Nav (z-30): sticky+z-index erzeugt einen Stacking-Context,
+            in dem das Aktionsmenü gefangen ist. Mit z-30 lag die später im DOM
+            stehende Bottom-Nav darüber und verdeckte die unteren Menüpunkte. */}
+        <header className="sticky top-0 z-40 min-w-0 border-b border-[var(--vibe-line)] bg-[var(--vibe-bg-base)]/90 pb-3 pt-[calc(env(safe-area-inset-top)+0.5rem)] backdrop-blur-md">
           <div className="flex min-w-0 items-center gap-2.5">
             <Link
               href="/"
               aria-label="Zur Turnierübersicht"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[var(--vibe-r-md)] bg-[var(--accent-soft)] text-[var(--accent)] shadow-[var(--vibe-shadow-soft)] transition-transform duration-200 [transition-timing-function:var(--vibe-ease-spring)] active:scale-[0.92]"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--vibe-r-md)] bg-[var(--accent-soft)] text-[var(--accent)] shadow-[var(--vibe-shadow-soft)] transition-transform duration-200 [transition-timing-function:var(--vibe-ease-spring)] active:scale-[0.92] desk:h-9 desk:w-9"
             >
               <Brandmark size={20} />
             </Link>

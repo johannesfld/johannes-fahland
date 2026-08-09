@@ -104,6 +104,11 @@ export function ScoreEntryView({
           const winsNeeded = bestOfToWinsNeeded(bestOf);
           const wins = getWinsPerTeam(mergedSets);
           const matchCanClose = wins.team1 >= winsNeeded || wins.team2 >= winsNeeded;
+          const teamName = (team: 1 | 2) =>
+            match.players
+              .filter((player) => player.team === team)
+              .map((player) => player.name)
+              .join(" / ") || `Team ${team}`;
 
           return (
             <MatchCard key={match.id} match={match}>
@@ -120,6 +125,8 @@ export function ScoreEntryView({
                       setNumber={setNumber}
                       scoreTeam1={scoreTeam1}
                       scoreTeam2={scoreTeam2}
+                      team1Label={teamName(1)}
+                      team2Label={teamName(2)}
                       disabled={readOnly}
                       onChange={(team, value) =>
                         setDraft((prev) => ({

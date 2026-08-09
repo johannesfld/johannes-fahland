@@ -171,7 +171,9 @@ export function Onboarding() {
     <AnimatePresence>
       {open ? (
         <motion.div
-          className="fixed inset-0 z-[70] flex flex-col bg-[var(--vibe-bg-base)]"
+          /* overflow-y-auto: im Querformat ist der Inhalt höher als der Viewport –
+             ohne Scrollen waren „Weiter"/„Los geht's" nicht erreichbar. */
+          className="fixed inset-0 z-[70] flex flex-col overflow-y-auto bg-[var(--vibe-bg-base)]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -190,7 +192,7 @@ export function Onboarding() {
             aria-hidden
           />
           {/* Überspringen */}
-          <div className="relative flex justify-end p-4">
+          <div className="relative flex shrink-0 justify-end p-4">
             <button
               type="button"
               onClick={finish}
@@ -203,7 +205,7 @@ export function Onboarding() {
           </div>
 
           {/* Slide */}
-          <div className="relative flex flex-1 items-center justify-center px-6">
+          <div className="relative flex flex-1 shrink-0 items-center justify-center px-6 py-2">
             <AnimatePresence mode="wait">
               <motion.div
                 key={slides[slide].key}
@@ -221,7 +223,7 @@ export function Onboarding() {
           </div>
 
           {/* Dots + Navigation */}
-          <div className="relative flex flex-col items-center gap-4 p-6">
+          <div className="relative flex shrink-0 flex-col items-center gap-4 p-4 sm:p-6">
             <div className="flex items-center gap-2">
               {slides.map((s, i) => (
                 <button

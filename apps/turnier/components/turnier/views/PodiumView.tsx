@@ -48,19 +48,21 @@ export function PodiumView({ standings, onShowTable }: PodiumViewProps) {
       {/* Konfetti (reines CSS) — nur wenn fertig & Motion erlaubt */}
       {finished && !reduce ? <Confetti /> : null}
 
-      {/* Skip / „Tabelle" — SOFORT sichtbar, kein Zwang abzuwarten */}
-      <button
-        type="button"
-        onClick={onShowTable}
-        className={cn(subtleBtn, "absolute right-4 top-4 z-20 !min-h-10 !px-3 !py-1.5 text-xs")}
-        aria-label="Siegerehrung überspringen, Tabelle anzeigen"
-      >
-        Überspringen
-      </button>
-
-      <h2 className="absolute left-4 top-4 z-10 font-display text-2xl font-extrabold tracking-tight text-[var(--vibe-fg-base)] sm:left-6 sm:top-6 sm:text-3xl">
-        Siegerehrung
-      </h2>
+      {/* Titel + Skip im normalen Fluss: absolut positioniert überlappten sie auf
+          kurzen/Querformat-Viewports die Podestkarten und einander. */}
+      <div className="relative z-20 flex w-full shrink-0 items-start justify-between gap-3">
+        <h2 className="min-w-0 font-display text-2xl font-extrabold tracking-tight text-[var(--vibe-fg-base)] sm:text-3xl">
+          Siegerehrung
+        </h2>
+        <button
+          type="button"
+          onClick={onShowTable}
+          className={cn(subtleBtn, "shrink-0 !min-h-10 !px-3 !py-1.5 text-xs")}
+          aria-label="Siegerehrung überspringen, Tabelle anzeigen"
+        >
+          Überspringen
+        </button>
+      </div>
 
       <div className="relative z-10 mt-auto grid w-full max-w-3xl grid-cols-3 items-end gap-2 sm:gap-4">
         <PodiumCard

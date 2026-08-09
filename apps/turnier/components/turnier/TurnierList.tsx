@@ -271,7 +271,9 @@ export function TurnierList({ initialItems }: TurnierListProps) {
           </span>
         </div>
 
-        <section className="grid min-h-0 min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {/* shrink-0: sonst staucht der Flex-Container die Karten bei knapper
+            Viewport-Höhe auf wenige Pixel zusammen statt zu scrollen. */}
+        <section className="grid min-w-0 shrink-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {items.length === 0 ? (
             <div className="col-span-full rounded-[var(--vibe-r-2xl)] border border-dashed border-[var(--vibe-line-strong)] bg-[var(--vibe-bg-sunken)]/40 p-8 text-center">
               <p className="text-sm font-medium text-[var(--vibe-fg-muted)]">
@@ -352,10 +354,10 @@ export function TurnierList({ initialItems }: TurnierListProps) {
         </section>
 
         {/* --- Footer --- */}
-        <footer className="mt-auto flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pt-4 text-xs text-[var(--vibe-fg-faint)]">
+        <footer className="mt-auto flex shrink-0 flex-wrap items-center justify-center gap-x-4 gap-y-1 pt-4 text-xs text-[var(--vibe-fg-faint)]">
           <Link
             href="/impressum"
-            className="font-semibold transition-colors [@media(hover:hover)]:hover:text-[var(--accent)]"
+            className="inline-flex min-h-11 items-center px-2 font-semibold transition-colors [@media(hover:hover)]:hover:text-[var(--accent)]"
           >
             Impressum
           </Link>
