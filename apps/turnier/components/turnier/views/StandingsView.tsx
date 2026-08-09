@@ -1,7 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { Maximize2, RotateCcw, X } from "lucide-react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { Maximize2, RotateCcw, Smartphone, X } from "lucide-react";
 import { StandingsTable } from "@/components/turnier/components/StandingsTable";
 import { subtleBtn, turnierCard } from "@/components/turnier/styles";
 import { cn } from "@/components/ui/styles";
@@ -16,15 +18,38 @@ type StandingsViewProps = {
   onJumpToLatest: () => void;
 };
 
+/** Viewport-Orientierung als externer Store – kein setState im Effect nötig. */
+const orientationStore = {
+  subscribe(onChange: () => void) {
+    window.addEventListener("resize", onChange);
+    window.addEventListener("orientationchange", onChange);
+    return () => {
+      window.removeEventListener("resize", onChange);
+      window.removeEventListener("orientationchange", onChange);
+    };
+  },
+  getSnapshot: () => window.innerHeight > window.innerWidth,
+  getServerSnapshot: () => false,
+};
+
 /**
- * Vollbild für die Tabelle. Nutzt die Fullscreen-API, wo verfügbar (blendet die
- * Browser-Leisten aus) und versucht zusätzlich, ins Querformat zu drehen – das
- * bringt die zusätzlichen Statspalten ins Bild. iOS-Safari auf dem iPhone kennt
- * beides für normale Elemente nicht, deshalb liegt darunter immer noch ein
- * fixiertes Overlay, das dort denselben Effekt erzielt.
+ * Vollbild-Tabelle im erzwungenen Querformat.
+ *
+ * screen.orientation.lock() allein genügt nicht: Genau dann, wenn der Nutzer die
+ * System-Rotationssperre aktiviert hat – und auf iOS generell – schlägt es fehl.
+ * Deshalb wird der Inhalt bei hochkantem Viewport per CSS um 90 Grad gedreht und
+ * auf getauschte Kantenlängen gelegt. Dreht das Gerät anschließend (oder der
+ * Lock greift doch), wird der Viewport quer, `portrait` kippt auf false und die
+ * CSS-Drehung entfällt – beide Wege enden im selben Bild.
  */
 function useTableFullscreen() {
   const [active, setActive] = useState(false);
+  const [hintArmed, setHintArmed] = useState(false);
+  const portrait = useSyncExternalStore(
+    orientationStore.subscribe,
+    orientationStore.getSnapshot,
+    orientationStore.getServerSnapshot,
+  );
 
   useEffect(() => {
     const sync = () => {
@@ -43,14 +68,25 @@ function useTableFullscreen() {
     return () => window.removeEventListener("keydown", onKey);
   }, [active]);
 
+  // Hinweis nur kurz zeigen; setState läuft im Timer-Callback, nicht im Effektrumpf.
+  useEffect(() => {
+    if (!hintArmed) return;
+    const timer = window.setTimeout(() => setHintArmed(false), 1900);
+    return () => window.clearTimeout(timer);
+  }, [hintArmed]);
+
+  // Sobald das Gerät quer steht, ist der Hinweis erledigt – abgeleitet statt
+  // per Effekt gesetzt.
+  const showRotateHint = hintArmed && portrait;
+
   const enter = useCallback(async () => {
+    const isPortraitNow = window.innerHeight > window.innerWidth;
     setActive(true);
+    if (isPortraitNow) setHintArmed(true);
     try {
-      // Ganzes Dokument statt eines Elements: das Overlay zeichnet die Tabelle
-      // ohnehin darüber, und so wird kein Ref im Render gebraucht.
       await document.documentElement.requestFullscreen?.();
     } catch {
-      /* nicht unterstützt – Overlay allein genügt */
+      /* iOS-Safari am iPhone kennt das nicht – das Overlay genügt dort */
     }
     try {
       const orientation = screen.orientation as ScreenOrientation & {
@@ -58,25 +94,26 @@ function useTableFullscreen() {
       };
       await orientation.lock?.("landscape");
     } catch {
-      /* Desktop/iOS erlauben kein Locken */
+      /* bei aktiver Rotationssperre und auf iOS erwartbar – CSS-Drehung greift */
     }
   }, []);
 
   const exit = useCallback(async () => {
     setActive(false);
+    setHintArmed(false);
     try {
       screen.orientation.unlock?.();
     } catch {
-      /* egal */
+      /* nicht überall verfügbar */
     }
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
     } catch {
-      /* egal */
+      /* nicht überall verfügbar */
     }
   }, []);
 
-  return { active, enter, exit };
+  return { active, portrait, showRotateHint, enter, exit };
 }
 
 export function StandingsView({
@@ -90,6 +127,30 @@ export function StandingsView({
   const throughRound = hasRounds && viewedRoundNumber != null ? viewedRoundNumber : null;
   const showHistoricalBanner = hasRounds && !isViewingLatestRound;
   const fs = useTableFullscreen();
+
+  const table = (
+    <StandingsTable
+      rows={rows}
+      tournament={tournament}
+      throughRoundInclusive={throughRound}
+      // Im Vollbild immer alle Spalten: bei gedrehter Darstellung greifen die
+      // Breakpoints sonst auf die schmale Hochkant-Breite.
+      wide={fs.active}
+    />
+  );
+
+  // Hochkant: Rahmen mit getauschten Kanten, um die linke obere Ecke gedreht.
+  const frameStyle: React.CSSProperties = fs.portrait
+    ? {
+        position: "fixed",
+        top: 0,
+        left: "100dvw",
+        width: "100dvh",
+        height: "100dvw",
+        transformOrigin: "top left",
+        transform: "rotate(90deg)",
+      }
+    : { position: "fixed", inset: 0 };
 
   return (
     <section className={`${turnierCard} flex min-w-0 flex-col gap-4`}>
@@ -116,38 +177,84 @@ export function StandingsView({
         </div>
       ) : null}
 
-      <div
-        className={cn(
-          "min-w-0",
-          fs.active &&
-            // Extra Kopfraum, damit der Schließen-Button nicht auf der
-            // Tabellenkopfzeile sitzt.
-            "fixed inset-0 z-[80] flex flex-col gap-2 overflow-auto bg-[var(--vibe-bg-base)] p-3 pt-[calc(env(safe-area-inset-top)+3.75rem)]",
-        )}
-      >
-        {fs.active ? (
-          <button
-            type="button"
-            onClick={fs.exit}
-            aria-label="Vollbild beenden"
-            className="absolute right-3 top-[calc(env(safe-area-inset-top)+0.75rem)] z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] text-[var(--vibe-fg-muted)] shadow-[var(--vibe-shadow-lifted)] transition-transform duration-200 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60"
-          >
-            <X className="h-5 w-5" strokeWidth={2.4} />
-          </button>
-        ) : null}
-        <StandingsTable rows={rows} tournament={tournament} throughRoundInclusive={throughRound} />
-      </div>
+      {/* Im Vollbild lebt die Tabelle im Portal – sonst stünde sie doppelt im
+          DOM, inklusive doppelter Bedienelemente für Screenreader. */}
+      <div className="min-w-0">{fs.active ? null : table}</div>
 
       {/* Hinweise bewusst unter der Tabelle, nicht davor. */}
       <div className="flex min-w-0 flex-col gap-1 text-xs text-[var(--vibe-fg-faint)]">
-        {!fs.active ? (
-          <p className="inline-flex items-center gap-1.5 font-medium text-[var(--vibe-fg-muted)] sm:hidden landscape:hidden">
-            <RotateCcw className="h-3.5 w-3.5 shrink-0" strokeWidth={2.4} aria-hidden />
-            Quer drehen zeigt Spiele, Sätze und Punkte.
-          </p>
-        ) : null}
+        <p className="inline-flex items-center gap-1.5 font-medium text-[var(--vibe-fg-muted)] sm:hidden landscape:hidden">
+          <RotateCcw className="h-3.5 w-3.5 shrink-0" strokeWidth={2.4} aria-hidden />
+          Quer drehen zeigt Spiele, Sätze und Punkte.
+        </p>
         <p>Sortiert nach Siegen, dann Satz- und Balldifferenz. Spieler antippen für Details.</p>
       </div>
+
+      {typeof document !== "undefined"
+        ? createPortal(
+            <AnimatePresence>
+              {fs.active ? (
+                <motion.div
+                  key="table-fullscreen"
+                  className="fixed inset-0 z-[90] bg-[var(--vibe-bg-base)]"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div style={frameStyle} className="overflow-auto p-3 pt-14">
+                    <button
+                      type="button"
+                      onClick={fs.exit}
+                      aria-label="Vollbild beenden"
+                      className="absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] text-[var(--vibe-fg-muted)] shadow-[var(--vibe-shadow-lifted)] transition-transform duration-200 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]/60"
+                    >
+                      <X className="h-5 w-5" strokeWidth={2.4} />
+                    </button>
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.97 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3, ease: [0.34, 1.56, 0.64, 1] }}
+                    >
+                      {table}
+                    </motion.div>
+                  </div>
+
+                  {/* Dreh-Hinweis bewusst ungedreht – er soll in der aktuellen
+                      Handhaltung lesbar sein. */}
+                  <AnimatePresence>
+                    {fs.showRotateHint ? (
+                      <motion.div
+                        key="rotate-hint"
+                        className="pointer-events-none fixed inset-0 z-[95] flex flex-col items-center justify-center gap-4 bg-[var(--vibe-bg-base)]/85 backdrop-blur-sm"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                      >
+                        <motion.div
+                          animate={{ rotate: [0, 0, 90, 90] }}
+                          transition={{
+                            duration: 1.6,
+                            times: [0, 0.25, 0.7, 1],
+                            ease: [0.22, 1, 0.36, 1],
+                          }}
+                          className="flex h-20 w-20 items-center justify-center rounded-[var(--vibe-r-2xl)] bg-[var(--accent-soft)] text-[var(--accent)] shadow-[var(--vibe-shadow-clay)]"
+                        >
+                          <Smartphone className="h-10 w-10" strokeWidth={2} aria-hidden />
+                        </motion.div>
+                        <p className="font-display text-lg font-extrabold tracking-tight text-[var(--vibe-fg-base)]">
+                          Gerät drehen
+                        </p>
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>,
+            document.body,
+          )
+        : null}
     </section>
   );
 }

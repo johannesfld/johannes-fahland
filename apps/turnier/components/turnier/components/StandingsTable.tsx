@@ -16,6 +16,12 @@ type StandingsTableProps = {
   tournament: TournamentDetail;
   /** Spieler-Detail: nur Runden bis einschließlich dieser Nummer (wie Tabellenwerte). */
   throughRoundInclusive?: number | null;
+  /**
+   * Alle Statspalten erzwingen, unabhängig von der Viewport-Breite. Nötig im
+   * gedrehten Vollbild: Media Queries sehen dort weiterhin die schmale
+   * Hochkant-Breite, obwohl der Inhalt quer über den ganzen Schirm läuft.
+   */
+  wide?: boolean;
 };
 
 type PlayerMatchEntry = {
@@ -30,8 +36,10 @@ type PlayerMatchEntry = {
 // Spalten-Layout: kompakt auf Mobile (Rang/Name/S/N/Quote), volle Statspalten
 // ab 640px. Bewusst sm statt md, damit ein quer gedrehtes Handy die zusätzlichen
 // Spalten tatsächlich erreicht – darauf weist die Tabellenansicht hin.
-const GRID_COLS =
+const GRID_RESPONSIVE =
   "grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(3,minmax(2.5rem,1fr))_1.75rem] sm:grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(6,minmax(2.5rem,1fr))_1.75rem]";
+const GRID_ALWAYS_WIDE =
+  "grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(6,minmax(2.5rem,1fr))_1.75rem]";
 
 // Medaillen-Tönung für Rang 1–3 (Gold/Silber/Bronze als Clay-Chip).
 const MEDAL_TONE: Record<number, string> = {
@@ -79,8 +87,11 @@ export function StandingsTable({
   rows,
   tournament,
   throughRoundInclusive,
+  wide = false,
 }: StandingsTableProps) {
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
+  const GRID_COLS = wide ? GRID_ALWAYS_WIDE : GRID_RESPONSIVE;
+  const extraCol = wide ? "block" : "hidden sm:block";
 
   const playerMatchesById = useMemo(() => {
     const map = new Map<string, PlayerMatchEntry[]>();
@@ -104,9 +115,9 @@ export function StandingsTable({
           <span>S</span>
           <span>N</span>
           <span>Quote</span>
-          <span className="hidden sm:block">Sp</span>
-          <span className="hidden sm:block">Sätze</span>
-          <span className="hidden sm:block">Punkte</span>
+          <span className={extraCol}>Sp</span>
+          <span className={extraCol}>Sätze</span>
+          <span className={extraCol}>Punkte</span>
           <span aria-hidden />
         </div>
         <div className="min-w-0">
@@ -161,11 +172,11 @@ export function StandingsTable({
                   <span className="text-[var(--vibe-fg-muted)]">
                     {Math.round(row.winRate * 100)}%
                   </span>
-                  <span className="hidden text-[var(--vibe-fg-muted)] md:block">{row.played}</span>
-                  <span className="hidden text-[var(--vibe-fg-muted)] md:block">
+                  <span className={cn("text-[var(--vibe-fg-muted)]", extraCol)}>{row.played}</span>
+                  <span className={cn("text-[var(--vibe-fg-muted)]", extraCol)}>
                     {row.setDiff > 0 ? `+${row.setDiff}` : row.setDiff}
                   </span>
-                  <span className="hidden text-[var(--vibe-fg-muted)] md:block">
+                  <span className={cn("text-[var(--vibe-fg-muted)]", extraCol)}>
                     {row.pointDiff > 0 ? `+${row.pointDiff}` : row.pointDiff}
                   </span>
                   <ChevronDown
