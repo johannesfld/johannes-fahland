@@ -21,7 +21,7 @@ export function TVView({ tournament }: TVViewProps) {
   }, []);
 
   return (
-    <div className="dark relative flex h-full min-h-0 w-full flex-1 flex-col gap-4 overflow-hidden bg-[var(--vibe-bg-base)] p-4 text-[var(--vibe-fg-base)] md:gap-6 md:p-8 lg:p-10">
+    <div className="relative flex h-full min-h-0 w-full flex-1 flex-col gap-4 overflow-hidden bg-[var(--vibe-bg-base)] p-4 text-[var(--vibe-fg-base)] md:gap-6 md:p-8 lg:p-10">
       <div
         className="pointer-events-none absolute inset-0"
         style={{ background: "var(--vibe-table-light)" }}

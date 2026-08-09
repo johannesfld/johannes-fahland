@@ -125,7 +125,10 @@
   --tool-surface: #DBE7FF;
 }
 
-/* --- Dark Mode: warmes weiches Nacht-Clay (kein hartes Schwarz) --- */
+/* --- Dark Mode: warmes weiches Nacht-Clay (kein hartes Schwarz) ---
+   INAKTIV: Die App ist bewusst Light-only. Nichts setzt die .dark-Klasse mehr
+   (siehe themeInitScript in app/layout.tsx). Der Block bleibt erhalten, damit
+   Dark Mode ohne Neuaufbau der Palette wieder aktiviert werden kann. */
 .dark {
   --background: #26211D;
   --foreground: #F5EEE6;

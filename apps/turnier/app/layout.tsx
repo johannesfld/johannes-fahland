@@ -10,10 +10,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#FBF7F0" },
-    { media: "(prefers-color-scheme: dark)", color: "#26211D" },
-  ],
+  // App ist bewusst Light-only – auch bei dunkler Systemeinstellung.
+  themeColor: "#FBF7F0",
   viewportFit: "cover",
   interactiveWidget: "resizes-content",
 };
@@ -26,7 +24,9 @@ export const metadata: Metadata = {
   manifest: "/turnier-manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    // "default" = dunkler Statusleistentext. "black-translucent" zeichnet ihn
+    // weiß – auf dem hellen Creme-Hintergrund wäre die Uhrzeit unsichtbar.
+    statusBarStyle: "default",
     title: "Turnier",
   },
   formatDetection: {
@@ -43,15 +43,17 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Light-only: entfernt eine ggf. aus einer früheren Version noch gesetzte
+ * .dark-Klasse und fixiert das Farbschema, damit Formularelemente und
+ * Scrollbalken auch bei dunkler Systemeinstellung hell gerendert werden.
+ */
 const themeInitScript = `
 (function(){
   try {
-    var t = localStorage.getItem('theme');
-    var sysDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    var dark = t === 'light' ? false : t === 'system' ? sysDark : t === 'dark' ? true : sysDark;
     var r = document.documentElement;
-    r.classList.toggle('dark', dark);
-    r.style.colorScheme = dark ? 'dark' : 'light';
+    r.classList.remove('dark');
+    r.style.colorScheme = 'light';
   } catch (e) {}
 })();`;
 
@@ -69,10 +71,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta
-          name="apple-mobile-web-app-status-bar-style"
-          content="black-translucent"
-        />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
       </head>
       <body className="flex h-dvh min-h-dvh flex-col overflow-hidden overscroll-none bg-[var(--vibe-bg-base)] text-[var(--vibe-fg-base)]">
