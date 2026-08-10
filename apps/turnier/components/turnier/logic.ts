@@ -1,30 +1,14 @@
 import { buildStandings } from "@/lib/turnier/standings";
-import { bestOfToWinsNeeded } from "@/lib/turnier/validation";
-import type { BestOf, MatchEntry, MatchSet, StandingRow, TournamentDetail } from "@/components/turnier/types";
+import type { StandingRow, TournamentDetail } from "@/components/turnier/types";
 
-export function getWinsPerTeam(sets: MatchSet[]) {
-  return sets.reduce(
-    (acc, setEntry) => {
-      if (setEntry.scoreTeam1 > setEntry.scoreTeam2) acc.team1 += 1;
-      if (setEntry.scoreTeam2 > setEntry.scoreTeam1) acc.team2 += 1;
-      return acc;
-    },
-    { team1: 0, team2: 0 },
-  );
-}
-
-export function getRequiredSetSlots(bestOf: BestOf, sets: MatchSet[]) {
-  const winsNeeded = bestOfToWinsNeeded(bestOf);
-  const wins = getWinsPerTeam(sets);
-  if (wins.team1 >= winsNeeded || wins.team2 >= winsNeeded) return sets.length;
-  return Math.max(sets.length + 1, winsNeeded);
-}
-
-export function canCompleteMatch(bestOf: BestOf, match: MatchEntry) {
-  const winsNeeded = bestOfToWinsNeeded(bestOf);
-  const wins = getWinsPerTeam(match.sets);
-  return wins.team1 >= winsNeeded || wins.team2 >= winsNeeded;
-}
+// Match-Auswertung liegt in lib/, damit Server-Actions und Client dieselbe
+// Regel verwenden – hier nur durchgereicht.
+export {
+  computeMatchResult,
+  getRequiredSetSlots,
+  getWinsPerTeam,
+} from "@/lib/turnier/matchResult";
+export type { MatchResult } from "@/lib/turnier/matchResult";
 
 export function getCurrentRound(tournament: TournamentDetail | null) {
   if (!tournament) return null;

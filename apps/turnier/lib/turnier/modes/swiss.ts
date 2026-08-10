@@ -4,16 +4,24 @@ function pairKey(a: string, b: string) {
   return [a, b].sort().join("|");
 }
 
-/** Punkte je Spieler aus abgeschlossenen Matches (1 Sieg = 1 Punkt). */
+/** Punkte je Spieler aus abgeschlossenen Matches (Sieg 1, Unentschieden 0,5). */
 function scoreByPlayer(rounds: EngineRound[], activeIds: Set<string>): Map<string, number> {
   const score = new Map<string, number>();
   for (const id of activeIds) score.set(id, 0);
+  const add = (playerId: string, value: number) => {
+    if (score.has(playerId)) score.set(playerId, (score.get(playerId) ?? 0) + value);
+  };
   for (const round of rounds) {
     for (const match of round.matches) {
-      if (match.status !== "completed" || !match.winnerTeam) continue;
-      const winners = match.players.filter((p) => p.team === match.winnerTeam);
-      for (const w of winners) {
-        if (score.has(w.playerId)) score.set(w.playerId, (score.get(w.playerId) ?? 0) + 1);
+      if (match.status !== "completed") continue;
+      // Abgeschlossen ohne Sieger = Unentschieden: beide bekommen einen halben
+      // Punkt, wie im Schweizer System üblich.
+      if (match.winnerTeam == null) {
+        for (const p of match.players) add(p.playerId, 0.5);
+        continue;
+      }
+      for (const w of match.players.filter((p) => p.team === match.winnerTeam)) {
+        add(w.playerId, 1);
       }
     }
   }

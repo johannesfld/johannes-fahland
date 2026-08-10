@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { PlayerChip } from "@/components/turnier/components/PlayerChip";
 import { actionBtn, pillToggle, sectionLabel, turnierCard } from "@/components/turnier/styles";
 import { cn } from "@/components/ui/styles";
+import { SCORING_LABELS, resolveScoring } from "@/lib/turnier/scoring";
 import type { BestOf, TournamentDetail } from "@/components/turnier/types";
 
 type SetupViewProps = {
@@ -44,14 +45,24 @@ export function SetupView({
   const canStart = !isPaused && tournament.status === "setup";
   const showBestOfEditor = tournament.status === "setup" && !isPaused;
   const formatLabel = tournament.format === "doubles" ? "Doppel (2 vs 2)" : "Einzel (1 vs 1)";
+  // Die Wertung wird beim Anlegen festgelegt – hier nur zur Erinnerung.
+  const showScoring = tournament.mode !== "knockout";
+  const scoringLabel = SCORING_LABELS[resolveScoring(tournament.config)];
 
   return (
     <section className={`${turnierCard} flex min-w-0 flex-col gap-6`}>
       <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
         <h2 className="font-display text-2xl font-extrabold tracking-tight">Setup</h2>
-        <span className="inline-flex items-center rounded-full border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] px-3 py-1 text-xs font-semibold text-[var(--vibe-fg-muted)]">
-          {formatLabel}
-        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="inline-flex items-center rounded-full border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] px-3 py-1 text-xs font-semibold text-[var(--vibe-fg-muted)]">
+            {formatLabel}
+          </span>
+          {showScoring ? (
+            <span className="inline-flex items-center rounded-full border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] px-3 py-1 text-xs font-semibold text-[var(--vibe-fg-muted)]">
+              Wertung {scoringLabel}
+            </span>
+          ) : null}
+        </div>
       </div>
 
       {showBestOfEditor ? (

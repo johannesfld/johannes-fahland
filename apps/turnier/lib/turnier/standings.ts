@@ -1,3 +1,4 @@
+import { matchPoints, resolveScoring, usesMatchPoints } from "@/lib/turnier/scoring";
 import type { StandingRow, TournamentDetail } from "@/components/turnier/types";
 
 export type BuildStandingsOptions = {
@@ -5,11 +6,18 @@ export type BuildStandingsOptions = {
   throughRoundInclusive?: number | null;
 };
 
+/** Unentschieden zählt wie ein halber Sieg. */
+function rateOf(row: { wins: number; draws: number; played: number }) {
+  return row.played > 0 ? (row.wins + row.draws / 2) / row.played : 0;
+}
+
 export function buildStandings(
   tournament: TournamentDetail,
   options?: BuildStandingsOptions,
 ): StandingRow[] {
   const maxRound = options?.throughRoundInclusive;
+  const scoring = resolveScoring(tournament.config);
+  const byPoints = usesMatchPoints(scoring);
   const rows = new Map<string, StandingRow>();
 
   for (const player of tournament.players) {
@@ -20,7 +28,9 @@ export function buildStandings(
       rank: 0,
       played: 0,
       wins: 0,
+      draws: 0,
       losses: 0,
+      points: 0,
       winRate: 0,
       setsWon: 0,
       setsLost: 0,
@@ -34,10 +44,12 @@ export function buildStandings(
   for (const round of tournament.rounds) {
     if (maxRound != null && round.roundNumber > maxRound) continue;
     for (const match of round.matches) {
-      if (match.sets.length === 0 || match.winnerTeam == null) continue;
+      // Abgeschlossen ohne Sieger = Unentschieden; offene Matches zählen nicht.
+      if (match.status !== "completed" || match.sets.length === 0) continue;
 
       const team1 = match.players.filter((p) => p.team === 1);
       const team2 = match.players.filter((p) => p.team === 2);
+      const isDraw = match.winnerTeam == null;
       const team1WinsMatch = match.winnerTeam === 1;
 
       let team1Sets = 0;
@@ -59,8 +71,9 @@ export function buildStandings(
         const row = rows.get(player.playerId);
         if (!row) continue;
         row.played += 1;
-        row.wins += team1WinsMatch ? 1 : 0;
-        row.losses += team1WinsMatch ? 0 : 1;
+        row.draws += isDraw ? 1 : 0;
+        row.wins += !isDraw && team1WinsMatch ? 1 : 0;
+        row.losses += !isDraw && !team1WinsMatch ? 1 : 0;
         row.setsWon += team1Sets;
         row.setsLost += team2Sets;
         row.pointsWon += team1Points;
@@ -71,8 +84,9 @@ export function buildStandings(
         const row = rows.get(player.playerId);
         if (!row) continue;
         row.played += 1;
-        row.wins += team1WinsMatch ? 0 : 1;
-        row.losses += team1WinsMatch ? 1 : 0;
+        row.draws += isDraw ? 1 : 0;
+        row.wins += !isDraw && !team1WinsMatch ? 1 : 0;
+        row.losses += !isDraw && team1WinsMatch ? 1 : 0;
         row.setsWon += team2Sets;
         row.setsLost += team1Sets;
         row.pointsWon += team2Points;
@@ -82,9 +96,16 @@ export function buildStandings(
   }
 
   const sorted = [...rows.values()].sort((a, b) => {
-    if (b.wins !== a.wins) return b.wins - a.wins;
-    const aRate = a.played > 0 ? a.wins / a.played : 0;
-    const bRate = b.played > 0 ? b.wins / b.played : 0;
+    if (byPoints) {
+      const aPoints = matchPoints(scoring, a.wins, a.draws);
+      const bPoints = matchPoints(scoring, b.wins, b.draws);
+      if (bPoints !== aPoints) return bPoints - aPoints;
+    } else {
+      if (b.wins !== a.wins) return b.wins - a.wins;
+      if (b.draws !== a.draws) return b.draws - a.draws;
+    }
+    const aRate = rateOf(a);
+    const bRate = rateOf(b);
     if (bRate !== aRate) return bRate - aRate;
     const aSetDiff = a.setsWon - a.setsLost;
     const bSetDiff = b.setsWon - b.setsLost;
@@ -99,10 +120,16 @@ export function buildStandings(
   let previousRank = 0;
 
   return sorted.map((row, index) => {
-    const winRate = row.played > 0 ? row.wins / row.played : 0;
+    const winRate = rateOf(row);
+    const points = matchPoints(scoring, row.wins, row.draws);
     const setDiff = row.setsWon - row.setsLost;
     const pointDiff = row.pointsWon - row.pointsLost;
-    const signature = [row.wins, winRate.toFixed(6), setDiff, pointDiff].join("|");
+    const signature = [
+      byPoints ? points : `${row.wins}/${row.draws}`,
+      winRate.toFixed(6),
+      setDiff,
+      pointDiff,
+    ].join("|");
     const rank = signature === previousSignature ? previousRank : index + 1;
     previousSignature = signature;
     previousRank = rank;
@@ -110,6 +137,7 @@ export function buildStandings(
     return {
       ...row,
       rank,
+      points,
       setDiff,
       pointDiff,
       winRate,

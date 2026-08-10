@@ -7,6 +7,16 @@ export type TournamentFormat = "singles" | "doubles";
 // Turnierform. Spielart (Einzel/Doppel) bleibt in `format`.
 export type TournamentMode = "round_robin" | "knockout" | "swiss" | "groups_ko";
 
+/**
+ * Wertung der Matchergebnisse in der Tabelle. Relevant, sobald Unentschieden
+ * vorkommen – die sind überall möglich außer in K.-o.-Matches (dort muss jemand
+ * weiterkommen, siehe `drawsAllowedForMatch`).
+ * - `points210`: Sieg 2, Unentschieden 1, Niederlage 0 (Standard)
+ * - `points310`: Sieg 3, Unentschieden 1, Niederlage 0
+ * - `winsFirst`: Rangfolge nach Siegen, Unentschieden nur als Feinwertung
+ */
+export type ScoringMode = "points210" | "points310" | "winsFirst";
+
 // Modusspezifische Parameter, in Tournament.config (JSON) gespeichert.
 export type TournamentConfig = {
   /** Swiss: feste Rundenzahl. */
@@ -15,6 +25,12 @@ export type TournamentConfig = {
   groupCount?: number;
   /** Gruppe+K.o.: wie viele pro Gruppe in die K.o.-Phase. */
   advancePerGroup?: number;
+  /**
+   * Wertung/Rangfolge. Fehlt der Wert (Turniere von vor der Umstellung), gilt
+   * `points210` – ohne Unentschieden ist das exakt die alte Sortierung nach
+   * Siegen, bestehende Tabellen ändern sich dadurch nicht.
+   */
+  scoring?: ScoringMode;
 };
 
 export const MODE_LABELS: Record<TournamentMode, string> = {
@@ -50,6 +66,7 @@ export type MatchEntry = {
   id: string;
   matchNumber: number;
   status: MatchStatus;
+  /** `null` bei `status: "completed"` heißt Unentschieden, sonst: noch offen. */
   winnerTeam: 1 | 2 | null;
   groupLabel: string | null;
   bracketSlot: number | null;
@@ -101,7 +118,11 @@ export type StandingRow = {
   rank: number;
   played: number;
   wins: number;
+  draws: number;
   losses: number;
+  /** Match-Punkte gemäß Wertung. Bei `winsFirst` nur informativ. */
+  points: number;
+  /** Unentschieden zählen als halber Sieg. */
   winRate: number;
   setsWon: number;
   setsLost: number;

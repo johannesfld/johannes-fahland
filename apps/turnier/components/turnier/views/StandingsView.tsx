@@ -7,6 +7,7 @@ import { Maximize2, RotateCcw, Smartphone, X } from "lucide-react";
 import { StandingsTable } from "@/components/turnier/components/StandingsTable";
 import { subtleBtn, turnierCard } from "@/components/turnier/styles";
 import { cn } from "@/components/ui/styles";
+import { WIN_POINTS, resolveScoring, usesMatchPoints } from "@/lib/turnier/scoring";
 import type { StandingRow, TournamentDetail } from "@/components/turnier/types";
 
 type StandingsViewProps = {
@@ -128,6 +129,16 @@ export function StandingsView({
   const showHistoricalBanner = hasRounds && !isViewingLatestRound;
   const fs = useTableFullscreen();
 
+  // Im reinen K.-o.-System gibt es keine Unentschieden – dort bleibt der alte
+  // Hinweis stehen, sonst erklärt er die gewählte Wertung.
+  const scoring = resolveScoring(tournament.config);
+  const sortHint =
+    tournament.mode === "knockout"
+      ? "Sortiert nach Siegen, dann Satz- und Balldifferenz."
+      : usesMatchPoints(scoring)
+        ? `Sortiert nach Punkten (Sieg ${WIN_POINTS[scoring]}, Unentschieden 1, Niederlage 0), dann Quote sowie Satz- und Balldifferenz.`
+        : "Sortiert nach Siegen, dann Unentschieden, Quote sowie Satz- und Balldifferenz.";
+
   const table = (
     <StandingsTable
       rows={rows}
@@ -185,9 +196,9 @@ export function StandingsView({
       <div className="flex min-w-0 flex-col gap-1 text-xs text-[var(--vibe-fg-faint)]">
         <p className="inline-flex items-center gap-1.5 font-medium text-[var(--vibe-fg-muted)] sm:hidden landscape:hidden">
           <RotateCcw className="h-3.5 w-3.5 shrink-0" strokeWidth={2.4} aria-hidden />
-          Quer drehen zeigt Spiele, Sätze und Punkte.
+          Quer drehen zeigt Spiele, Sätze und Bälle.
         </p>
-        <p>Sortiert nach Siegen, dann Satz- und Balldifferenz. Spieler antippen für Details.</p>
+        <p>{sortHint} Spieler antippen für Details.</p>
       </div>
 
       {typeof document !== "undefined"

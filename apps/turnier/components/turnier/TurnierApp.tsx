@@ -465,6 +465,7 @@ export function TurnierApp({ initialTournament }: TurnierAppProps) {
             <ScoreEntryView
               round={selectedRound}
               bestOf={tournament.bestOf}
+              mode={tournament.mode}
               readOnly={!canEditTournament || selectedRound?.status === "completed"}
               onSaveAndCompleteMatch={actions.saveAndCompleteMatch}
               onCompleteRound={actions.completeRound}

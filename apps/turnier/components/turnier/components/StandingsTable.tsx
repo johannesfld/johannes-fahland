@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 import { cn } from "@/components/ui/styles";
+import { resolveScoring, usesMatchPoints } from "@/lib/turnier/scoring";
 import type {
   MatchEntry,
   RoundEntry,
@@ -30,16 +31,109 @@ type PlayerMatchEntry = {
   team: 1 | 2;
   partners: string[];
   opponents: string[];
-  result: "won" | "lost" | "open";
+  result: "won" | "drawn" | "lost" | "open";
 };
 
-// Spalten-Layout: kompakt auf Mobile (Rang/Name/S/N/Quote), volle Statspalten
-// ab 640px. Bewusst sm statt md, damit ein quer gedrehtes Handy die zusätzlichen
-// Spalten tatsächlich erreicht – darauf weist die Tabellenansicht hin.
-const GRID_RESPONSIVE =
-  "grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(3,minmax(2.5rem,1fr))_1.75rem] sm:grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(6,minmax(2.5rem,1fr))_1.75rem]";
-const GRID_ALWAYS_WIDE =
-  "grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(6,minmax(2.5rem,1fr))_1.75rem]";
+type StatColumn = {
+  key: string;
+  header: string;
+  /** Erst ab 640px sichtbar (bzw. immer im Vollbild). */
+  extra: boolean;
+  className: string;
+  render: (row: StandingRow) => React.ReactNode;
+};
+
+const signed = (value: number) => (value > 0 ? `+${value}` : `${value}`);
+
+const COL_POINTS: StatColumn = {
+  key: "points",
+  header: "Pkt",
+  extra: false,
+  className: "font-bold text-[var(--vibe-fg-base)]",
+  render: (row) => row.points,
+};
+const COL_WINS: StatColumn = {
+  key: "wins",
+  header: "S",
+  extra: false,
+  className: "font-bold text-[var(--ok)]",
+  render: (row) => row.wins,
+};
+const COL_DRAWS: StatColumn = {
+  key: "draws",
+  header: "U",
+  extra: false,
+  className: "text-[var(--vibe-fg-muted)]",
+  render: (row) => row.draws,
+};
+const COL_LOSSES: StatColumn = {
+  key: "losses",
+  header: "N",
+  extra: false,
+  className: "text-[var(--danger)]",
+  render: (row) => row.losses,
+};
+const COL_RATE = (extra: boolean): StatColumn => ({
+  key: "rate",
+  header: "Quote",
+  extra,
+  className: "text-[var(--vibe-fg-muted)]",
+  render: (row) => `${Math.round(row.winRate * 100)}%`,
+});
+const COL_PLAYED: StatColumn = {
+  key: "played",
+  header: "Sp",
+  extra: true,
+  className: "text-[var(--vibe-fg-muted)]",
+  render: (row) => row.played,
+};
+const COL_SETS: StatColumn = {
+  key: "sets",
+  header: "Sätze",
+  extra: true,
+  className: "text-[var(--vibe-fg-muted)]",
+  render: (row) => signed(row.setDiff),
+};
+// Balldifferenz. Hieß früher „Punkte" – das kollidiert mit den Match-Punkten
+// der Wertung, und „Bälle" passt zum Hinweistext („Balldifferenz").
+const COL_BALLS: StatColumn = {
+  key: "balls",
+  header: "Bälle",
+  extra: true,
+  className: "text-[var(--vibe-fg-muted)]",
+  render: (row) => signed(row.pointDiff),
+};
+
+/**
+ * Spalten hängen davon ab, ob im Turnier überhaupt Unentschieden vorkommen –
+ * ohne sie bleibt die Tabelle so schmal wie zuvor. Mit Unentschieden rücken „U"
+ * und (außer bei Wertung nach Siegen) die Punktespalte nach vorn; die Quote
+ * wandert dafür zu den breiten Spalten.
+ */
+function buildColumns(showDraws: boolean, showPoints: boolean): StatColumn[] {
+  if (!showDraws) {
+    return [COL_WINS, COL_LOSSES, COL_RATE(false), COL_PLAYED, COL_SETS, COL_BALLS];
+  }
+  const leading = showPoints
+    ? [COL_POINTS, COL_WINS, COL_DRAWS, COL_LOSSES]
+    : [COL_WINS, COL_DRAWS, COL_LOSSES];
+  return [...leading, COL_RATE(showPoints), COL_PLAYED, COL_SETS, COL_BALLS];
+}
+
+// Spalten-Layout: kompakt auf Mobile, volle Statspalten ab 640px. Bewusst sm
+// statt md, damit ein quer gedrehtes Handy die zusätzlichen Spalten tatsächlich
+// erreicht – darauf weist die Tabellenansicht hin. Die Klassen stehen als
+// Literale da, weil Tailwind sie sonst nicht generiert.
+const GRID_RESPONSIVE: Record<string, string> = {
+  "3|6": "grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(3,minmax(2.5rem,1fr))_1.75rem] sm:grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(6,minmax(2.5rem,1fr))_1.75rem]",
+  "4|7": "grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(4,minmax(2.25rem,1fr))_1.75rem] sm:grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(7,minmax(2.25rem,1fr))_1.75rem]",
+  "4|8": "grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(4,minmax(2.25rem,1fr))_1.75rem] sm:grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(8,minmax(2.25rem,1fr))_1.75rem]",
+};
+const GRID_ALWAYS_WIDE: Record<number, string> = {
+  6: "grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(6,minmax(2.5rem,1fr))_1.75rem]",
+  7: "grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(7,minmax(2.25rem,1fr))_1.75rem]",
+  8: "grid-cols-[2.5rem_minmax(0,1.4fr)_repeat(8,minmax(2.25rem,1fr))_1.75rem]",
+};
 
 // Medaillen-Tönung für Rang 1–3 (Gold/Silber/Bronze als Clay-Chip).
 const MEDAL_TONE: Record<number, string> = {
@@ -67,8 +161,9 @@ function collectPlayerMatches(
         .filter((player) => player.team !== team)
         .map((player) => player.name);
       let result: PlayerMatchEntry["result"] = "open";
-      if (match.status === "completed" && match.winnerTeam) {
-        result = match.winnerTeam === team ? "won" : "lost";
+      if (match.status === "completed") {
+        result =
+          match.winnerTeam == null ? "drawn" : match.winnerTeam === team ? "won" : "lost";
       }
       entries.push({
         roundNumber: round.roundNumber,
@@ -90,8 +185,16 @@ export function StandingsTable({
   wide = false,
 }: StandingsTableProps) {
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
-  const GRID_COLS = wide ? GRID_ALWAYS_WIDE : GRID_RESPONSIVE;
   const extraCol = wide ? "block" : "hidden sm:block";
+
+  const columns = useMemo(() => {
+    const showDraws = rows.some((row) => row.draws > 0);
+    return buildColumns(showDraws, showDraws && usesMatchPoints(resolveScoring(tournament.config)));
+  }, [rows, tournament.config]);
+  const baseCount = columns.filter((column) => !column.extra).length;
+  const GRID_COLS = wide
+    ? GRID_ALWAYS_WIDE[columns.length]
+    : GRID_RESPONSIVE[`${baseCount}|${columns.length}`];
 
   const playerMatchesById = useMemo(() => {
     const map = new Map<string, PlayerMatchEntry[]>();
@@ -112,12 +215,11 @@ export function StandingsTable({
         >
           <span>#</span>
           <span>Name</span>
-          <span>S</span>
-          <span>N</span>
-          <span>Quote</span>
-          <span className={extraCol}>Sp</span>
-          <span className={extraCol}>Sätze</span>
-          <span className={extraCol}>Punkte</span>
+          {columns.map((column) => (
+            <span key={column.key} className={column.extra ? extraCol : undefined}>
+              {column.header}
+            </span>
+          ))}
           <span aria-hidden />
         </div>
         <div className="min-w-0">
@@ -167,18 +269,14 @@ export function StandingsTable({
                   >
                     {row.name}
                   </span>
-                  <span className="font-bold text-[var(--ok)]">{row.wins}</span>
-                  <span className="text-[var(--danger)]">{row.losses}</span>
-                  <span className="text-[var(--vibe-fg-muted)]">
-                    {Math.round(row.winRate * 100)}%
-                  </span>
-                  <span className={cn("text-[var(--vibe-fg-muted)]", extraCol)}>{row.played}</span>
-                  <span className={cn("text-[var(--vibe-fg-muted)]", extraCol)}>
-                    {row.setDiff > 0 ? `+${row.setDiff}` : row.setDiff}
-                  </span>
-                  <span className={cn("text-[var(--vibe-fg-muted)]", extraCol)}>
-                    {row.pointDiff > 0 ? `+${row.pointDiff}` : row.pointDiff}
-                  </span>
+                  {columns.map((column) => (
+                    <span
+                      key={column.key}
+                      className={cn(column.className, column.extra ? extraCol : undefined)}
+                    >
+                      {column.render(row)}
+                    </span>
+                  ))}
                   <ChevronDown
                     className={cn(
                       "h-4 w-4 justify-self-end text-[var(--vibe-fg-faint)] transition-transform duration-200",
@@ -272,6 +370,13 @@ function ResultBadge({ result }: { result: PlayerMatchEntry["result"] }) {
     return (
       <span className="rounded-full bg-[var(--danger-soft)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--danger-ink)]">
         Niederlage
+      </span>
+    );
+  }
+  if (result === "drawn") {
+    return (
+      <span className="rounded-full bg-[var(--warn-soft)] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[var(--warn-ink)]">
+        Unentschieden
       </span>
     );
   }

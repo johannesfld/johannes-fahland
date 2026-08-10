@@ -25,6 +25,8 @@ export function MatchCard({ match, children }: MatchCardProps) {
   const team1 = match.players.filter((player) => player.team === 1);
   const team2 = match.players.filter((player) => player.team === 2);
   const isCompleted = match.status === "completed";
+  // Abgeschlossen ohne Sieger = Unentschieden.
+  const isDraw = isCompleted && match.winnerTeam == null;
   const team1Wins = match.winnerTeam === 1;
   const team2Wins = match.winnerTeam === 2;
 
@@ -35,8 +37,13 @@ export function MatchCard({ match, children }: MatchCardProps) {
     "bg-[var(--accent-soft)] text-[var(--vibe-fg-base)] ring-2 ring-[var(--accent)]/50";
   const loserTone = "bg-[var(--vibe-bg-sunken)] text-[var(--vibe-fg-muted)] opacity-70";
   const openTone = "bg-[var(--vibe-bg-sunken)] text-[var(--vibe-fg-base)]";
-  const team1Tone = isCompleted ? (team1Wins ? winnerTone : loserTone) : openTone;
-  const team2Tone = isCompleted ? (team2Wins ? winnerTone : loserTone) : openTone;
+  // Unentschieden: beide gleich hervorgehoben, aber ohne Sieger-Akzent.
+  const drawTone =
+    "bg-[var(--neutral-soft)] text-[var(--vibe-fg-base)] ring-2 ring-[var(--vibe-line-strong)]";
+  const toneFor = (won: boolean) =>
+    !isCompleted ? openTone : isDraw ? drawTone : won ? winnerTone : loserTone;
+  const team1Tone = toneFor(team1Wins);
+  const team2Tone = toneFor(team2Wins);
 
   return (
     <article className={`${turnierCard} flex min-w-0 flex-col gap-3`}>
@@ -45,9 +52,11 @@ export function MatchCard({ match, children }: MatchCardProps) {
           Match {match.matchNumber}
         </p>
         <span
-          className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${STATUS_TONE[match.status]}`}
+          className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${
+            isDraw ? STATUS_TONE.pending : STATUS_TONE[match.status]
+          }`}
         >
-          {STATUS_LABEL[match.status]}
+          {isDraw ? "Unentschieden" : STATUS_LABEL[match.status]}
         </span>
       </header>
 

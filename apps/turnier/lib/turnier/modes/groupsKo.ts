@@ -71,14 +71,21 @@ function isGroupPhaseDone(ctx: EngineContext, assignments: Map<string, string>):
   return true;
 }
 
-/** Punkte (Siege) je Spieler in der Gruppenphase. */
+/** Punkte je Spieler in der Gruppenphase (Sieg 1, Unentschieden 0,5). */
 function groupScores(rounds: EngineRound[]): Map<string, number> {
   const score = new Map<string, number>();
+  const add = (playerId: string, value: number) =>
+    score.set(playerId, (score.get(playerId) ?? 0) + value);
   for (const round of rounds) {
     for (const match of round.matches) {
-      if (!match.groupLabel || match.status !== "completed" || !match.winnerTeam) continue;
+      if (!match.groupLabel || match.status !== "completed") continue;
+      // Abgeschlossen ohne Sieger = Unentschieden (nur in der Gruppenphase möglich).
+      if (match.winnerTeam == null) {
+        for (const p of match.players) add(p.playerId, 0.5);
+        continue;
+      }
       for (const w of match.players.filter((p) => p.team === match.winnerTeam)) {
-        score.set(w.playerId, (score.get(w.playerId) ?? 0) + 1);
+        add(w.playerId, 1);
       }
     }
   }

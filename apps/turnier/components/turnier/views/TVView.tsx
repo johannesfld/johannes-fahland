@@ -12,6 +12,11 @@ export function TVView({ tournament }: TVViewProps) {
   const [showStandings, setShowStandings] = useState(true);
   const standings = standingsForTournament(tournament);
   const latestRound = tournament.rounds[tournament.rounds.length - 1];
+  // Unentschieden-Spalte nur, wenn es welche gibt – sonst bleibt die Zeile luftig.
+  const showDraws = standings.some((row) => row.draws > 0);
+  const rowGrid = showDraws
+    ? "grid-cols-[2.5rem_minmax(0,1fr)_auto_auto_auto_auto] md:grid-cols-[5rem_minmax(0,1fr)_6rem_6rem_6rem_6rem]"
+    : "grid-cols-[2.5rem_minmax(0,1fr)_auto_auto_auto] md:grid-cols-[5rem_minmax(0,1fr)_8rem_8rem_8rem]";
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -43,11 +48,16 @@ export function TVView({ tournament }: TVViewProps) {
               key={row.playerId}
               /* Statspalten auf schmalen Geräten inhaltsbreit (auto) statt fix –
                  sonst bleibt für die Namensspalte 0px übrig. */
-              className="grid grid-cols-[2.5rem_minmax(0,1fr)_auto_auto_auto] items-center gap-2 rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] p-3 shadow-[var(--vibe-shadow-soft)] md:grid-cols-[5rem_minmax(0,1fr)_8rem_8rem_8rem] md:gap-3 md:p-4"
+              className={`grid ${rowGrid} items-center gap-2 rounded-[var(--vibe-r-xl)] border border-[var(--vibe-line)] bg-[var(--vibe-bg-elevated)] p-3 shadow-[var(--vibe-shadow-soft)] md:gap-3 md:p-4`}
             >
               <span className="font-mono text-2xl font-bold text-[var(--accent)] md:text-4xl">{row.rank}</span>
               <span className="truncate text-lg font-semibold md:text-3xl">{row.name}</span>
               <span className="font-mono text-base font-bold text-[var(--mint)] md:text-2xl">S {row.wins}</span>
+              {showDraws ? (
+                <span className="font-mono text-base font-bold text-[var(--vibe-fg-muted)] md:text-2xl">
+                  U {row.draws}
+                </span>
+              ) : null}
               <span className="font-mono text-base font-bold text-[var(--danger)] md:text-2xl">N {row.losses}</span>
               <span className="font-mono text-base font-bold text-[var(--vibe-fg-base)] md:text-2xl">
                 {Math.round(row.winRate * 100)}%

@@ -3,14 +3,15 @@
 import { useMemo, useState } from "react";
 import { MatchCard } from "@/components/turnier/components/MatchCard";
 import { SetScoreInput } from "@/components/turnier/components/SetScoreInput";
-import { getRequiredSetSlots, getWinsPerTeam } from "@/components/turnier/logic";
+import { computeMatchResult, getRequiredSetSlots } from "@/components/turnier/logic";
 import { actionBtn, turnierCard } from "@/components/turnier/styles";
-import type { BestOf, RoundEntry } from "@/components/turnier/types";
-import { bestOfToWinsNeeded } from "@/lib/turnier/validation";
+import type { BestOf, RoundEntry, TournamentMode } from "@/components/turnier/types";
+import { drawsAllowedForMatch } from "@/lib/turnier/scoring";
 
 type ScoreEntryViewProps = {
   round: RoundEntry | null;
   bestOf: BestOf;
+  mode: TournamentMode;
   readOnly: boolean;
   onSaveAndCompleteMatch: (
     matchId: string,
@@ -24,6 +25,7 @@ type DraftScores = Record<string, Record<number, { scoreTeam1?: number; scoreTea
 export function ScoreEntryView({
   round,
   bestOf,
+  mode,
   readOnly,
   onSaveAndCompleteMatch,
   onCompleteRound,
@@ -108,10 +110,11 @@ export function ScoreEntryView({
             .filter((setEntry) => setEntry.scoreTeam1 >= 0 && setEntry.scoreTeam2 >= 0)
             .sort((a, b) => a.setNumber - b.setNumber);
 
-          const slots = getRequiredSetSlots(bestOf, mergedSets);
-          const winsNeeded = bestOfToWinsNeeded(bestOf);
-          const wins = getWinsPerTeam(mergedSets);
-          const matchCanClose = wins.team1 >= winsNeeded || wins.team2 >= winsNeeded;
+          const drawsAllowed = drawsAllowedForMatch(mode, match.groupLabel);
+          const slots = getRequiredSetSlots(bestOf, mergedSets, drawsAllowed);
+          const result = computeMatchResult(mergedSets, bestOf, drawsAllowed);
+          const matchCanClose = result.decided;
+          const endsDrawn = result.decided && result.winnerTeam === null;
           // Bei einem fertigen Match nur dann einen Button zeigen, wenn sich
           // gegenüber dem gespeicherten Stand wirklich etwas geändert hat.
           const isDirty =
@@ -184,7 +187,11 @@ export function ScoreEntryView({
                       )
                     }
                   >
-                    {match.status === "completed" ? "Match aktualisieren" : "Match abschließen"}
+                    {match.status === "completed"
+                      ? "Match aktualisieren"
+                      : endsDrawn
+                        ? "Unentschieden eintragen"
+                        : "Match abschließen"}
                   </button>
                 </div>
               ) : null}

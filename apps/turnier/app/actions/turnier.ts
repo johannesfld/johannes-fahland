@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { prisma, Prisma } from "@pasch/db";
 import { buildStandings } from "@/lib/turnier/standings";
-import { bestOfToWinsNeeded, validateSetScore } from "@/lib/turnier/validation";
+import { computeMatchResult } from "@/lib/turnier/matchResult";
+import { drawsAllowedForMatch, resolveScoring } from "@/lib/turnier/scoring";
+import { validateSetScore } from "@/lib/turnier/validation";
 import { getEngine } from "@/lib/turnier/modes";
 import type { EngineRound } from "@/lib/turnier/modes";
 import type {
@@ -107,17 +109,31 @@ function parseConfig(value: unknown): TournamentConfig | null {
   return value as TournamentConfig;
 }
 
-function computeMatchWinner(sets: MatchSet[], bestOf: BestOf): 1 | 2 | null {
-  const winsNeeded = bestOfToWinsNeeded(bestOf);
-  let team1Wins = 0;
-  let team2Wins = 0;
-  for (const setEntry of sets) {
-    if (setEntry.scoreTeam1 > setEntry.scoreTeam2) team1Wins += 1;
-    if (setEntry.scoreTeam2 > setEntry.scoreTeam1) team2Wins += 1;
-    if (team1Wins >= winsNeeded) return 1;
-    if (team2Wins >= winsNeeded) return 2;
+/**
+ * Sieger eines Matches – `null` steht für ein Unentschieden und wird zusammen
+ * mit `status: "completed"` gespeichert. Ist das Match noch nicht entschieden,
+ * bricht die Aktion mit einer erklärenden Meldung ab.
+ */
+function resolveMatchWinner(
+  match: { groupLabel: string | null; sets: MatchSet[] },
+  tournament: { bestOf: "ONE" | "THREE" | "FIVE"; mode: string },
+): 1 | 2 | null {
+  const bestOf = fromPrismaBestOf(tournament.bestOf);
+  const drawsAllowed = drawsAllowedForMatch(
+    fromPrismaMode(tournament.mode as PrismaMode),
+    match.groupLabel,
+  );
+  const result = computeMatchResult(match.sets, bestOf, drawsAllowed);
+  if (!result.decided) {
+    throw new UserError(
+      !drawsAllowed
+        ? "Noch kein gültiger Match-Sieger vorhanden."
+        : bestOf === 1
+          ? "Bitte zuerst ein Satzergebnis eintragen."
+          : `Das Match ist noch nicht entschieden – bitte alle ${bestOf} Sätze eintragen.`,
+    );
   }
-  return null;
+  return result.winnerTeam;
 }
 
 async function assertTournamentWritable(tournamentId: string) {
@@ -259,13 +275,17 @@ async function createTournamentImpl(
     ? format
     : engine.supportsFormats[0];
 
+  // Wertung immer explizit ablegen: fehlt sie, greift beim Lesen der Default –
+  // gespeichert ist sie aber das, was beim Anlegen gewählt wurde.
+  const safeConfig: TournamentConfig = { ...(config ?? {}), scoring: resolveScoring(config) };
+
   const created = await prisma.tournament.create({
     data: {
       name: safeName,
       bestOf: toPrismaBestOf(bestOf),
       format: toPrismaFormat(effectiveFormat),
       mode: toPrismaMode(mode),
-      config: config ? (config as Prisma.InputJsonValue) : Prisma.JsonNull,
+      config: safeConfig as Prisma.InputJsonValue,
     },
   });
 
@@ -534,16 +554,7 @@ async function completeMatchImpl(tournamentId: string, matchId: string) {
   });
   if (!match) throw new UserError("Match nicht gefunden.");
 
-  const winnerTeam = computeMatchWinner(
-    match.sets.map((setEntry) => ({
-      setNumber: setEntry.setNumber,
-      scoreTeam1: setEntry.scoreTeam1,
-      scoreTeam2: setEntry.scoreTeam2,
-    })),
-    fromPrismaBestOf(match.round.tournament.bestOf),
-  );
-
-  if (!winnerTeam) throw new UserError("Noch kein gültiger Match-Sieger vorhanden.");
+  const winnerTeam = resolveMatchWinner(match, match.round.tournament);
 
   await prisma.match.update({
     where: { id: matchId },
@@ -599,15 +610,7 @@ async function saveAndCompleteMatchImpl(
     });
     if (!match) throw new UserError("Match nicht gefunden.");
 
-    const winnerTeam = computeMatchWinner(
-      match.sets.map((setEntry) => ({
-        setNumber: setEntry.setNumber,
-        scoreTeam1: setEntry.scoreTeam1,
-        scoreTeam2: setEntry.scoreTeam2,
-      })),
-      fromPrismaBestOf(match.round.tournament.bestOf),
-    );
-    if (!winnerTeam) throw new UserError("Noch kein gültiger Match-Sieger vorhanden.");
+    const winnerTeam = resolveMatchWinner(match, match.round.tournament);
 
     await tx.match.update({
       where: { id: matchId },

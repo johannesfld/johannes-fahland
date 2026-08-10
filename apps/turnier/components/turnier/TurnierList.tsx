@@ -18,8 +18,15 @@ import {
 import { cn } from "@/components/ui/styles";
 import { ToolShell } from "@/components/tool-shell/ToolShell";
 import {
+  DEFAULT_SCORING,
+  SCORING_HINTS,
+  SCORING_LABELS,
+  SCORING_ORDER,
+} from "@/lib/turnier/scoring";
+import {
   MODE_LABELS,
   type BestOf,
+  type ScoringMode,
   type TournamentFormat,
   type TournamentListItem,
   type TournamentMode,
@@ -84,11 +91,15 @@ export function TurnierList({ initialItems }: TurnierListProps) {
   const [bestOf, setBestOf] = useState<BestOf>(3);
   const [format, setFormat] = useState<TournamentFormat>("doubles");
   const [mode, setMode] = useState<TournamentMode>("round_robin");
+  const [scoring, setScoring] = useState<ScoringMode>(DEFAULT_SCORING);
   const [error, setError] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<TournamentListItem | null>(null);
 
   const doublesAllowed = MODE_SUPPORTS_DOUBLES[mode];
   const effectiveFormat: TournamentFormat = doublesAllowed ? format : "singles";
+  // Im reinen K.-o.-System muss jedes Match einen Sieger haben – dort ist die
+  // Wertung gegenstandslos.
+  const scoringRelevant = mode !== "knockout";
 
   function selectMode(next: TournamentMode) {
     setMode(next);
@@ -129,7 +140,7 @@ export function TurnierList({ initialItems }: TurnierListProps) {
       setError(message);
     };
 
-    void createTournament(safeName, bestOf, effectiveFormat, mode)
+    void createTournament(safeName, bestOf, effectiveFormat, mode, { scoring })
       .then((result) => {
         if (!result.ok) return undo(result.error);
         setItems((prev) =>
@@ -258,6 +269,40 @@ export function TurnierList({ initialItems }: TurnierListProps) {
                   );
                 })}
               </div>
+            </div>
+          ) : null}
+
+          {/* Wertung (nur wo Unentschieden möglich sind) */}
+          {scoringRelevant ? (
+            <div className="flex min-w-0 flex-col gap-2">
+              <p className={sectionLabel}>Wertung</p>
+              <div className="inline-flex w-fit max-w-full flex-wrap gap-1 rounded-full border border-[var(--vibe-line)] bg-[var(--vibe-bg-sunken)] p-1">
+                {SCORING_ORDER.map((option) => {
+                  const active = scoring === option;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setScoring(option)}
+                      aria-pressed={active}
+                      className={cn(
+                        pillToggle,
+                        active
+                          ? "bg-[var(--accent)] text-[var(--accent-ink)] shadow-[var(--vibe-shadow-clay)]"
+                          : "text-[var(--vibe-fg-muted)] [@media(hover:hover)]:hover:text-[var(--vibe-fg-base)]",
+                      )}
+                    >
+                      {SCORING_LABELS[option]}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-[var(--vibe-fg-faint)]">
+                {SCORING_HINTS[scoring]}{" "}
+                {mode === "groups_ko"
+                  ? "Unentschieden sind in der Gruppenphase eintragbar – K.-o.-Matches brauchen einen Sieger."
+                  : "Unentschieden (z. B. 11:11 oder 12:12) lassen sich direkt eintragen."}
+              </p>
             </div>
           ) : null}
 

@@ -16,8 +16,8 @@ import {
   submitSetScore,
   updateBestOf,
 } from "@/app/actions/turnier";
-import { getWinsPerTeam } from "@/components/turnier/logic";
-import { bestOfToWinsNeeded } from "@/lib/turnier/validation";
+import { computeMatchResult } from "@/components/turnier/logic";
+import { drawsAllowedForMatch } from "@/lib/turnier/scoring";
 import type {
   ActionResult,
   ApiEnvelope,
@@ -214,28 +214,28 @@ export function useTournament(tournamentId: string, initial: TournamentDetail) {
 
       saveAndCompleteMatch: (matchId: string, sets: MatchSet[]) =>
         mutate(
-          (state) => {
-            const winsNeeded = bestOfToWinsNeeded(state.bestOf);
-            const wins = getWinsPerTeam(sets);
-            const winnerTeam: 1 | 2 | null =
-              wins.team1 >= winsNeeded ? 1 : wins.team2 >= winsNeeded ? 2 : null;
-            return {
-              ...state,
-              rounds: state.rounds.map((round) => ({
-                ...round,
-                matches: round.matches.map((match) =>
-                  match.id === matchId
-                    ? {
-                        ...match,
-                        sets,
-                        status: winnerTeam ? ("completed" as const) : match.status,
-                        winnerTeam: winnerTeam ?? match.winnerTeam,
-                      }
-                    : match,
-                ),
-              })),
-            };
-          },
+          (state) => ({
+            ...state,
+            rounds: state.rounds.map((round) => ({
+              ...round,
+              matches: round.matches.map((match) => {
+                if (match.id !== matchId) return match;
+                // Unentschieden = abgeschlossen ohne Sieger; deshalb wird
+                // winnerTeam beim Abschluss immer neu gesetzt, nie nur ergänzt.
+                const result = computeMatchResult(
+                  sets,
+                  state.bestOf,
+                  drawsAllowedForMatch(state.mode, match.groupLabel),
+                );
+                return {
+                  ...match,
+                  sets,
+                  status: result.decided ? ("completed" as const) : match.status,
+                  winnerTeam: result.decided ? result.winnerTeam : match.winnerTeam,
+                };
+              }),
+            })),
+          }),
           () => saveAndCompleteMatch(tournamentId, matchId, sets),
         ),
 
